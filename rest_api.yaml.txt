@@ -1,0 +1,2411 @@
+swagger: '2.0'
+info:
+  title: EXWui REST API Documentation
+  description: 'Description of the public REST API interfaces of the Cubro Packetmaster
+    devices.
+
+    ### Some notes:
+
+    #### Dynamic parameters
+
+    In this document, parameters/Keys written in all-caps and in parentheses (e.g.
+    ''(EXAMPLE)'') are placeholders for keys with dynamic names. Three dots after
+    it ''...'' additionally indicate that multiple such fields are expected.
+
+    #### JSON parameter format
+
+    All function using the default HTTP parameter format also support JSON as an input
+    format format if the content type of the request is "application/json".
+
+    #### Authentication and Access Checks
+
+    If UAC (user authentication and access control) is activated the REST interface
+    can only be used if authenticated through an existing web UI user account. Authentication
+    is possible through either HTTP basic authentication or by setting the parameters
+    ''username'' and ''password''. Note that the console and web/REST users are totally
+    seperate. The default web/REST user account has the username ''admin'' and password
+    ''cubro'' (both without quotes).
+
+
+    An user account has a certain access level and REST methods might have minimum
+    level required. Three user level exist: READ (1), WRITE (7) and SUPER (31); in
+    the brackets are the numeric representations. Every level encompasses the levels
+    below it. A user is at least level 1 (READ).
+
+    #### Types
+
+    Sometimes, multiple types are possible for a parameter or returned in a response,
+    the type mentioned here always represents the most likely type used, e.g. a numeric
+    value for throughputs even if it can be ''n/a'' in case the port does yet not
+    exist for long enough.
+
+    #### Errors
+
+    Errors are normally returned using an error object with an ''error'' field but
+    in some cases it is possible that it is actually simply in the ''result'' field
+    of an result object. This is normally only the case if the error is not likely
+    to be dire for the user.
+
+    #### HTTP Methods
+
+    Instead of using the HTTP methods PUT/DELETE there is the possibility of using
+    POST together with the HTTP header `X-HTTP-Method-Override:<METHOD>` (where `<METHOD>`
+    stands for the PUT/DELETE to represent) instead.'
+  version: 2.0.0.30_04_V_d2Qg
+  contact:
+    email: support@cubro.net
+  license:
+    name: All rights reserved
+    url: ''
+basePath: /rest
+schemes:
+- http
+securityDefinitions:
+  Read_Rights_Required:
+    description: 'Read-only access to everything. Any user has at least this rights
+      level.
+
+
+      Numeric level: 1'
+    type: basic
+  Write_Rights_Required:
+    description: 'Can add/​change/​remove rules/​groups/apps, add/​change/​remove
+      rule save-points and set them as load-on-boot, reset counters, and change group
+      hashing methods used.
+
+
+      Numeric level: 7'
+    type: basic
+  Super_Rights_Required:
+    description: 'Can do everything, therefore has the ability to e.g. change port
+      settings, add/​change/​remove port save-points, import save-points, upgrade/​reboot
+      device, change IP/​label/​description, add/​change/​remove users, enable/​disable
+      user access checks and change any setting/​mode like the special protocol transparency
+      settings.
+
+
+      Numeric level: 31'
+    type: basic
+security:
+- Read_Rights_Required: []
+produces:
+- application/json
+paths:
+  /apps:
+    delete:
+      summary: Stops a running app
+      description: 'Stops an app instance.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: pid
+        in: query
+        description: PID of the app instance to be killed.
+        required: true
+        type: integer
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Returns all apps
+      description: Returns a list of all available apps
+      responses:
+        '200':
+          description: Map with apps with the keys being the app names. _(APPNAME)_
+            is a placeholder for the unique name of the app.
+          schema:
+            type: object
+            properties:
+              (APPNAME):
+                $ref: '#/definitions/App'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Starts an app
+      description: 'Starts an available app, creating a new instance.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of the app to start an instance of.
+        required: false
+        type: string
+      - name: userDescription
+        in: query
+        description: Custom description for the new instance of the app.
+        required: false
+        type: string
+      - name: (PARAM)...
+        in: query
+        description: _(PARAM)_ is a placeholder for any app-specific parameter.
+        required: false
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Modifies the parameters of an app instance
+      description: 'Modifies the parameters of an already running app.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: pid
+        in: query
+        description: PID of the app instance.
+        required: true
+        type: integer
+      - name: userDescription
+        in: query
+        description: Custom description for the new instance of the app.
+        required: false
+        type: string
+      - name: (PARAM)...
+        in: query
+        description: App parameter to change. _(PARAM)_ is a placeholder for any app-specific
+          parameter.
+        required: false
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /apps/action:
+    post:
+      summary: Calls a custom app action
+      description: 'Calls a custom app action.
+
+        An user level as required by the app might be necessary.'
+      parameters:
+      - name: pid
+        in: query
+        description: PID of the app instance
+        required: true
+        type: integer
+      - name: actionName
+        in: query
+        description: Name of the action to be called.
+        required: false
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /apps/running:
+    get:
+      summary: Returns all app instances
+      description: Returns all running apps (app instances)
+      responses:
+        '200':
+          description: Map with app instances with the keys being the PIDs. _(PID)_
+            is a placeholder for the unique ID of an app instance.
+          schema:
+            type: object
+            properties:
+              (PID):
+                $ref: '#/definitions/App'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/customident:
+    get:
+      summary: Returns the device label and notes
+      description: Returns the web UI device label and notes.
+      responses:
+        '200':
+          description: Device label and notes.
+          schema:
+            type: object
+            properties:
+              name:
+                description: Device label.
+                type: string
+              notes:
+                description: Device notes.
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Sets the device label and device notes
+      description: 'Sets the device label and device notes used in the web UI.
+
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: New device label.
+        required: true
+        type: string
+      - name: notes
+        in: query
+        description: New device notes.
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/generation:
+    get:
+      summary: Returns the generation
+      description: Returns the device model generation.
+      responses:
+        '200':
+          description: Device model generation information.
+          schema:
+            type: object
+            properties:
+              generation:
+                description: Generation of the model of device in use.
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/grouphash:
+    get:
+      summary: Returns a map of all supported group select hash keys and their states
+      description: Returns a map of all supported group select hash keys and their
+        states. The key is an hash key available on this device. The boolean value
+        indicates whether that hash key is used (_true_ = it is used).
+      responses:
+        '200':
+          description: map of all group select hash keys.
+          schema:
+            type: object
+            properties:
+              macsa:
+                description: Boolean value indicating whether MAC source address is
+                  used as a key.
+                type: boolean
+              macda:
+                description: Boolean value indicating whether MAC destination address
+                  is used as a key.
+                type: boolean
+              ethertype:
+                description: Boolean value indicating whether the ethertype value
+                  is used as a key.
+                type: boolean
+              ipsa:
+                description: Boolean value indicating whether the IP source address
+                  is used as a key.
+                type: boolean
+              ipda:
+                description: Boolean value indicating whether the IP destination address
+                  is used as a key.
+                type: boolean
+              ipProtocol:
+                description: Boolean value indicating whether the IP protocol number
+                  is used as a key.
+                type: boolean
+              srcPort:
+                description: Boolean value indicating whether the source port is used
+                  as a key.
+                type: boolean
+              dstPort:
+                description: Boolean value indicating whether the destination port
+                  is used as a key.
+                type: boolean
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Sets whether certain group select hash keys should be used or not
+      description: 'Sets whether certain group select hash keys should be used or
+        not.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: macsa
+        in: query
+        description: Boolean value indicating whether MAC source address should be
+          used as a key.
+        type: boolean
+      - name: macda
+        in: query
+        description: Boolean value indicating whether MAC destination address should
+          be used as a key.
+        type: boolean
+      - name: ethertype
+        in: query
+        description: Boolean value indicating whether the ethertype value should be
+          used as a key.
+        type: boolean
+      - name: ipsa
+        in: query
+        description: Boolean value indicating whether the IP source address should
+          be used as a key.
+        type: boolean
+      - name: ipda
+        in: query
+        description: Boolean value indicating whether the IP destination address should
+          be used as a key.
+        type: boolean
+      - name: ipProtocol
+        in: query
+        description: Boolean value indicating whether the IP protocol number should
+          be used as a key.
+        type: boolean
+      - name: srcPort
+        in: query
+        description: Boolean value indicating whether the source port should be used
+          as a key.
+        type: boolean
+      - name: dstPort
+        in: query
+        description: Boolean value indicating whether the destination port should
+          be used as a key.
+        type: boolean
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/idled:
+    get:
+      summary: Gets the device ID LED status
+      description: Shows whether the device ID LED is activated or not
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            type: object
+            properties:
+              activated:
+                type: boolean
+    post:
+      summary: Sets the device ID LED
+      description: 'Activates or deactivates the device ID LED
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: activated
+        in: query
+        description: true enables the LED, false disables it.
+        required: true
+        type: boolean
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/imageversion:
+    get:
+      summary: Returns the version of the active image
+      description: Returns the version of the active image.
+      responses:
+        '200':
+          description: Image version information.
+          schema:
+            type: object
+            properties:
+              version:
+                description: Version of image in use.
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/ipconfig:
+    get:
+      summary: Returns the IP config
+      description: Returns the current and stored IP configuration of the management
+        port.
+      responses:
+        '200':
+          description: IP configuration information.
+          schema:
+            type: object
+            properties:
+              current_ip:
+                description: Current IP address of the management port
+                type: string
+              current_netmask:
+                description: Current netmask of the management port
+                type: string
+              current_gateway:
+                description: Current default gateway of the management port
+                type: string
+              stored_ip:
+                description: IP address of the management port after reboot
+                type: string
+              stored_netmask:
+                description: Netmask of the management port after reboot
+                type: string
+              stored_gateway:
+                description: Default gateway of the management port after reboot
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Sets the IP config
+      description: 'Sets the current and stored (the one loaded on boot) IP configuration
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: ip
+        in: query
+        required: true
+        description: New IP address of the management port, e.g. '192.168.0.200' or
+          '169.254.254.42'.
+        type: string
+      - name: mask
+        in: query
+        required: true
+        description: New network mask of the management port, e.g. '255.255.0.0'.
+        type: string
+      - name: gw
+        in: query
+        required: true
+        description: New default gateway of the management port, e.g. '192.168.0.1'.
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/loadaverage:
+    get:
+      summary: Returns load information
+      description: Returns various information about the load on the OS, namely CPU
+        usage.
+      responses:
+        '200':
+          description: Load information.
+          schema:
+            type: object
+            properties:
+              average_1m:
+                description: Average CPU load over 1 minute.
+                type: number
+                format: double
+              average_5m:
+                description: Average CPU load over 5 minutes.
+                type: number
+                format: double
+              average_15m:
+                description: Average CPU load over 15 minutes.
+                type: number
+                format: double
+              proc_no_running:
+                description: Number of currenty running processes.
+                type: integer
+              proc_no_total:
+                description: Total number of processes.
+                type: integer
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/memoryusage:
+    get:
+      summary: Returns memory usage
+      description: Returns total and free amount of memory.
+      responses:
+        '200':
+          description: Memory usage information.
+          schema:
+            type: object
+            properties:
+              total:
+                description: Total memory in Kibibyte.
+                type: integer
+              free:
+                description: Free memory in Kibibyte.
+                type: integer
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/model:
+    get:
+      summary: Returns the device model
+      description: Returns the device model.
+      responses:
+        '200':
+          description: Device model information.
+          schema:
+            type: object
+            properties:
+              model:
+                description: Model of the device.
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/name:
+    get:
+      summary: Returns the device label
+      description: Returns the device label used in the web UI.
+      responses:
+        '200':
+          description: Device label.
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Sets the device label
+      description: 'Sets the device label used in the web UI, the one displayed in
+        the right-left there.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: devicename
+        in: query
+        description: New device name.
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/permanentrulesmode:
+    get:
+      summary: Returns state of permanent mode
+      description: Returns the state of the permanent mode. Permanent mode means that
+        the active rules/groups are always permanent and remain throughout reboots.
+      responses:
+        '200':
+          description: Permanent rules mode.
+          schema:
+            type: object
+            properties:
+              state:
+                type: boolean
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Sets the permanent mode
+      description: 'Sets the permanent mode.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: state
+        in: query
+        description: New state of permanent mode, true = on.
+        required: true
+        type: boolean
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/reboot:
+    post:
+      summary: Device reboot
+      description: 'Reboots the device right away.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      responses:
+        '200':
+          description: Result state (device might reboot before returning it)
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/rulestoragemode:
+    get:
+      summary: Returns the rule storage mode setting
+      description: Returns the rule storage mode setting.
+      responses:
+        '200':
+          description: Rule storage mode ("simple"/"ipv6").
+          schema:
+            type: object
+            properties:
+              modeCurrent:
+                description: Currently active rule storage mode.
+                type: string
+                enum:
+                - simple
+                - ipv6
+              modeNext:
+                description: Rule storage mode after reboot.
+                type: string
+                enum:
+                - simple
+                - ipv6
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Sets the rule storage mode
+      description: 'Sets the rule storage mode, might affect the matching and action
+        capabilities of some devices, e.g. concerning IPv6.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: mode
+        in: query
+        description: New rule storage mode ('simple' or 'ipv6').
+        required: true
+        type: string
+        enum:
+        - simple
+        - ipv6
+      responses:
+        '200':
+          description: Rule storage mode ('simple' or 'ipv6').
+          schema:
+            type: object
+            properties:
+              modeCurrent:
+                description: Currently active rule storage mode (the newly activated
+                  one)
+                type: string
+                enum:
+                - simple
+                - ipv6
+              modeNext:
+                description: Rule storage mode after reboot.
+                type: string
+                enum:
+                - simple
+                - ipv6
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/serialno:
+    get:
+      summary: Returns the serial number
+      description: Returns the serial number of the device.
+      responses:
+        '200':
+          description: Serial number information.
+          schema:
+            type: object
+            properties:
+              generation:
+                description: Serial no. of the device in use.
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/serverrevision:
+    get:
+      summary: Returns the revision
+      description: Returns the revision.
+      responses:
+        '200':
+          description: Revision information.
+          schema:
+            type: object
+            properties:
+              revision:
+                description: Revision of cch machinery in use.
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/specialprotocoltransparencies:
+    get:
+      summary: Returns the protocol transparency settings
+      description: Returns the protocol transparency settings.
+      responses:
+        '200':
+          description: Transparency settings, true = transparency enabled.
+          schema:
+            type: object
+            properties:
+              lacp:
+                description: Boolean value indicating whether LACP (and similar) is
+                  set to be transparent to the device (not being parsed)
+                type: boolean
+              mpls:
+                description: Boolean value indicating whether MPLS(M) is set to be
+                  transparent to the device (not being parsed)
+                type: boolean
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Sets the protocol transparency settings
+      description: 'Sets the different protocol transparency settings.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: lacp
+        in: query
+        description: Boolean value indicating whether LACP (and similar) is set to
+          be transparent to the device (not being parsed)
+        required: true
+        type: boolean
+      - name: mpls
+        in: query
+        description: Boolean value indicating whether MPLS(M) is set to be transparent
+          to the device (not being parsed)
+        required: true
+        type: boolean
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/telnet:
+    get:
+      summary: Gets the device ID LED status
+      description: Shows whether the device ID LED is activated or not
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            type: object
+            properties:
+              activated:
+                type: boolean
+    post:
+      summary: Gets the device ID LED status
+      description: Shows whether the device ID LED is activated or not
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            type: object
+            properties:
+              activated:
+                type: boolean
+  /flownumbers:
+    get:
+      summary: Returns the maximum and currently used amount of TCAM flows
+      description: Returns the maximum and currently used amount of TCAM flows. (Note
+        that the maximum is only a lower bound of what is at least supported by all
+        rules possible, depending on the rules overstepping it to some extend it might
+        still be possible.)
+      responses:
+        '200':
+          description: TCAM flow count info.
+          schema:
+            type: object
+            properties:
+              used_flows:
+                description: Number of TCAM flows currently utilized by the active
+                  rules.
+                type: integer
+              maximum_flows:
+                description: Total number of TCAM flows (at least) supported.
+                type: integer
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /groups:
+    delete:
+      summary: Deletes a group
+      description: 'Deletes an existing group specified by the group id given in ''gid''.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: group_id
+        in: query
+        description: ID of the group to be deleted.
+        required: true
+        type: integer
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Adds a group
+      description: 'Adds a group. Also deletes all rules which have this group as
+        an action.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      consumes:
+      - application/json
+      parameters:
+      - name: body
+        in: body
+        description: Groups JSON
+        required: true
+        schema:
+          $ref: '#/definitions/GroupInput'
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Modifies a group
+      description: 'Modifies an existing group matched by its group ID.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      consumes:
+      - application/json
+      parameters:
+      - name: body
+        in: body
+        description: Groups JSON
+        required: true
+        schema:
+          $ref: '#/definitions/GroupInput'
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /groups/all:
+    delete:
+      summary: Deletes all active groups
+      description: 'Deletes all active groups. Also deletes all rules which have any
+        group as an action.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Returns all currently active groups on the device
+      description: Returns all currently active groups on the device.
+      responses:
+        '200':
+          description: Object with active groups.
+          schema:
+            type: object
+            properties:
+              rules:
+                type: array
+                items:
+                  $ref: '#/definitions/GroupOutput'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /ports/config:
+    get:
+      summary: Returns port configurations
+      description: Returns the configuration of all ports.
+      responses:
+        '200':
+          description: Port configs.
+          schema:
+            type: object
+            properties:
+              port_config:
+                $ref: '#/definitions/PortConfig'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Configures a port
+      description: 'Sets the configuration of one port to the given values.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: if_name
+        in: query
+        description: Interface ID, e.g. "1/1"
+        required: true
+        type: string
+      - name: speed
+        in: query
+        description: Speed setting, can be "10", "100", "1000", "10G", "40G", "100G",
+          or "auto"
+        required: false
+        type: string
+        enum:
+        - 10
+        - 100
+        - 1000
+        - 10G
+        - 40G
+        - 100G
+        - auto
+      - name: duplex
+        in: query
+        description: Duplex setting, can be _full_, _half_, or _auto_.
+        required: false
+        type: string
+        enum:
+        - full
+        - half
+        - auto
+      - name: unidirectional
+        in: query
+        description: Whether to be in unidirectional mode where TX is forced to be
+          up, irrespective of the actual link state.
+        required: false
+        type: boolean
+      - name: crc_check
+        in: query
+        description: Whether to accept incoming packets with invalid checksums.
+        required: false
+        type: boolean
+      - name: crc_recalculation
+        in: query
+        description: Whether to correct the checksum of outgoing packets (e.g. after
+          modifications like truncations).
+        required: false
+        type: boolean
+      - name: xg_speed
+        in: query
+        description: Speed level, 1G/XG (XG normally means 10G) for devices which
+          need to reboot for it to take effect
+        required: false
+        type: string
+        enum:
+        - 1G
+        - XG
+      - name: shutdown
+        in: query
+        description: Boolean controlling whether interface is shut down, otherwise
+          it is up
+        required: false
+        type: boolean
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /ports/counters:
+    delete:
+      summary: Resets rule counters
+      description: 'Resets all counters of all rules.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /ports/info:
+    get:
+      summary: Returns status of the ports
+      description: Returns status and other information about the ports.
+      responses:
+        '200':
+          description: Port info.
+          schema:
+            type: object
+            properties:
+              result:
+                type: object
+                properties:
+                  port_no:
+                    description: Port ID, e.g. eth-0-1.
+                    type: string
+                    example: eth-0-1
+                  if_name:
+                    description: Interface name.
+                    type: string
+                  admin_status:
+                    description: Set port status
+                    type: string
+                    enum:
+                    - PORT_UP
+                    - PORT_DOWN
+                  link_status:
+                    description: Link status.
+                    type: string
+                    enum:
+                    - LINK_UP
+                    - LINK_DOWN
+                  duplex:
+                    description: Current duplex status, and duplex setting in parentheses
+                    type: string
+                  mac_addr:
+                    description: MAC address of the interface, hex bytes seperated
+                      using colons
+                    type: string
+                  speed:
+                    description: Current speed, and speed setting in parentheses,
+                      e.g. 1Gb (auto)
+                    type: string
+                    example: 1Gb (auto)
+            example:
+              result:
+              - type: object
+                properties:
+                  port_no: 1
+                  link_status: LINK_UP
+                  duplex: Full (auto)
+                  if_name: eth-0-1
+                  admin_status: PORT_UP
+                  mac_addr: 00:1e:08:0a:0d:78
+                  speed: 1Gb (auto)
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /ports/sfpstatus:
+    get:
+      summary: Returns information about the SFPs
+      description: Returns the status of all SFPs.
+      responses:
+        '200':
+          description: Port counters.
+          schema:
+            type: object
+            properties:
+              result:
+                description: All the SFP info formatted for fixed-width display (e.g.
+                  a terminal)
+                type: string
+            example:
+              result: "Port port-6 transceiver info: \nTransceiver Type: 1000BASE-T\n\
+                \ Transceiver Vendor Name : CISCO-FINISAR   \n Transceiver PN    \
+                \      : GEGB3RC-C       \n Transceiver S/N         : EC1501064242\
+                \    \nTransceiver Output Wavelength: N/A\nSupported Link Type and\
+                \ Length: \n      Link Length for copper: 100 m\nDigital diagnostic\
+                \ is not implemented.\n"
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /ports/stats:
+    get:
+      summary: Returns the counters of all ports
+      description: Returns the counters of all ports.
+      responses:
+        '200':
+          description: Port counters.
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                portnum:
+                  description: ID of the port
+                  type: string
+                rxpkts:
+                  description: Number of received packets
+                  type: integer
+                rxbytes:
+                  description: Number of received bytes
+                  type: integer
+                rxdrop:
+                  description: Number of packets dropped on receiving
+                  type: integer
+                rxerrs:
+                  description: Total number of packets dropped due to rx errors (sum
+                    or greater than rxframe+rxover+rxcrc)
+                  type: integer
+                rxframe:
+                  description: Number of packets dropped due to frame alignment errors
+                  type: integer
+                rxover:
+                  description: Number of packets dropped due to rx overrun
+                  type: integer
+                rxcrc:
+                  description: Number of packets dropped due to CRC errors
+                  type: integer
+                txpkts:
+                  description: Number of transmitted packets
+                  type: integer
+                txbytes:
+                  description: Number of transmitted bytes
+                  type: integer
+                txdrop:
+                  description: Number of packets dropped on sending
+                  type: integer
+                txerrs:
+                  description: Total number of packets dropped due to tx errors (equal
+                    or greater than txcoll)
+                  type: integer
+                txcoll:
+                  description: Number of packets dropped due to collisions
+                  type: integer
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /rules:
+    delete:
+      summary: Deletes a rule
+      description: 'Deletes the specified rule. A rule is identified by all match
+        fields (including priority), all other fields are ignored and can be omitted.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: priority
+        in: query
+        description: Priority of the rule to delete.
+        required: true
+        type: integer
+        minimum: 0
+        maximum: 65535
+      - name: match[(MATCH_FIELD)]...
+        in: query
+        description: '(MATCH_FIELD) is placeholder for fields like ''in_port'' which
+          make up the match of a rule and this way unambiguously identify it (together
+          with the priority).
+
+          Depending on the match field in question the value might not matter and
+          can be set to ''''.'
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Adds a rule
+      description: 'Adds the given rule.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of the rule.
+        required: true
+        type: string
+      - name: description
+        in: query
+        description: Description of the rule.
+        required: true
+        type: string
+      - name: priority
+        in: query
+        description: Priority of the rule. Higher priority rules are tried first,
+          each packet can only be matched by a single rule.
+        required: true
+        type: integer
+        minimum: 0
+        maximum: 65535
+      - name: match[(MATCH_FIELD)]...
+        in: query
+        description: (MATCH_FIELD) is placeholder for fields like 'in_port' which
+          make up the match of a rule and this way unambiguously identify it (together
+          with the priority).
+        required: true
+        type: string
+      - name: actions
+        in: query
+        description: String with all actions (order matters!) seperated by ','.
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Modifies a rule
+      description: 'Modifies an existing rule. Modifies the actions, the name or the
+        description of a specified rule. The rule is identified by its match fields
+        (including priority). The match (including priority) cannot be modified.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: New name of the rule.
+        required: true
+        type: string
+      - name: description
+        in: query
+        description: New description of the rule.
+        required: true
+        type: string
+      - name: priority
+        in: query
+        description: Priority of the rule to edit.
+        required: true
+        type: integer
+        minimum: 0
+        maximum: 65535
+      - name: match[(MATCH_FIELD)]...
+        in: query
+        description: '(MATCH_FIELD) is placeholder for fields like ''in_port'' which
+          make up the match of a rule and this way unambiguously identify it (together
+          with the priority).
+
+          Depending on the match field in question the value might not matter and
+          can be set to ''''.'
+        required: true
+        type: string
+      - name: actions
+        in: query
+        description: New string of all actions (order matters!), seperated by ','.
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /rules/all:
+    delete:
+      summary: Deletes all rules
+      description: Deletes all active rules.
+      security:
+      - Write_Rights_Required: []
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Returns all rules
+      description: Returns all active rules on this device.
+      responses:
+        '200':
+          description: An object containing all active rules on this device.
+          schema:
+            type: object
+            properties:
+              rules:
+                type: array
+                items:
+                  $ref: '#/definitions/RuleOutput'
+              used_flows:
+                type: integer
+                description: Number of TCAM flows utilized.
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /rules/counters:
+    delete:
+      summary: Resets all rule counters
+      description: 'Resets the packet and byte counters of all rules.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints:
+    get:
+      summary: Returns all rule and port save-points
+      description: Returns all rule and port save-points.
+      responses:
+        '200':
+          description: Rule and port save-points.
+          schema:
+            type: object
+            properties:
+              RuleSavePoints:
+                type: array
+                items:
+                  $ref: '#/definitions/RuleSavePoint'
+              PortSavePoints:
+                type: array
+                items:
+                  $ref: '#/definitions/PortSavePoint'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/activeportsavepoint:
+    put:
+      summary: Activates a port save-point
+      description: 'Activates a port save-point with the given name.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of the port save point to activate.
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/activerulesavepoint:
+    put:
+      summary: Activates a rule save-point
+      description: 'Activates a rule save-point with the given name making all rules
+        and group active (or at least trying to, success depends on e.g. whether it
+        matches the current port settings). Does not make the rule save-point permanent.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of the port save point to activate
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/defaultrulesavepoint:
+    put:
+      summary: Sets a rule save-point to be loaded on boot
+      description: 'Sets the rule save-point with the given name to be loaded on boot
+        Does not make it active before next boot. There can be only one to be loaded
+        on boot.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of the port save point to set to be loaded on boot
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/export:
+    get:
+      summary: Returns selected rule and port save-points
+      description: Returns selected rule and port save-points (selected by names).
+      parameters:
+      - name: ruleSavePointNames
+        in: query
+        description: Rule save-points to be exported.
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+      - name: portSavePointNames
+        in: query
+        description: Port save-points to be exported.
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+      responses:
+        '200':
+          description: Rule and port save-points.
+          schema:
+            type: object
+            properties:
+              RuleSavePoints:
+                type: array
+                items:
+                  $ref: '#/definitions/RuleSavePoint'
+              PortSavePoints:
+                type: array
+                items:
+                  $ref: '#/definitions/PortSavePoint'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/modportsavepoint:
+    post:
+      summary: Modifies an existing port save-point
+      description: 'Renames the port save-point with the given name given in "oldname"
+        to the name given in "newname". If the "saveports" parameter is equal to "true"
+        the the currently active ports get saved into this port save point, thereby
+        overwriting all existing ports in that save-point. Also modifies the description
+        to the and the description given in "description". The description will not
+        be modified if the "description" parameter is not set or "null".
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: oldname
+        in: query
+        description: Existing name of the port save point
+        required: true
+        type: string
+      - name: newname
+        in: query
+        description: New name of the port save point
+        required: true
+        type: string
+      - name: description
+        in: query
+        description: Description of port save point (default is empty)
+        required: false
+        type: string
+      - name: saveports
+        in: query
+        description: If "true" (which is the default), save the currently active ports
+          into this save-point
+        required: false
+        type: boolean
+      responses:
+        '200':
+          description: Port save point in question.
+          schema:
+            type: object
+            properties:
+              portSavePoints:
+                type: array
+                items:
+                  $ref: '#/definitions/PortSavePoint'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/modrulesavepoint:
+    post:
+      summary: Modifies an existing rule save-point
+      description: 'Modifies an existing rule save-point. Renames the rule save-point
+        with the given name given in "oldname" to the name given in "newname". If
+        the "saverules" parameter is equal to "true" the the currently active rules
+        get saved into this rule save point, thereby overwriting all existing rules
+        in that save-point. Also modifies the description to the and the description
+        given in "description". The description will not be modified if the "description"
+        parameter is not set or "null".
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: oldname
+        in: query
+        description: Existing name of the rule save point
+        required: true
+        type: string
+      - name: newname
+        in: query
+        description: New name of the rule save point
+        required: true
+        type: string
+      - name: description
+        in: query
+        description: Description of rule save point (default is empty)
+        required: false
+        type: string
+      - name: saverules
+        in: query
+        description: If "true" (which is the default), save the currently active rules
+          into this save-point
+        required: false
+        type: boolean
+      responses:
+        '200':
+          description: Rule save point in question.
+          schema:
+            $ref: '#/definitions/RuleSavePoint'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/portsavepoint:
+    delete:
+      summary: Deletes a port save-point
+      description: 'Deletes the port save-point with the given name if it exists.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of the port save point to delete
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a new port save-point from current port settings
+      description: 'Saves the current port config into a new port save-point with
+        the name given in "name" and the description given in "description". Returns
+        the new port save-point.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of new rule save point.
+        required: false
+        type: string
+      - name: description
+        in: query
+        description: Description of new rule save point.
+        required: false
+        type: string
+      responses:
+        '200':
+          description: New port save point.
+          schema:
+            $ref: '#/definitions/PortSavePoint'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/quicksaverules:
+    put:
+      summary: From current rules/groups creates a 'Quicksave' rule save-point set
+        to load on boot
+      description: 'Saves the currently active rules and groups into a rule save-point
+        with the name ''Quicksave'' which will be set to load on boot. Any already
+        existing rule save-point by this name will be replaced.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      responses:
+        '200':
+          description: The rule save-point in question.
+          schema:
+            type: object
+            properties:
+              RuleSavePoints:
+                type: array
+                items:
+                  $ref: '#/definitions/RuleSavePoint'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /savepoints/rulesavepoint:
+    delete:
+      summary: Deletes a rule save-point
+      description: 'Deletes the rule save-point with the given name if it exists.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of the rule save point to delete
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a new rule save-point from current rules/groups
+      description: 'Saves the currently active rules and groups into a new rule save-point
+        with the name given in "name" and the description given in "description".
+        Returns the new rule save-point.
+
+        User level has to be higher or equal to WRITE.'
+      security:
+      - Write_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        description: Name of new rule save point.
+        required: false
+        type: string
+      - name: description
+        in: query
+        description: Description of new rule save point.
+        required: false
+        type: string
+      responses:
+        '200':
+          description: New rule save point.
+          schema:
+            $ref: '#/definitions/RuleSavePoint'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /uac:
+    get:
+      summary: Returns the UAC state
+      description: Returns the state of the UAC (mandatory user authentication and
+        access control) setting, whether it is enabled or not.
+      responses:
+        '200':
+          description: UAC state.
+          schema:
+            type: object
+            properties:
+              state:
+                description: Boolean value indicating whether user access control
+                  is activated (true = on).
+                type: boolean
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Sets the UAC state
+      description: 'Sets the state of UAC (mandatory user authentication and access
+        control).
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: state
+        in: query
+        required: true
+        description: New UAC state, true = active mandatory auth. and access control
+        type: boolean
+      responses:
+        '200':
+          description: UAC state.
+          schema:
+            type: object
+            properties:
+              state:
+                description: Boolean value indicating whether user access control
+                  is activated (true = on).
+                type: boolean
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /users:
+    delete:
+      summary: Deletes an user
+      description: 'Deletes a web UI user account.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: name
+        in: query
+        required: true
+        description: User name of the account to delete.
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Returns all users
+      description: Returns all web UI user accounts.
+      responses:
+        '200':
+          description: User accounts.
+          schema:
+            type: object
+            properties:
+              (USER_NAME):
+                description: User name info object, (USER_NAME) stands for the user
+                  in question.
+                type: object
+                properties:
+                  userid:
+                    description: Internal user ID.
+                    type: integer
+                  username:
+                    description: Username.
+                    type: string
+                  accesslevel:
+                    description: Access level; 1 = READ, 7 = WRITE, 31 = SUPER.
+                    type: integer
+                    enum:
+                    - 1
+                    - 7
+                    - 31
+                  description:
+                    description: User account description.
+                    type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Adds an user
+      description: 'Adds a web UI user account.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: username
+        in: query
+        required: true
+        description: New user name.
+        type: string
+      - name: accesslevel
+        in: query
+        required: true
+        description: New access level; 1 = READ, 7 = WRITE, 31 = SUPER.
+        type: integer
+        enum:
+        - 1
+        - 7
+        - 31
+      - name: password
+        in: query
+        required: true
+        description: New password.
+        type: string
+      - name: description
+        in: query
+        required: true
+        description: New user account descriptions.
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Modifies an user
+      description: 'Modifies an existing web UI user account.
+
+        User level has to be higher or equal to SUPER.'
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: username
+        in: query
+        required: true
+        description: Current user name.
+        type: string
+      - name: newUsername
+        in: query
+        required: true
+        description: New user name.
+        type: string
+      - name: password
+        in: query
+        required: false
+        description: New password.
+        type: string
+      - name: description
+        in: query
+        required: true
+        description: New user account description.
+        type: string
+      - name: accesslevel
+        in: query
+        required: false
+        description: New access level; 1 = READ, 7 = WRITE, 31 = SUPER.
+        type: integer
+        enum:
+        - 1
+        - 7
+        - 31
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /weblog:
+    get:
+      summary: Returns the logs
+      description: Returns the (cch) logs.
+      responses:
+        '200':
+          description: Log entries.
+          schema:
+            type: object
+            properties:
+              logs:
+                type: array
+                items:
+                  description: Log entry.
+                  type: string
+              systemDateTime:
+                description: Date and time of the device.
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Error:
+    type: object
+    properties:
+      error:
+        description: Error info
+        type: string
+  Result:
+    type: object
+    properties:
+      result:
+        description: Result info, on success often just 'OK'
+        type: string
+    example:
+      result: OK
+  RuleOutput:
+    type: object
+    properties:
+      cookie:
+        type: integer
+        description: internal ID, maps information like name and description to a
+          rule
+      name:
+        type: string
+        description: Name of the rule
+      description:
+        type: string
+        description: Description of the rule
+      priority:
+        type: string
+        description: Priority value. Higher priority rules are tried first, each packet
+          can only be matched by a single rule.
+      match:
+        description: Match object with fields that make up match. Some match fields
+          have are only keys, so their values will simply be empty strings.
+        type: object
+        additionalProperties: {}
+      actions:
+        type: string
+        description: Actions of this rule in a string seperated using commas
+      datarate:
+        type: string
+        description: Data rate in a human-readable format
+      n_bytes:
+        type: string
+        description: Total byte size of all packets matched by this rule
+      n_packets:
+        type: string
+        description: Number of packets that were handled by this rule
+      real_flow_ct:
+        type: integer
+        description: Number of TCAM flows used
+    example:
+      cookie: 1152921504606846978
+      name: example
+      description: just an example
+      priority: 32768
+      match:
+        in_port: 1
+      actions: output:2
+      datarate: 0 bit/s
+      datarate_raw: 0.0
+      n_bytes: 0
+      n_packets: 0
+      real_flow_ct: 1
+  GroupOutput:
+    type: object
+    properties:
+      group_id:
+        description: Unique integer ID of the group
+        type: integer
+      type:
+        description: _select_ for loadbalancing, _ff_ for fast failover, _all_ for
+          cloning the traffic and executing all buckets
+        type: string
+      buckets:
+        description: Bucket-related properties
+        type: array
+        items:
+          type: object
+          properties:
+            watch_port:
+              description: ID of the watch_port
+              type: string
+            actions:
+              description: String containing all actions of that bucket
+              type: string
+    example:
+      buckets:
+      - actions: push_vlan:0x8100, set_field:4->vlan_vid, output:2
+        watch_port: 3
+      - actions: push_vlan:0x8100, set_field:7->vlan_vid, output:5
+        watch_port: 6
+      group_id: 1
+      type: ALL
+      description: test
+  GroupInput:
+    type: string
+    description: (GID) stands for the group number.
+    example:
+      (GID):
+        group_id: <Unique ID of the group>
+        type: <'select' for loadbalancing; 'ff' for fast failover; 'all' clones the
+          traffic and executes all buckets>
+        buckets:
+        - watch_port: <ID of the watch port>
+          actions: <Actions for that bucket, similar to rule actions, seperated using
+            commas>
+  PortSavePoint:
+    type: object
+    description: (PORT_SAVE_POINT) is a placeholder for the name of the port save-point
+    properties:
+      (PORT_SAVE_POINT)...:
+        type: object
+        properties:
+          name:
+            type: string
+            enum:
+            - (PORT_SAVE_POINT)
+          ports:
+            type: array
+            items:
+              $ref: '#/definitions/PortConfig'
+          readonly:
+            description: _true_ if the port save-point cannot be edited/deleted.
+            type: boolean
+          type:
+            type: string
+            enum:
+            - PortSavePoint
+          description:
+            description: Port save-point description
+            type: string
+  RuleSavePoint:
+    type: object
+    description: (RULE_SAVE_POINT) is a placeholder for the name of the rule save-point
+    properties:
+      (RULE_SAVE_POINT)...:
+        type: object
+        properties:
+          name:
+            type: string
+            enum:
+            - (RULE_SAVE_POINT)
+          rules:
+            type: array
+            items:
+              $ref: '#/definitions/RuleOutput'
+          groupusage:
+            description: How many groups this rule save-point utilizes.
+            type: integer
+          readonly:
+            description: _true_ if the port save-point cannot be edited/deleted.
+            type: boolean
+          groups:
+            type: array
+            items:
+              $ref: '#/definitions/GroupOutput'
+          type:
+            type: string
+            enum:
+            - RuleSavePoint
+          flowusage:
+            description: How many TCAM flows this rule save-point utilizes.
+            type: integer
+          description:
+            description: Rule save-point description
+            type: string
+    example:
+      Factory Default:
+        rules:
+        - n_packets: '0'
+          name: ''
+          n_bytes: '0'
+          hard_age: ''
+          actions:
+          - output:2
+          - output:3
+          duration_raw: '49.145'
+          priority: '32768'
+          cookie: '1152921504606846982'
+          duration: 49s
+          table: '0'
+          real_flow_ct: 1
+          match:
+            in_port: '1'
+          description: ''
+        - n_packets: '0'
+          name: ''
+          n_bytes: '0'
+          hard_age: ''
+          actions:
+          - output:4
+          - output:5
+          duration_raw: '61.094'
+          priority: '32768'
+          cookie: '1152921504606846980'
+          duration: 61s
+          table: '0'
+          real_flow_ct: 1
+          match:
+            in_port: '6'
+          description: ''
+        - n_packets: '0'
+          name: ''
+          n_bytes: '0'
+          hard_age: ''
+          actions:
+          - output:4
+          - output:6
+          duration_raw: '55.819'
+          priority: '32768'
+          cookie: '1152921504606846981'
+          duration: 55s
+          table: '0'
+          real_flow_ct: 1
+          match:
+            in_port: '5'
+          description: ''
+        - n_packets: '0'
+          name: ''
+          n_bytes: '0'
+          hard_age: ''
+          actions:
+          - output:1
+          - output:3
+          duration_raw: '45.061'
+          priority: '32768'
+          cookie: '1152921504606846983'
+          duration: 45s
+          table: '0'
+          real_flow_ct: 1
+          match:
+            in_port: '2'
+          description: ''
+        groupusage: 1
+        readonly: false
+        groups:
+        - buckets:
+          - actions: output:1
+            watch_port: '1'
+          group_id: '1'
+          type: ALL
+          description: ''
+        type: RuleSavePoint
+        flowusage: 4
+        description: Taps the connection between ports 1 and 2 to port 3. Also taps
+          the connection between ports 5 and 6 to port 4. Does not affect the port
+          configuration.
+  App:
+    type: object
+    properties:
+      canBeInstantiated:
+        description: Whether an instance of the app can be started. False e.g. for
+          apps which for which there can be only one instance running at the same
+          time and this currently being the case.
+        type: boolean
+      paramFormat:
+        type: array
+        items:
+          type: string
+        minItems: 5
+        maxItems: 5
+        description: 'Tuple consisting of:
+
+          * Internal unique parameter name.
+
+          * Human-readable name of the parameter.
+
+          * Input Type.
+
+          * Help text.
+
+          * JS code. If the result of executing this code is _false_ then this field
+          is to be hidden.
+
+          * Default value of this field.'
+      name:
+        description: Name of the app.
+        type: string
+      actions:
+        type: array
+        items:
+        - type: array
+          minItems: 5
+          maxItems: 5
+          items:
+            type: string
+          description: 'Tuple consisting of:
+
+            * Name
+
+            * Glyphicon
+
+            * Color
+
+            * Help text
+
+            * Minimal access level required'
+      description:
+        description: Description of the app.
+        type: string
+  PortConfig:
+    description: Port config.
+    type: object
+    required:
+    - if_name
+    - type
+    - shutdown
+    properties:
+      if_name:
+        description: Interface ID, e.g. "1" or "1/1".
+        type: string
+        example: 1/1
+      type:
+        description: '1. RJ45;
+
+          2. SFP, 1G only;
+
+          3. Switchabe RJ45 to SFP, 1G only;
+
+          4. SFP, 1G or 10G, changing speed requires reboot;
+
+          5. SFP, 10G only;
+
+          6. QSFP, 40G, splittable to 4x10G or 4x1G (breakout cable). Splitting requires
+          reboot;
+
+          7. QSFP, 40G or 100G, splittable to 4x10G or 4x1G (breakout cable). Splitting
+          requires reboot;
+
+          8. QSFP, 40G, splittable to 4x10G or 4x1G (breakout cable or SFP port).
+          Splitting requires reboot;
+
+          9. Split version of type 8, split to SFP port. 1G or 10G. Unsplitting requires
+          reboot;
+
+          10. Split version of port 6, 7 or 8, split to breakout cable. 1G or 10G.
+          Unsplitting requires reboot;
+
+          11. SFP, 1G or 10G, changing speed does not require reboot'
+        type: integer
+        minimum: 1
+        maximum: 11
+      media_type:
+        description: Optional field media type, any of ["sfp", "rj45", "auto"]
+        type: string
+        enum:
+        - sfp
+        - rj45
+        - auto
+      speed:
+        description: Speed setting, can be "10", "100", "1000", "10G", "40G", "100G",
+          or "auto"
+        type: string
+        enum:
+        - 10
+        - 100
+        - 1000
+        - 10G
+        - 100G
+        - auto
+      duplex:
+        description: Duplex setting, can be _full_, _half_, or _auto_
+        type: string
+        enum:
+        - full
+        - half
+        - auto
+      xg_speed:
+        description: Speed level, 1G/XG (XG normally means 10G) for devices which
+          need to reboot for it to take effect
+        type: object
+        properties:
+          currSetting:
+            description: Current setting.
+            type: string
+            enum:
+            - 1G
+            - XG
+          nextSetting:
+            description: Setting after reboot.
+            type: string
+            enum:
+            - 1G
+            - XG
+      split:
+        description: Whether splittable port is split, can be _break-out_ (split to
+          breakout cable, type 6/7/8 only), _sfp_ (split to breakout cable, type 8
+          only), or _default_
+        type: string
+        enum:
+        - break-out
+        - sfp
+        - default
+      shutdown:
+        description: Boolean controlling whether interface is shut down, otherwise
+          it is up
+        type: boolean
+    example:
+      duplex: auto
+      speed: auto
+      mediaType: auto-select
+      shutdown: false
+      ifName: '1'
+      type: 1
