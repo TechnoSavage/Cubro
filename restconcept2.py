@@ -1,4 +1,4 @@
-#Python2.7 Cubro Packetmaster REST proof of concept v2.0.  Written by Derek Burke 11/2016
+#Use with firmware version 2.0.0.x or earlier. Python2.7 Cubro Packetmaster REST proof of concept v2.0.  Written by Derek Burke 11/2016
 #Use a Packetmaster to detect the presence of an excessive amount of ICMP packets on a link and drop ICMP packets for one minute if they exceed threshold.
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json, time

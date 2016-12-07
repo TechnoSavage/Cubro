@@ -1,4 +1,4 @@
-#Python2.7 Cubro Packetmaster REST proof of concept v2.0.  Written by Derek Burke 11/2016
+#Use with firmware version 2.0.0.x or earlier. Python2.7 Cubro Packetmaster REST proof of concept v2.0.  Written by Derek Burke 11/2016
 #Use Packetmaster A to detect the presence of a given IP address and, upon detection, issue a rule to Packetmaster B: see below for Packetmaster Confguration.
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json, time

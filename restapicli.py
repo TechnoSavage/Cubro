@@ -1,4 +1,4 @@
-#Python2.7 Cubro Packetmaster REST API demo.  Written by Derek Burke 10/2016
+#Use with firmware version 2.0.0.x or earlier. Python2.7 Cubro Packetmaster REST API demo.  Written by Derek Burke 10/2016
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json
 
@@ -97,13 +97,12 @@ def checkmenu():
               8 - Port Counters
               9 - SFP Status
              10 - Show Rules
-             11 - Rule Counters
-             12 - List Apps
-             13 - List Running Apps
-             14 - Print Save Points \n'''
+             11 - List Apps
+             12 - List Running Apps
+             13 - Print Save Points \n'''
     userselect = raw_input('Enter the number of the selection to check: ')
     choice = userselect
-    if int(choice) >= 1 and int(choice) <= 14:
+    if int(choice) >= 1 and int(choice) <= 13:
         choice = int(choice)
         print 'Working'
         if choice == 1:
@@ -127,12 +126,10 @@ def checkmenu():
         elif choice == 10:
             getrulesrun()
         elif choice == 11:
-            getrulecount
-        elif choice == 12:
             getapps()
-        elif choice == 13:
+        elif choice == 12:
             getappsrun()
-        elif choice == 14:
+        elif choice == 13:
             getsaves()
         else:
             print 'Something went horribly wrong'
@@ -149,22 +146,23 @@ def changemenu():
              3 - Change Port Configuration
              4 - Shut Down or Activate Port
              5 - Delete Port Counters
-             6 - Add Rule
-             7 - Activate a save point for ports
-             8 - Activate a save point for rules
-             9 - Set the rule save point to be loaded on boot
-            10 - Export a save point
-            11 - Modify a save point for port configuration
-            12 - Modify a save point for rules
-            13 - Create save point from current port configuration
-            14 - Create a quicksave point from current configuration
-            15 - Create a save point from current rules
-            16 - Delete a port save point
-            17 - Delete a rule save point
-            18 - Reboot Packetmaster \n'''
+             6 - Reset Rule Counters
+             7 - Add Rule
+             8 - Activate a save point for ports
+             9 - Activate a save point for rules
+            10 - Set the rule save point to be loaded on boot
+            11 - Export a save point
+            12 - Modify a save point for port configuration
+            13 - Modify a save point for rules
+            14 - Create save point from current port configuration
+            15 - Create a quicksave point from current configuration
+            16 - Create a save point from current rules
+            17 - Delete a port save point
+            18 - Delete a rule save point
+            19 - Reboot Packetmaster \n'''
     userchange = raw_input('Enter the number of the setting you would like to change: ')
     change = userchange
-    if int(change) >= 1 and int(change) <= 18:
+    if int(change) >= 1 and int(change) <= 19:
         change = int(change)
         print 'Working'
         if change == 1:
@@ -178,30 +176,32 @@ def changemenu():
         elif change == 5:
             deletecounters()
         elif change == 6:
-            addrule()
+            resetrulecounter()
         elif change == 7:
-            actspport()
+            addrule()
         elif change == 8:
-            actsprule()
+            actspport()
         elif change == 9:
-            setbootsp()
+            actsprule()
         elif change == 10:
-            exportsp()
+            setbootsp()
         elif change == 11:
-            modportsp()
+            exportsp()
         elif change == 12:
-            modrulesp()
+            modportsp()
         elif change == 13:
-            createportsp()
+            modrulesp()
         elif change == 14:
-            createquick()
+            createportsp()
         elif change == 15:
-            createrulesp()
+            createquick()
         elif change == 16:
-            deleteportsp()
+            createrulesp()
         elif change == 17:
-            deleterulesp()
+            deleteportsp()
         elif change == 18:
+            deleterulesp()
+        elif change == 19:
             reboot()
         else:
             print 'Something went horribly wrong'
@@ -340,19 +340,6 @@ def getrulesrun():
         print 'Device is unavailable'
     topmenu()
 
-#Retrieve rule counters
-def getrulecount():
-        try:
-            url = ip + rulecount + auth
-            response = requests.get(url)
-            print response.status_code
-            r = response.content
-            data = json.loads(r)
-            print json.dumps(data, indent=4)
-        except:
-            print 'Device is unavailable'
-        topmenu()
-
 #List all available apps
 def getapps():
     try:
@@ -457,7 +444,7 @@ def portonoff():
         print 'Device is unavailable'
     topmenu()
 
-#Reset port Counters
+#Reset Port Counters
 def deletecounters():
     url = ip + counters + auth
     try:
@@ -466,6 +453,16 @@ def deletecounters():
     except:
         print 'Unable to delete counters'
     topmenu()
+
+#Reset Rule Counters
+def resetrulecounter():
+        url = ip + rulecount + auth
+        try:
+            requests.delete(url)
+            print 'Counters deleted successfully'
+        except:
+            print 'Unable to delete counters'
+        topmenu()
 
 #Add a rule
 def addrule():
@@ -605,7 +602,7 @@ def addrule():
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[match_extra]': extra, 'actions': ruleaction}
     elif matchtraf == 3 and filt == 6:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[match_extra]': extra, 'actions': ruleaction}
-    if matchtraf != 3 and filt == 7:
+    elif matchtraf != 3 and filt == 7:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[match_extra]': extra, 'actions': ruleaction}
     elif matchtraf == 3 and filt == 7:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[match_extra]': extra, 'actions': ruleaction}

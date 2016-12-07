@@ -1,4 +1,4 @@
-#Written by Derek Burke 9/2016
+#Use with firmware version 2.0.0.x or earlier. Written by Derek Burke 9/2016
 #Import necessary Python libraries for interacting with the REST API
 import urllib
 import urllib2
