@@ -1,6 +1,7 @@
 #Python2.7 Cubro Copper Bypass Switch REST API demo.  Written by Derek Burke 12/2016
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json
+from requests.exceptions import ConnectionError
 
 #Print welcome statement
 print 'Welcome to the Cubro Bypass Switch REST Demo\n'
@@ -42,8 +43,9 @@ def eng():
         response = requests.get(url + '/takeDown?')
         print response.status_code
         r = response.content
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     menu()
 
 #Function to disngage the bypass
@@ -52,8 +54,9 @@ def dis():
         response = requests.get(url + '/takeUp?')
         print response.status_code
         r = response.content
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     menu()
 
 #Function to change Management IP
@@ -84,8 +87,9 @@ def mgmt():
         response = requests.post(url + '/setConfig?', data=params)
         print response.status_code
         r = response.content
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     menu()
 
 menu()

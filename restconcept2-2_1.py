@@ -1,7 +1,8 @@
-#Use with firmware version 2.0.0.x or earlier. Python2.7 Cubro Packetmaster REST proof of concept v2.1.  Written by Derek Burke 11/2016
+#Use with firmware version 2.0.0.x or earlier. Python2.7 Cubro Packetmaster REST proof of concept v2.1.  Written by Derek Burke 12/2016
 #Use a Packetmaster to detect the presence of an excessive amount of ICMP packets on a link and drop ICMP packets for one minute if they exceed threshold.
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json, time
+from requests.exceptions import ConnectionError
 
 #Initiate variable for EX authentication, EX IP address and needed rest paths
 auth = urllib.urlencode({
@@ -36,8 +37,9 @@ def query():
         else:
             print datarate
             query()
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
 
 #Function that creates two rules: One that drops all ICMP packets and another that passes all other traffic.  Calls recreate function after 60 seconds.
 def dropicmp():
@@ -66,16 +68,18 @@ def dropicmp():
         r1 = response1.content
         data1 = json.loads(r1)
         print json.dumps(data1, indent=4)
-    except Exception:
-        print 'Unable to drop ICMP packets; add rule failed'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     try:
         response2 = requests.post(url, data=params2)
         print response2.status_code
         r2 = response2.content
         data2 = json.loads(r2)
         print json.dumps(data2, indent=4)
-    except Exception:
-        print 'Unable to pass all remaining traffic; add rule failed'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     time.sleep(60)
     recreate()
 
@@ -105,16 +109,18 @@ def recreate():
         r1 = response1.content
         data1 = json.loads(r1)
         print json.dumps(data1, indent=4)
-    except Exception:
-        print 'Unable to recreate rule 1'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     try:
         response2 = requests.post(url, data=params2)
         print response2.status_code
         r2 = response2.content
         data2 = json.loads(r2)
         print json.dumps(data2, indent=4)
-    except Exception:
-        print 'Unable to recreate rule 2'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     print 'Returning to standard traffic flow'
     time.sleep(10)
     query()

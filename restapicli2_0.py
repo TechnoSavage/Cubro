@@ -1,6 +1,7 @@
 #Use with firmware version 2.0.0.x or earlier. Python2.7 Cubro Packetmaster REST API demo.  Written by Derek Burke 10/2016
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json
+from requests.exceptions import ConnectionError
 
 #Welcome statement
 print '''
@@ -58,8 +59,7 @@ def topmenu():
         4 - Change Packetmaster Settings
         5 - Quit \n'''
 
-    menuselect = raw_input('Enter the number of what you would like to do: ')
-    option = menuselect
+    option = raw_input('Enter the number of what you would like to do: ')
     if int(option) == 1:
         deviceip = raw_input('What is the IP address of the Packetmaster you want to access: ')
         ip = 'http://' + deviceip + '/rest'
@@ -80,7 +80,7 @@ def topmenu():
         print 'Goodbye'
         exit()
     else:
-        print 'That is not a valid selection'
+        print 'That is not a valid selection \n'
         topmenu()
 
 #Check settings menu
@@ -99,43 +99,40 @@ def checkmenu():
              10 - Show Rules
              11 - List Apps
              12 - List Running Apps
-             13 - Print Save Points \n'''
-    userselect = raw_input('Enter the number of the selection to check: ')
-    choice = userselect
-    if int(choice) >= 1 and int(choice) <= 13:
-        choice = int(choice)
-        print 'Working'
-        if choice == 1:
-            getversion()
-        elif choice == 2:
-            getip()
-        elif choice == 3:
-            getmodel()
-        elif choice == 4:
-            getname()
-        elif choice == 5:
-            getserial()
-        elif choice == 6:
-            getportconfig()
-        elif choice == 7:
-            getportinfo()
-        elif choice == 8:
-            getportstat()
-        elif choice == 9:
-            getsfp()
-        elif choice == 10:
-            getrulesrun()
-        elif choice == 11:
-            getapps()
-        elif choice == 12:
-            getappsrun()
-        elif choice == 13:
-            getsaves()
-        else:
-            print 'Something went horribly wrong'
-            exit()
+             13 - Print Save Points
+             14 - Go back to Top Menu \n'''
+    choice = raw_input('Enter the number of the selection to check: ')
+    if int(choice) == 1:
+        getversion()
+    elif int(choice) == 2:
+        getip()
+    elif int(choice) == 3:
+        getmodel()
+    elif int(choice) == 4:
+        getname()
+    elif int(choice) == 5:
+        getserial()
+    elif int(choice) == 6:
+        getportconfig()
+    elif int(choice) == 7:
+        getportinfo()
+    elif int(choice) == 8:
+        getportstat()
+    elif int(choice) == 9:
+        getsfp()
+    elif int(choice) == 10:
+        getrulesrun()
+    elif int(choice) == 11:
+        getapps()
+    elif int(choice) == 12:
+        getappsrun()
+    elif int(choice) == 13:
+        getsaves()
+    elif int(choice) == 14:
+        topmenu()
     else:
-        print 'That is not a valid choice'
+        print 'That is not a valid choice \n'
+        checkmenu()
 
 #Change settings menu
 def changemenu():
@@ -159,56 +156,52 @@ def changemenu():
             16 - Create a save point from current rules
             17 - Delete a port save point
             18 - Delete a rule save point
-            19 - Reboot Packetmaster \n'''
-    userchange = raw_input('Enter the number of the setting you would like to change: ')
-    change = userchange
-    if int(change) >= 1 and int(change) <= 19:
-        change = int(change)
-        print 'Working'
-        if change == 1:
-            changeip()
-        elif change == 2:
-            changename()
-        elif change == 3:
-            changeportconfig()
-        elif change == 4:
-            portonoff()
-        elif change == 5:
-            deletecounters()
-        elif change == 6:
-            resetrulecounter()
-        elif change == 7:
-            addrule()
-        elif change == 8:
-            actspport()
-        elif change == 9:
-            actsprule()
-        elif change == 10:
-            setbootsp()
-        elif change == 11:
-            exportsp()
-        elif change == 12:
-            modportsp()
-        elif change == 13:
-            modrulesp()
-        elif change == 14:
-            createportsp()
-        elif change == 15:
-            createquick()
-        elif change == 16:
-            createrulesp()
-        elif change == 17:
-            deleteportsp()
-        elif change == 18:
-            deleterulesp()
-        elif change == 19:
-            reboot()
-        else:
-            print 'Something went horribly wrong'
-            exit()
-    else:
-        print 'That is not a valid choice'
+            19 - Reboot Packetmaster
+            20 - Go back to Top Menu \n'''
+    change = raw_input('Enter the number of the setting you would like to change: ')
+    if int(change) == 1:
+        changeip()
+    elif int(change) == 2:
+        changename()
+    elif int(change) == 3:
+        changeportconfig()
+    elif int(change) == 4:
+        portonoff()
+    elif int(change) == 5:
+        deletecounters()
+    elif int(change) == 6:
+        resetrulecounter()
+    elif int(change) == 7:
+        addrule()
+    elif int(change) == 8:
+        actspport()
+    elif int(change) == 9:
+        actsprule()
+    elif int(change) == 10:
+        setbootsp()
+    elif int(change) == 11:
+        exportsp()
+    elif int(change) == 12:
+        modportsp()
+    elif int(change) == 13:
+        modrulesp()
+    elif int(change) == 14:
+        createportsp()
+    elif int(change) == 15:
+        createquick()
+    elif int(change) == 16:
+        createrulesp()
+    elif int(change) == 17:
+        deleteportsp()
+    elif int(change) == 18:
+        deleterulesp()
+    elif int(change) == 19:
+        reboot()
+    elif int(change) == 20:
         topmenu()
+    else:
+        print 'That is not a valid choice \n'
+        changemenu()
 
 #Retrieve firmware version
 def getversion():
@@ -219,8 +212,9 @@ def getversion():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve IP configuration
@@ -232,8 +226,9 @@ def getip():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve Packetmaster model
@@ -245,8 +240,9 @@ def getmodel():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve Packetmaster name
@@ -258,8 +254,9 @@ def getname():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve Packetmaster serial number
@@ -271,8 +268,9 @@ def getserial():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve current port configuration
@@ -284,8 +282,9 @@ def getportconfig():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve port statistics
@@ -297,8 +296,9 @@ def getportinfo():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve port counters
@@ -310,8 +310,9 @@ def getportstat():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve SFP information
@@ -323,8 +324,9 @@ def getsfp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve active rules
@@ -336,8 +338,9 @@ def getrulesrun():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #List all available apps
@@ -349,8 +352,9 @@ def getapps():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Retrieve running apps
@@ -362,8 +366,9 @@ def getappsrun():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #List all save points
@@ -375,8 +380,9 @@ def getsaves():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Change the management IP configuration
@@ -392,8 +398,9 @@ def changeip():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Change the device name
@@ -407,8 +414,9 @@ def changename():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Change the configuration of a port
@@ -424,8 +432,9 @@ def changeportconfig(): #Add additional parameters, add function to change multi
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Activate or deactivate a port
@@ -440,8 +449,9 @@ def portonoff():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Reset Port Counters
@@ -450,8 +460,9 @@ def deletecounters():
     try:
         requests.delete(url)
         print 'Counters deleted successfully'
-    except Exception:
-        print 'Unable to delete counters'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Reset Rule Counters
@@ -460,8 +471,9 @@ def resetrulecounter():
     try:
         requests.delete(url)
         print 'Counters deleted successfully'
-    except Exception:
-        print 'Unable to delete counters'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Add a rule
@@ -618,8 +630,9 @@ def addrule():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Make a port save point active
@@ -633,8 +646,9 @@ def actspport():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Make a rule save point active
@@ -648,8 +662,9 @@ def actsprule():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Set a save point as the default boot configuration
@@ -663,8 +678,9 @@ def setbootsp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Export a save point from the Packetmaster
@@ -679,8 +695,9 @@ def exportsp(): #Write code to save object accompanying response to file
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Modify a port save point
@@ -697,8 +714,9 @@ def modportsp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Modify a rule save point
@@ -715,8 +733,9 @@ def modrulesp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Create a port save point from current configuration
@@ -731,8 +750,9 @@ def createportsp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Create a quicksave point of current configuration
@@ -744,8 +764,9 @@ def createquick():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Create a rule save point from current configuration
@@ -760,8 +781,9 @@ def createrulesp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Delete a port save point
@@ -775,8 +797,9 @@ def deleteportsp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Delete a rule save point
@@ -790,8 +813,9 @@ def deleterulesp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except Exception:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 #Reboot the Packetmaster
@@ -800,8 +824,9 @@ def reboot():
     try:
         requests.post(url)
         print 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
-    except Exception:
-        print 'Unable to reboot device'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     topmenu()
 
 topmenu()

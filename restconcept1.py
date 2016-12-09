@@ -2,6 +2,7 @@
 #Use Packetmaster A to detect the presence of a given IP address and, upon detection, issue a rule to Packetmaster B: see below for Packetmaster Confguration.
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json, time
+from requests.exceptions import ConnectionError
 
 #ttl represents that this program will run for an hour until it expires or the match criteria is found
 ttl = 3600
@@ -30,8 +31,9 @@ delcount = PMA + pcounters + autha
 try:
     requests.delete(delcount)
     print 'Counters deleted successfully'
-except:
-    print 'Unable to delete counters'
+except ConnectionError as e:
+    r = 'No Response'
+    print 'Device is unavailable \n'
 
 #Define function 'query' which will check the REST status every second for an hour for a specific event
 def query():
@@ -42,8 +44,9 @@ def query():
         response = requests.get(url)
         r = response.content
         data = json.loads(r)
-    except:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     for item in data:
         l.append(item['txpkts'])
     if l[5] > 0:
@@ -64,8 +67,9 @@ def execute():
         data = json.loads(r)
         print json.dumps(data, indent=4)
         print 'Detection rule has been added'
-    except:
-        print 'Unable to add rule'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     ttl = 0
 
 #while loop executes 'query' so long as ttl value is greater than zero

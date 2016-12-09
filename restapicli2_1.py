@@ -2,6 +2,7 @@
 #Use with firmware version 2.1.0.x or later. Python2.7 Cubro Packetmaster REST API demo.  Written by Derek Burke 10/2016
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json
+from requests.exceptions import ConnectionError
 
 #Welcome statement
 print '''

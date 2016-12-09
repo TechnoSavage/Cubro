@@ -3,6 +3,7 @@
 #Import necessary libraries
 import urllib, requests, json, time
 from datetime import datetime
+from requests.exceptions import ConnectionError
 
 #IP address to access REST data of device
 deviceip = raw_input('What is the IP address of the Packetmaster you want to access: ')
@@ -25,8 +26,9 @@ def checktime():
     if str(currenttime) == '11:39':
         try:
             addrule()
-        except:
-            print "Unable to execute drop SMB rules"
+        except ConnectionError as e:
+            r = 'No Response'
+            print 'Device is unavailable \n'
 
 def addrule():
     url = ip + rule + auth
@@ -43,8 +45,9 @@ def addrule():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
-        print 'Device is unavailable'
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
     addruletwo()
 
 def addruletwo():
@@ -63,8 +66,9 @@ def addruletwo():
             r = response.content
             data = json.loads(r)
             print json.dumps(data, indent=4)
-        except:
-            print 'Device is unavailable'
+        except ConnectionError as e:
+            r = 'No Response'
+            print 'Device is unavailable \n'
 
 while True:
     checktime()
