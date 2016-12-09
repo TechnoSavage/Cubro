@@ -219,7 +219,7 @@ def getversion():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -232,7 +232,7 @@ def getip():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -245,7 +245,7 @@ def getmodel():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -258,7 +258,7 @@ def getname():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -271,7 +271,7 @@ def getserial():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -284,7 +284,7 @@ def getportconfig():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -297,7 +297,7 @@ def getportinfo():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -310,7 +310,7 @@ def getportstat():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -323,7 +323,7 @@ def getsfp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -336,7 +336,7 @@ def getrulesrun():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -349,7 +349,7 @@ def getapps():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -362,7 +362,7 @@ def getappsrun():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -375,7 +375,7 @@ def getsaves():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -392,7 +392,7 @@ def changeip():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -407,7 +407,7 @@ def changename():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -424,7 +424,7 @@ def changeportconfig(): #Add additional parameters, add function to change multi
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -440,7 +440,7 @@ def portonoff():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -450,19 +450,19 @@ def deletecounters():
     try:
         requests.delete(url)
         print 'Counters deleted successfully'
-    except:
+    except Exception:
         print 'Unable to delete counters'
     topmenu()
 
 #Reset Rule Counters
 def resetrulecounter():
-        url = ip + rulecount + auth
-        try:
-            requests.delete(url)
-            print 'Counters deleted successfully'
-        except:
-            print 'Unable to delete counters'
-        topmenu()
+    url = ip + rulecount + auth
+    try:
+        requests.delete(url)
+        print 'Counters deleted successfully'
+    except Exception:
+        print 'Unable to delete counters'
+    topmenu()
 
 #Add a rule
 def addrule():
@@ -618,7 +618,7 @@ def addrule():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -633,7 +633,7 @@ def actspport():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -648,7 +648,7 @@ def actsprule():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -663,7 +663,7 @@ def setbootsp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -679,7 +679,7 @@ def exportsp(): #Write code to save object accompanying response to file
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -697,7 +697,7 @@ def modportsp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -715,7 +715,7 @@ def modrulesp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -731,7 +731,7 @@ def createportsp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -744,7 +744,7 @@ def createquick():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -760,7 +760,7 @@ def createrulesp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -775,7 +775,7 @@ def deleteportsp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -790,7 +790,7 @@ def deleterulesp():
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-    except:
+    except Exception:
         print 'Device is unavailable'
     topmenu()
 
@@ -800,7 +800,7 @@ def reboot():
     try:
         requests.post(url)
         print 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
-    except:
+    except Exception:
         print 'Unable to reboot device'
     topmenu()
 

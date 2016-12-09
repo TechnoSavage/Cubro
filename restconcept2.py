@@ -30,7 +30,7 @@ def query():
         else:
             print line
             query()
-    except:
+    except Exception:
         print 'Device is unavailable'
 
 #Function that creates two rules: One that drops all ICMP packets and another that passes all other traffic.  Calls recreate function after 60 seconds.
@@ -60,7 +60,7 @@ def dropicmp():
         r1 = response1.content
         data1 = json.loads(r1)
         print json.dumps(data1, indent=4)
-    except:
+    except Exception:
         print 'Unable to drop ICMP packets; add rule failed'
     try:
         response2 = requests.post(url, data=params2)
@@ -68,7 +68,7 @@ def dropicmp():
         r2 = response2.content
         data2 = json.loads(r2)
         print json.dumps(data2, indent=4)
-    except:
+    except Exception:
         print 'Unable to pass all remaining traffic; add rule failed'
     time.sleep(60)
     recreate()
@@ -99,7 +99,7 @@ def recreate():
         r1 = response1.content
         data1 = json.loads(r1)
         print json.dumps(data1, indent=4)
-    except:
+    except Exception:
         print 'Unable to recreate rule 1'
     try:
         response2 = requests.post(url, data=params2)
@@ -107,7 +107,7 @@ def recreate():
         r2 = response2.content
         data2 = json.loads(r2)
         print json.dumps(data2, indent=4)
-    except:
+    except Exception:
         print 'Unable to recreate rule 2'
     print 'Returning to standard traffic flow'
     time.sleep(10)
