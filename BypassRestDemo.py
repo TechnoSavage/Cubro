@@ -48,7 +48,7 @@ def eng():
         print 'Device is unavailable \n'
     menu()
 
-#Function to disngage the bypass
+#Function to disengage the bypass
 def dis():
     try:
         response = requests.get(url + '/takeUp?')
