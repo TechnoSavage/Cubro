@@ -16,9 +16,10 @@ def menu():
     print '''Make Selection:
             1 - Engage Bypass
             2 - Disengage Bypass
-            3 - Change Management IP
-            4 - Change working device
-            5 - Quit\n'''
+            3 - Timeout
+            4 - Change Management IP
+            5 - Change working device
+            6 - Quit\n'''
     choice = raw_input('Enter the number of your selection: ')
     #Evaluate user selection
     if int(choice) == 1:
@@ -26,11 +27,13 @@ def menu():
     elif int(choice) == 2:
         dis()
     elif int(choice) == 3:
-        mgmt()
+        timeout()
     elif int(choice) == 4:
+        mgmt()
+    elif int(choice) == 5:
         ip = raw_input('Enter the IP Address of the Bypass Switch you want to manage: ')
         url = 'http://' + ip
-    elif int(choice) == 5:
+    elif int(choice) == 6:
         print 'Goodbye'
         exit()
     else:
@@ -52,6 +55,17 @@ def eng():
 def dis():
     try:
         response = requests.get(url + '/takeUp?')
+        print response.status_code
+        r = response.content
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    menu()
+
+#Function to disengage bypass for timeout period
+def timeout():
+    try:
+        response = requests.get(url + '/setTimeout?')
         print response.status_code
         r = response.content
     except ConnectionError as e:
