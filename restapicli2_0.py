@@ -490,20 +490,14 @@ def addrule():
     trafmatch = raw_input('Enter the number of your selection: ')
     if trafmatch == '':
         trafmatch = 1
-    matchtraf = trafmatch
-    if int(trafmatch) >= 1 and int(trafmatch) <=3:
-        matchtraf = int(trafmatch)
-        if matchtraf == 1:
-            matchvlan = ''
-        elif matchtraf == 2:
-            matchvlan = 'neg_match'
-        elif matchtraf == 3:
-            matchvlan = 'match'
-            matchid = raw_input('Enter the VLAN ID to filter on: ')
-            vpri = raw_input('Enter the VLAN priority (Enter 0-7): ')
-        else:
-            print 'Something went horribly wrong'
-            exit()
+    if int(trafmatch) == 1:
+        matchvlan = ''
+    elif int(trafmatch) == 2:
+        matchvlan = 'neg_match'
+    elif int(trafmatch) == 3:
+        matchvlan = 'match'
+        matchid = raw_input('Enter the VLAN ID to filter on: ')
+        vpri = raw_input('Enter the VLAN priority (Enter 0-7): ')
     else:
         print 'That is not a valid selection; restarting add rule'
         addrule()
@@ -521,106 +515,95 @@ def addrule():
     proto = raw_input('Enter the number of your selection: ')
     if proto == '':
         proto = 1
-    filt = proto
-    if int(proto) >= 1 and int(proto) <= 8:
-        filt = int(proto)
-        if filt == 1:
-            profil = ''
-        elif filt == 2:
-            profil = 'ip'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
-        elif filt == 3:
-            profil = 'tcp'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
-            tcpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
-            tcpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
-        elif filt == 4:
-            profil = 'udp'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
-            udpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
-            udpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
-        elif filt == 5:
-            profil = 'sctp'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
-            sctpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
-            sctpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
-        elif filt == 6:
-            profil = 'icmp'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
-            icmpt = raw_input('Flter on ICMP type?  Leave blank for no or enter ICMP type number: ')
-            icmpc = raw_input('Flter on ICMP code?  Leave blank for no or enter ICMP code number: ')
-        elif filt == 7:
-            profil = 'arp'
-        elif filt == 8:
-            profil = 'custom'
-            ether = raw_input('Enter Ethertype e.g. 0x800: ')
-            nwproto = raw_input('Enter protocol number (protocol number in IPv4, header type in IPv6, opcode in ARP) or leave blank for none: ')
-        else:
-            print 'Something went horribly wrong.'
-            exit()
+    if int(proto) == 1:
+        profil = ''
+    elif int(proto) == 2:
+        profil = 'ip'
+        nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+    elif int(proto) == 3:
+        profil = 'tcp'
+        nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        tcpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
+        tcpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+    elif int(proto) == 4:
+        profil = 'udp'
+        nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        udpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
+        udpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+    elif int(proto) == 5:
+        profil = 'sctp'
+        nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        sctpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
+        sctpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+    elif int(proto) == 6:
+        profil = 'icmp'
+        nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        icmpt = raw_input('Flter on ICMP type?  Leave blank for no or enter ICMP type number: ')
+        icmpc = raw_input('Flter on ICMP code?  Leave blank for no or enter ICMP code number: ')
+    elif int(proto) == 7:
+        profil = 'arp'
+    elif int(proto) == 8:
+        profil = 'custom'
+        ether = raw_input('Enter Ethertype e.g. 0x800: ')
+        nwproto = raw_input('Enter protocol number (protocol number in IPv4, header type in IPv6, opcode in ARP) or leave blank for none: ')
     else:
         print 'That is not a valid selection; restarting add rule'
         addrule()
-    print '''Add rule timout?
+    print '''Add rule timeout?
             1 - No
             2 - Hard Timeout
             3 - Idle Timeout'''
     xsel = raw_input('Enter the number of your selection: ')
     if xsel == '':
         xsel = 1
-    selx = xsel
-    if int(xsel) >= 1 and int(xsel) <= 3:
-        selx = int(xsel)
-        if selx == 1:
-            extra = ''
-        elif selx == 2: #Does this work?
-            time = raw_input('Enter the time in seconds for the rule to exist: ')
-            extra = 'hard_timeout=', time
-        elif selx == 3:
-            time = raw_input('Enter the time in seconds for the rule to exist while not idle: ')
-            extra = 'idle_timeout=', time
-        else:
-            print 'Something went horribly wrong.'
-            exit()
+    if int(xsel) == 1:
+        extra = ''
+    elif int(xsel) == 2:
+        time = raw_input('Enter the time in seconds for the rule to exist: ')
+        extra = 'hard_timeout=' + time
+    elif int(xsel) == 3:
+        time = raw_input('Enter the time in seconds for the rule to exist while not idle: ')
+        extra = 'idle_timeout=' + time
     else:
-        print 'That is not a valid selection; defaulting to no timout.'
+        print 'That is not a valid selection; no timeout will be applied'
+        extra = ''
     ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - imporoper syntax will cause add rule to fail: ')
-    if matchtraf != 3 and filt == 1:
+    if int(trafmatch) != 3 and int(proto) == 1:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf == 3 and filt == 1:
+    elif int(trafmatch) == 3 and int(proto) == 1:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf != 3 and filt == 2:
+    elif int(trafmatch) != 3 and int(proto) == 2:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf == 3 and filt == 2:
+    elif int(trafmatch) == 3 and int(proto) == 2:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf != 3 and filt == 3:
+    elif int(trafmatch) != 3 and int(proto) == 3:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf == 3 and filt == 3:
+    elif int(trafmatch) == 3 and int(proto) == 3:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf != 3 and filt == 4:
+    elif int(trafmatch) != 3 and int(proto) == 4:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf == 3 and filt == 4:
+    elif int(trafmatch) == 3 and int(proto) == 4:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf != 3 and filt == 5:
+    elif int(trafmatch) != 3 and int(proto) == 5:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf == 3 and filt == 5:
+    elif int(trafmatch) == 3 and int(proto) == 5:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf != 3 and filt == 6:
+    elif int(trafmatch) != 3 and int(proto) == 6:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf == 3 and filt == 6:
+    elif int(trafmatch) == 3 and int(proto) == 6:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf != 3 and filt == 7:
+    elif int(trafmatch) != 3 and int(proto) == 7:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf == 3 and filt == 7:
+    elif int(trafmatch) == 3 and int(proto) == 7:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf != 3 and filt == 8:
+    elif int(trafmatch) != 3 and int(proto) == 8:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[match_extra]': extra, 'actions': ruleaction}
-    elif matchtraf == 3 and  filt == 8:
+    elif int(trafmatch) == 3 and int(proto) == 8:
         params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[match_extra]': extra, 'actions': ruleaction}
     else:
         print 'Something went horribly wrong.'
