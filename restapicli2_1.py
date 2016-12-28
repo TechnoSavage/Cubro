@@ -1,4 +1,4 @@
-#Use with firmware version 2.0.0.x or earlier. Python2.7 Cubro Packetmaster REST API demo.  Written by Derek Burke 10/2016
+#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.  Written by Derek Burke 12/2016
 #Import necessary Python libraries for interacting with the REST API
 import urllib, requests, json
 from requests.exceptions import ConnectionError
@@ -21,21 +21,36 @@ auth = urllib.urlencode({
 })
 
 #options to append to device URL
-version = '/device/imageversion?'
-address = '/device/ipconfig?'
-devicemodel = '/device/model?'
-devicename = '/device/name?'
-serial = '/device/serialno?'
+version = '/device/imageversion?' #good
+address = '/device/ipconfig?' #good
+devicemodel = '/device/model?' #good
+devicename = '/device/name?' #good
+devicelabel = '/device/customident?' #Add
+devicegen = '/device/generation?' #Add
+deviceenv = '/device/environment?' #Add
+deviceidled = '/device/idled?' #Add
+deviceload = '/device/loadaverage?' #Add
+devicemem = '/device/memoryusage?' #Add
+devicehash = '/device/grouphash?' #Add
+devicehttps = 'device/https?' #Add
+deviceserver = 'device/serverrevision?' #Add
+deviceperm = '/device/permanentrulesmode?' #Add
+devicestor = '/device/rulestoragemode?' #Add
+serial = '/device/serialno?' #good
 portconfig = '/ports/config?'
 portinfo = '/ports/info?'
 portstat = '/ports/stats?'
 sfp = '/ports/sfpstatus?'
-rulesrun = '/flows/all?'
 counters = '/ports/counters?'
 rulecount = '/rules/counters?'
-rule = '/flows?'
+rule = '/rules?' #change
+allrule = '/rules/all?' #change/add
+flows = '/flownumbers?' #change/add
 apps = '/apps?'
 appsrun = '/apps/running?'
+appsact = '/apps/action?' #add
+groups = '/groups?' #add
+allgroup = '/groups/all?' #add
 sp = '/savepoints?'
 spaports = '/savepoints/activeportsavepoint?'
 sparules = '/savepoints/activerulesavepoint?'
@@ -47,6 +62,10 @@ spportsave = '/savepoints/portsavepoint?'
 spquick = '/savepoints/quicksaverules?'
 sprulesave = '/savepoints/rulesavepoint?'
 reboot = '/device/reboot?'
+users = '/users?' #add
+raduser = '/users/radius?' #add
+uac = '/users/uac?' #add
+weblog = 'weblog?' #add
 
 #Initial menu to check or change settings
 def topmenu():
@@ -667,11 +686,11 @@ def setbootsp():
     topmenu()
 
 #Export a save point from the Packetmaster
-def exportsp():
+def exportsp(): #Write code to save object accompanying response to file
     rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
     pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
     url = ip + spexport + auth
-    params = {'ruleSavePointNames': rspname, 'portSavePointNames': pspname}
+    params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
     try:
         response = requests.get(url, data=params)
         print response.status_code
@@ -679,9 +698,8 @@ def exportsp():
         data = json.loads(r)
         print json.dumps(data, indent=4)
         filename = raw_input('Enter a file name for the exported savepoint: ')
-        f = open(filename, "w")
-        f.write(r)
-        f.close()
+        with open(filename) as filename:
+            f.write(r)
     except ConnectionError as e:
         r = 'No Response'
         print 'Device is unavailable \n'
