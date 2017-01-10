@@ -25,19 +25,19 @@ version = '/device/imageversion?' #good
 address = '/device/ipconfig?' #good
 devicemodel = '/device/model?' #good
 devicename = '/device/name?' #good
-devicelabel = '/device/customident?' #Add
-devicegen = '/device/generation?' #Add
-deviceenv = '/device/environment?' #Add
-deviceidled = '/device/idled?' #Add
-deviceload = '/device/loadaverage?' #Add
-devicemem = '/device/memoryusage?' #Add
-devicehash = '/device/grouphash?' #Add
-devicehttps = 'device/https?' #Add
-deviceserver = 'device/serverrevision?' #Add
-deviceperm = '/device/permanentrulesmode?' #Add
-devicestor = '/device/rulestoragemode?' #Add
+devicelabel = '/device/customident?' #add post
+devicegen = '/device/generation?' #good
+deviceenv = '/device/environment?' #good
+deviceidled = '/device/idled?' #add post
+deviceload = '/device/loadaverage?' #good
+devicemem = '/device/memoryusage?' #good
+devicehash = '/device/grouphash?' #Add post
+devicehttps = '/device/https?' #Add post
+deviceserver = '/device/serverrevision?' #good
+deviceperm = '/device/permanentrulesmode?' #Add post
+devicestor = '/device/rulestoragemode?' #Add post
 serial = '/device/serialno?' #good
-portconfig = '/ports/config?'
+portconfig = '/ports/config?' #good
 portinfo = '/ports/info?'
 portstat = '/ports/stats?'
 sfp = '/ports/sfpstatus?'
@@ -65,7 +65,7 @@ reboot = '/device/reboot?'
 users = '/users?' #add
 raduser = '/users/radius?' #add
 uac = '/users/uac?' #add
-weblog = 'weblog?' #add
+weblog = '/weblog?' #add
 
 #Initial menu to check or change settings
 def topmenu():
@@ -109,17 +109,26 @@ def checkmenu():
               1 - Software Version
               2 - IP Configuration
               3 - Model
-              4 - Name
+              4 - Name + Notes
               5 - Serial Number
-              6 - Port Configuration
-              7 - Port Status
-              8 - Port Counters
-              9 - SFP Status
-             10 - Show Rules
-             11 - List Apps
-             12 - List Running Apps
-             13 - Print Save Points
-             14 - Go back to Top Menu \n'''
+              6 - Hardware Generation
+              7 - Port Configuration
+              8 - Port Status
+              9 - Port Counters
+             10 - SFP Status
+             11 - Show Rules
+             12 - List Apps
+             13 - List Running Apps
+             14 - Print Save Points
+             15 - Show Active Load-Balancing Hashes
+             16 - Permanence Mode
+             17 - Rule Storage Mode
+             18 - Environment
+             19 - ID LED Status
+             20 - OS and CPU Load Averages
+             21 - Memory Usage
+             22 - CCH Server Revision
+             23 - Go back to Top Menu \n'''
     choice = raw_input('Enter the number of the selection to check: ')
     if int(choice) == 1:
         getversion()
@@ -128,26 +137,44 @@ def checkmenu():
     elif int(choice) == 3:
         getmodel()
     elif int(choice) == 4:
-        getname()
+        getlabel()
     elif int(choice) == 5:
         getserial()
     elif int(choice) == 6:
-        getportconfig()
+        getgen()
     elif int(choice) == 7:
-        getportinfo()
+        getportconfig()
     elif int(choice) == 8:
-        getportstat()
+        getportinfo()
     elif int(choice) == 9:
-        getsfp()
+        getportstat()
     elif int(choice) == 10:
-        getrulesrun()
+        getsfp()
     elif int(choice) == 11:
-        getapps()
+        getrulesrun()
     elif int(choice) == 12:
-        getappsrun()
+        getapps()
     elif int(choice) == 13:
-        getsaves()
+        getappsrun()
     elif int(choice) == 14:
+        getsaves()
+    elif int(choice) == 15:
+        gethash()
+    elif int(choice) == 16:
+        getperm()
+    elif int(choice) == 17:
+        getstor()
+    elif int(choice) == 18:
+        getenv()
+    elif int(choice) == 19:
+        getidled()
+    elif int(choice) == 20:
+        getload()
+    elif int(choice) == 21:
+        getmem()
+    elif int(choice) == 22:
+        getserver()
+    elif int(choice) == 23:
         topmenu()
     else:
         print 'That is not a valid choice \n'
@@ -278,6 +305,34 @@ def getname():
         print 'Device is unavailable \n'
     topmenu()
 
+#Retrieve Packetmaster Name plus Notes
+def getlabel():
+    try:
+        url = ip + devicelabel + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
+#Retrieve hardware generation of the device
+def getgen():
+    try:
+        url = ip + devicegen + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
 #Retrieve Packetmaster serial number
 def getserial():
     try:
@@ -390,6 +445,118 @@ def getappsrun():
         print 'Device is unavailable \n'
     topmenu()
 
+#Retrieve hash algorithm information
+def gethash():
+    try:
+        url = ip + devicehash + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
+#Retrieve rule permanence mode
+def getperm():
+    try:
+        url = ip + deviceperm + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
+#Retrieve rule storage model
+def getstor():
+    try:
+        url = ip + devicestor + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
+#Retrieve environment information
+def getenv():
+    try:
+        url = ip + deviceenv + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
+#Retrieve deice ID LED status_code
+def getidled():
+    try:
+        url = ip + deviceidled + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
+#Retrieve load information
+def getload():
+    try:
+        url = ip + deviceload + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
+#Retrieve memory usage
+def getmem():
+    try:
+        url = ip + devicemem + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
+#Retrieve cch machinery server revision
+def getserver():
+    try:
+        url = ip + deviceserver + auth
+        response = requests.get(url)
+        print response.status_code
+        r = response.content
+        data = json.loads(r)
+        print json.dumps(data, indent=4)
+    except ConnectionError as e:
+        r = 'No Response'
+        print 'Device is unavailable \n'
+    topmenu()
+
 #List all save points
 def getsaves():
     try:
@@ -443,8 +610,17 @@ def changeportconfig(): #Add additional parameters, add function to change multi
     interface = raw_input('Enter the interface name of the port you want to change: ')
     speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ')
     duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto": ')
+    forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no: ')
+    check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no: ')
+    recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no: ')
     url = ip + portconfig + auth
-    params = {'ifName': interface, 'speed': speed, 'duplex': duplex}
+    params = {
+        'if_name': interface,
+        'speed': speed,
+        'duplex': duplex,
+        'unidirectional': forcetx,
+        'crc_check': check,
+        'crc_recalculation': recalc }
     try:
         response = requests.post(url, data=params)
         print response.status_code
@@ -461,7 +637,7 @@ def portonoff():
     interface = raw_input('Enter the interface name of the port you want to change: ')
     updown = raw_input('Enter "true" to shut port down; Enter "false" to reactivate port: ')
     url = ip + portconfig + auth
-    params = {'ifName': interface, 'shutdown': updown}
+    params = {'if_name': interface, 'shutdown': updown}
     try:
         response = requests.post(url, data=params)
         print response.status_code
@@ -686,7 +862,7 @@ def setbootsp():
     topmenu()
 
 #Export a save point from the Packetmaster
-def exportsp(): #Write code to save object accompanying response to file
+def exportsp():
     rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
     pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
     url = ip + spexport + auth
@@ -697,9 +873,13 @@ def exportsp(): #Write code to save object accompanying response to file
         r = response.content
         data = json.loads(r)
         print json.dumps(data, indent=4)
-        filename = raw_input('Enter a file name for the exported savepoint: ')
-        with open(filename) as filename:
-            f.write(r)
+        filename = raw_input("Enter a file name for the savepoint: ")
+        try:
+            with open(filename, "w") as f:
+                f.write(r)
+        except:
+            print "Invalid filename\n"
+            topmenu()
     except ConnectionError as e:
         r = 'No Response'
         print 'Device is unavailable \n'
