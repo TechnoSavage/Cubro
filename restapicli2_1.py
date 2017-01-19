@@ -672,8 +672,9 @@ def resetrulecounter():
     topmenu()
 
 #Add a rule
-def addrule():  #MAC address fields now need options
+def addrule():  #Have options add key value pairs to params dictionary
     url = ip + rule + auth
+    params = {}
     rulename = raw_input('Enter a name for the rule: ')
     ruledescrip = raw_input('Enter a description for the rule: ')
     priority = int(raw_input('Enter the priority level of the rule; 0 - 65535 higher number = higher priority: '))
@@ -754,137 +755,9 @@ def addrule():  #MAC address fields now need options
              Leave blank for none
              Improper syntax will cause Add Rule to fail \n'''
     extra = raw_input('Enter Extra Custom Match String: ')
+    if extra != '':
+        params['match[extra]'] = extra
     ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - imporoper syntax will cause add rule to fail: ')
-    if int(trafmatch) != 3 and int(proto) == 1 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 1 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 1 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_dst]': macdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 1 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 1 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 1 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 1 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_dst]': macdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 1 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 2 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 2 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 2 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 2 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 2 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 2 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 2 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 2 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 3 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 3 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 3 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 3 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 3 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 3 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 3 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 3 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[tcp_src]': tcpsrc, 'match[tcp_dst]': tcpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 4 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 4 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 4 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 4 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 4 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 4 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 4 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 4 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 5 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 5 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 5 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 5 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[sctp_src]': sctpsrc, 'match[sctp_dst]': sctpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 5 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 5 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 5 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 5 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[udp_src]': udpsrc, 'match[udp_dst]': udpdst, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 6 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 6 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 6 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 6 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 6 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 6 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 6 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 6 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[nw_src]': nwsrc, 'match[nw_dst]': nwdst, 'match[icmp_type]': icmpt, 'match[icmp_code]': icmpc, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 7 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[protocol]': profil, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 7 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 7 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 7 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 7 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[protocol]': profil, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 7 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 7 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 7 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 8 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 8 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 8 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) != 3 and int(proto) == 8 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 8 and macsrc == '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 8 and macsrc != '' and macdst == '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 8 and macsrc == '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[extra]': extra, 'actions': ruleaction}
-    elif int(trafmatch) == 3 and int(proto) == 8 and macsrc != '' and macdst != '':
-        params = {'name': rulename, 'description': ruledescrip, 'priority': priority, 'match[in_port]': portin, 'match[vlan]': matchvlan, 'match[vlan_id]': matchid, 'match[vlan_priority]': vpri, 'match[dl_src]': macsrc, 'match[dl_dst]': macdst, 'match[protocol]': profil, 'match[dl_type]': ether, 'match[nw_proto]': nwproto, 'match[extra]': extra, 'actions': ruleaction}
-    else:
-        print 'Something went horribly wrong.'
     try:
         response = requests.post(url, data=params)
         print response.status_code
