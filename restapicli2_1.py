@@ -672,34 +672,44 @@ def resetrulecounter():
     topmenu()
 
 #Add a rule
-def addrule():  #Have options add key value pairs to params dictionary
+def addrule():  #Finish added appended key values
     url = ip + rule + auth
     params = {}
     rulename = raw_input('Enter a name for the rule: ')
+    if rulename != '':
+        params['name'] = rulename
     ruledescrip = raw_input('Enter a description for the rule: ')
+    if ruledescrip != '':
+        params['description'] = ruledescrip
     priority = int(raw_input('Enter the priority level of the rule; 0 - 65535 higher number = higher priority: '))
+    params['priority'] = priority
     portin = raw_input('Enter the port number or numbers for incoming traffic; multiple ports separated by a comma: ')
-    print '''Match VLAN tag?
+    params['match[in_port]'] = portin
+    print '''\nMatch VLAN tag?
             1 - No, match all tagged and untagged traffic
             2 - No, match only untagged traffic
-            3 - Yes, match a VLAN tag'''
+            3 - Yes, match a VLAN tag \n'''
     trafmatch = raw_input('Enter the number of your selection: ')
-    if trafmatch == '':
-        trafmatch = 1
-    if int(trafmatch) == 1:
-        matchvlan = ''
+    if trafmatch == '' or int(trafmatch) == 1:
+        continue
     elif int(trafmatch) == 2:
-        matchvlan = 'neg_match'
+        params['match[vlan]'] = 'neg_match'
     elif int(trafmatch) == 3:
-        matchvlan = 'match'
+        params['match[vlan]'] = 'match'
         matchid = raw_input('Enter the VLAN ID to filter on: ')
+        params['match[vlan_id]'] = matchid
         vpri = raw_input('Enter the VLAN priority (Enter 0-7): ')
+        params['match[vlan_priority]'] = vpri
     else:
-        print 'That is not a valid selection; restarting add rule'
+        print 'That is not a valid selection; restarting add rule\n'
         addrule()
     macsrc = raw_input('Filter by source MAC address?  Leave blank for no or enter MAC address: ')
+    if macsrc != '':
+        params['dl_src'] = macsrc
     macdst = raw_input('Filter by destination MAC address?  Leave blank for no or enter MAC address: ')
-    print '''Filter on protocol?
+    if macdst != '':
+        params['dl_dst'] = macdst
+    print '''\nFilter on protocol?
             1 - No Protocol Filtering
             2 - ip
             3 - tcp
@@ -707,57 +717,76 @@ def addrule():  #Have options add key value pairs to params dictionary
             5 - sctp
             6 - icmp
             7 - arp
-            8 - Enter Ethertype'''
+            8 - Enter Ethertype\n'''
     proto = raw_input('Enter the number of your selection: ')
-    if proto == '':
-        proto = 1
-    if int(proto) == 1:
-        profil = ''
+    if proto == '' or int(proto) == 1:
+        continue
     elif int(proto) == 2:
-        profil = 'ip'
+        params['match[protocol]'] = 'ip'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        if nwsrc != '':
+            params['match[nw_src]'] = nwsrc
         nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        if nwdst != '':
+            params['match[nw_dst]'] = nwdst
     elif int(proto) == 3:
-        profil = 'tcp'
+        params['match[protocol]'] = 'tcp'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        if nwsrc != '':
+            params['match[nw_src]'] = nwsrc
         nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        if nwdst != '':
+            params['match[nw_dst]'] = nwdst
         tcpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
         tcpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
     elif int(proto) == 4:
-        profil = 'udp'
+        params['match[protocol]'] = 'udp'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        if nwsrc != '':
+            params['match[nw_src]'] = nwsrc
         nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        if nwdst != '':
+            params['match[nw_dst]'] = nwdst
         udpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
         udpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
     elif int(proto) == 5:
-        profil = 'sctp'
+        params['match[protocol]'] = 'sctp'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        if nwsrc != '':
+            params['match[nw_src]'] = nwsrc
         nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        if nwdst != '':
+            params['match[nw_dst]'] = nwdst
         sctpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
         sctpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
     elif int(proto) == 6:
-        profil = 'icmp'
+        params['match[protocol]'] = 'icmp'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+        if nwsrc != '':
+            params['match[nw_src]'] = nwsrc
         nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+        if nwdst != '':
+            params['match[nw_dst]'] = nwdst
         icmpt = raw_input('Flter on ICMP type?  Leave blank for no or enter ICMP type number: ')
         icmpc = raw_input('Flter on ICMP code?  Leave blank for no or enter ICMP code number: ')
     elif int(proto) == 7:
-        profil = 'arp'
+        params['match[protocol]'] = 'arp'
     elif int(proto) == 8:
-        profil = 'custom'
+        params['match[protocol]'] = 'custom'
         ether = raw_input('Enter Ethertype e.g. 0x800: ')
         nwproto = raw_input('Enter protocol number (protocol number in IPv4, header type in IPv6, opcode in ARP) or leave blank for none: ')
     else:
-        print 'That is not a valid selection; restarting add rule'
+        print 'That is not a valid selection; restarting add rule \n'
         addrule()
-    print '''Add Custom Extra Match?
-             e.g. hard_timeout, idle_timeout, tcp_flags, QinQ
-             Leave blank for none
-             Improper syntax will cause Add Rule to fail \n'''
+    print '''\nAdd Custom Extra Match?
+    e.g. hard_timeout, idle_timeout, tcp_flags, QinQ
+    Leave blank for none
+    Improper syntax will cause Add Rule to fail \n'''
     extra = raw_input('Enter Extra Custom Match String: ')
     if extra != '':
         params['match[extra]'] = extra
     ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - imporoper syntax will cause add rule to fail: ')
+    params['actions'] = ruleaction
     try:
         response = requests.post(url, data=params)
         print response.status_code
