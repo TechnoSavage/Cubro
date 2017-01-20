@@ -738,7 +738,11 @@ def addrule():  #Finish added appended key values
         if nwdst != '':
             params['match[nw_dst]'] = nwdst
         tcpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
+        if tcpsrc != '':
+            params['match[tcp_src]'] = tcpsrc
         tcpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+        if tcpdst != '':
+            params['match[tcp_dst]'] = tcpdst
     elif int(proto) == 4:
         params['match[protocol]'] = 'udp'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
@@ -748,7 +752,11 @@ def addrule():  #Finish added appended key values
         if nwdst != '':
             params['match[nw_dst]'] = nwdst
         udpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
+        if udpsrc != '':
+            params['match[udp_src]'] = udpsrc
         udpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+        if udpdst != '':
+            params['match[udp_dst]'] = udpdst
     elif int(proto) == 5:
         params['match[protocol]'] = 'sctp'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
@@ -758,7 +766,11 @@ def addrule():  #Finish added appended key values
         if nwdst != '':
             params['match[nw_dst]'] = nwdst
         sctpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
+        if sctpsrc != '':
+            params['match[sctp_src]'] = sctpsrc
         sctpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+        if sctpdst != '':
+            params['match[sctp_dst]'] = sctpdst
     elif int(proto) == 6:
         params['match[protocol]'] = 'icmp'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
@@ -768,13 +780,21 @@ def addrule():  #Finish added appended key values
         if nwdst != '':
             params['match[nw_dst]'] = nwdst
         icmpt = raw_input('Flter on ICMP type?  Leave blank for no or enter ICMP type number: ')
+        if icmpt != '':
+            params['match[icmp_type]'] = icmpt
         icmpc = raw_input('Flter on ICMP code?  Leave blank for no or enter ICMP code number: ')
+        if icmpc != '':
+            params['match[icmp_code]'] = icmpc
     elif int(proto) == 7:
         params['match[protocol]'] = 'arp'
     elif int(proto) == 8:
         params['match[protocol]'] = 'custom'
         ether = raw_input('Enter Ethertype e.g. 0x800: ')
+        if ether != '':
+            params['match[dl_type]'] = ether
         nwproto = raw_input('Enter protocol number (protocol number in IPv4, header type in IPv6, opcode in ARP) or leave blank for none: ')
+        if nwproto != '':
+            params['match[nw_proto]'] = nwproto
     else:
         print 'That is not a valid selection; restarting add rule \n'
         addrule()
