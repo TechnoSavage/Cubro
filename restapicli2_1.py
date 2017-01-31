@@ -881,7 +881,7 @@ def exportsp():
         filename = raw_input("Enter a file name for the savepoint: ")
         try:
             with open(filename, "w") as f:
-                f.write(r)
+                f.write(r) #Try json.dump(r, f)?
         except:
             print "Invalid filename\n"
             topmenu()
