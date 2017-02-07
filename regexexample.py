@@ -7,5 +7,5 @@ with open('sample.txt') as source:
         text = line.rstrip()
         words += text
 
-pattern = re.findall('(.abe\S+)', words)
+pattern = re.findall('(\S*abe\S*)', words)
 print pattern
