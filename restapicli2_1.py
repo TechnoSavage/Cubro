@@ -691,7 +691,7 @@ def addrule():  #Finish added appended key values
             3 - Yes, match a VLAN tag \n'''
     trafmatch = raw_input('Enter the number of your selection: ')
     if trafmatch == '' or int(trafmatch) == 1:
-        continue
+        pass
     elif int(trafmatch) == 2:
         params['match[vlan]'] = 'neg_match'
     elif int(trafmatch) == 3:
@@ -720,7 +720,7 @@ def addrule():  #Finish added appended key values
             8 - Enter Ethertype\n'''
     proto = raw_input('Enter the number of your selection: ')
     if proto == '' or int(proto) == 1:
-        continue
+        pass
     elif int(proto) == 2:
         params['match[protocol]'] = 'ip'
         nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
