@@ -1,0 +1,2 @@
+This is a sample text with a label that allows
+us to demonstrate how regular expressions work
