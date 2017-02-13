@@ -3,8 +3,45 @@
 import urllib, requests, json
 from requests.exceptions import ConnectionError
 
+#Print welcome statement
+print 'Welcome to the Cubro Bypass Switch REST Demo\n'
+#Define IP address of the Bypass Switch
+ip = raw_input('Enter the IP Address of the Bypass Switch you want to manage: ')
+url = 'http://' + ip
+
+#Main menu
+def menu():
+    global ip, url
+    print '\nWorking with Bypass Switch at', ip,'\n'
+    print '''Make Selection:
+            1 - Engage Bypass
+            2 - Disengage Bypass
+            3 - Timeout
+            4 - Change Management IP
+            5 - Change working device
+            6 - Quit\n'''
+    choice = raw_input('Enter the number of your selection: ')
+    #Evaluate user selection
+    if int(choice) == 1:
+        eng()
+    elif int(choice) == 2:
+        dis()
+    elif int(choice) == 3:
+        timeout()
+    elif int(choice) == 4:
+        mgmt()
+    elif int(choice) == 5:
+        ip = raw_input('Enter the IP Address of the Bypass Switch you want to manage: ')
+        url = 'http://' + ip
+    elif int(choice) == 6:
+        print 'Goodbye'
+        exit()
+    else:
+        print "That is not a valid choice"
+    menu()
+
 #Function to engage the bypass
-def eng(url):
+def eng():
     try:
         response = requests.get(url + '/takeDown?')
         print response.status_code
@@ -12,9 +49,10 @@ def eng(url):
     except ConnectionError as e:
         r = 'No Response'
         print 'Device is unavailable \n'
+    menu()
 
 #Function to disengage the bypass
-def dis(url):
+def dis():
     try:
         response = requests.get(url + '/takeUp?')
         print response.status_code
@@ -22,9 +60,10 @@ def dis(url):
     except ConnectionError as e:
         r = 'No Response'
         print 'Device is unavailable \n'
+    menu()
 
 #Function to disengage bypass for timeout period
-def timeout(url):
+def timeout():
     try:
         response = requests.get(url + '/setTimeout?')
         print response.status_code
@@ -32,9 +71,10 @@ def timeout(url):
     except ConnectionError as e:
         r = 'No Response'
         print 'Device is unavailable \n'
+    menu()
 
 #Function to change Management IP
-def mgmt(url):
+def mgmt():
     ipadd = raw_input("Enter the Management IP Address; leave blank for factory default 192.168.0.201: ")
     if len(ipadd) <= 0:
         ipadd = '192.168.0.201'
@@ -64,43 +104,6 @@ def mgmt(url):
     except ConnectionError as e:
         r = 'No Response'
         print 'Device is unavailable \n'
-
-if __name__ == '__main__':
-    #Print welcome statement
-    print 'Welcome to the Cubro Bypass Switch REST Demo\n'
-    #Define IP address of the Bypass Switch
-    ip = raw_input('Enter the IP Address of the Bypass Switch you want to manage: ')
-    url = 'http://' + ip
-
-    #Main menu
-    def menu():
-        global ip, url
-        print '\nWorking with Bypass Switch at', ip,'\n'
-        print '''Make Selection:
-                1 - Engage Bypass
-                2 - Disengage Bypass
-                3 - Timeout
-                4 - Change Management IP
-                5 - Change working device
-                6 - Quit\n'''
-        choice = raw_input('Enter the number of your selection: ')
-        #Evaluate user selection
-        if int(choice) == 1:
-            eng(url)
-        elif int(choice) == 2:
-            dis(url)
-        elif int(choice) == 3:
-            timeout(url)
-        elif int(choice) == 4:
-            mgmt(url)
-        elif int(choice) == 5:
-            ip = raw_input('Enter the IP Address of the Bypass Switch you want to manage: ')
-            url = 'http://' + ip
-        elif int(choice) == 6:
-            print 'Goodbye'
-            exit()
-        else:
-            print "That is not a valid choice"
-        menu()
-
     menu()
+
+menu()
