@@ -398,7 +398,7 @@ def resetrulecounter(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Add a rule
-def addrule(address, uri, auth):  #Finish added appended key values
+def addrule(address, uri, auth):
     url = address + uri + auth
     params = {}
     rulename = raw_input('Enter a name for the rule: ')
