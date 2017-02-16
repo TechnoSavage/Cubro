@@ -21,7 +21,7 @@ def createblacklist(match, uri, auth):
             'priority': rulepriority,
             'match[in_port]': '1,2',
             'match[protocol]': 'ip',
-            'match[nw_src]': m,
+            'match[nw_src]': m + '/24',
             'match[extra]': 'idle_timeout=65535',
             'actions': 'drop'
         }
