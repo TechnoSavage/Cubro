@@ -23,7 +23,7 @@ rule = '/flows?'
 def checktime():
     currenttime = datetime.now().strftime('%H:%M')
     print currenttime
-    if str(currenttime) == '11:39':
+    if str(currenttime) == '16:59':
         try:
             addrule()
         except ConnectionError as e:
