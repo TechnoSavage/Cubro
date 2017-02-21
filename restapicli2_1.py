@@ -593,7 +593,7 @@ def exportsp(address, uri, auth):
     rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
     pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
     url = address + uri + auth
-    params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
+    params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname} #Change to JSON encoding
     try:
         response = requests.get(url, data=params)
         print response.status_code
