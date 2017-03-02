@@ -591,7 +591,9 @@ def setbootsp(address, uri, auth):
 #Export a save point from the Packetmaster
 def exportsp(address, uri, auth):
     rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
+    rspname = '[' + rspname + ']'
     pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
+    pspname = '[' + pspname + ']'
     url = address + uri + auth
     params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname} #Change to JSON encoding
     try:
