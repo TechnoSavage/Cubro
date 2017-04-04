@@ -1,0 +1,419 @@
+!
+!
+
+
+!#######system section#######
+
+system
+set hostname NPAS
+set device_id 255
+set mgmt_ip 192.168.10.224/24
+set mgmt_gw 192.168.10.1
+set src_port 2000
+set auto_start enable
+set packets_filter disable
+set ntp_server_ip 192.168.10.110
+set ntp_interval 600
+set port_ip_mac 1 192.168.101.101 00-11-22-33-44-01
+set port_ip_mac 2 192.168.101.102 00-11-22-33-44-02
+set port_ip_mac 3 192.168.101.103 00-11-22-33-44-03
+set port_ip_mac 4 192.168.101.104 00-11-22-33-44-04
+set port_ip_mac 40 192.168.101.140 00-11-22-33-44-40
+insert group_port 1 40
+insert group_dst_addr 1 192.168.101.202 00-22-33-44-55-01 8000
+!
+!
+
+
+!#######debug section#######
+
+debug
+set watchdog_reset enable
+
+!---------encrypt configuration---------
+
+set encrypt_password zcxc123
+
+
+!---------cdr configuration---------
+
+set flux_input_original enable
+set flux_calc_from 1
+set dns_decode enable
+set wtp_decode enable
+set wsp_decode enable
+set http_decode enable
+set mmse_decode enable
+set wechat_decode disable
+set http_proc_pipeline enable
+set dns_dpi disable
+set mms_transid_assoc enable
+set mms_transid_hash_size 32768
+set mms_transid_max_num 100000
+set mms_transid_timeout 360
+set mms_transid_timeout_x 1
+set diameter_ip_key disable
+set diameter_learning_mme_port enable
+
+!---------initial fpa configuration---------
+
+set initial_fpa 0 500000
+set initial_fpa 1 10000000
+set initial_fpa 2 8192
+set initial_fpa 3 5000000
+set initial_fpa 4 100000
+set initial_fpa 5 100000
+set initial_fpa 6 150000
+set initial_fpa 7 50000
+
+!---------realloc fpa configuration---------
+
+set fpa_realloc_threshold 0 0
+set fpa_realloc_threshold 1 500000
+set fpa_realloc_threshold 2 0
+set fpa_realloc_threshold 3 100000
+set fpa_realloc_threshold 4 100000
+set fpa_realloc_threshold 5 100000
+set fpa_realloc_threshold 6 100000
+set fpa_realloc_threshold 7 50000
+
+set drop_pkt_mem_threshold 1024
+
+set gtpv2_proc enable
+!
+
+
+!#######service section#######
+
+service
+
+!---------presys cdr configuration---------
+
+set sctp_sort disable
+set sctp_frag enable
+set sctp_stream_timeout 6
+set sctp_frag_timeout 2
+set iups_control enable
+set iups_data disable
+set gb_control enable
+set gb_data disable
+set gb_bssgp enable
+set gb_bssgp_hash_size 524288
+set gb_bssgp_hash_max 800000
+set gb_bssgp_timeout 30
+set gb_bssgp_check_timeout 10
+set gb_tlli enable
+set gb_tlli_hash_size 4194304
+set gb_tlli_hash_max 4000000
+set gb_tlli_timeout 600
+set gb_tlli_check_timeout 60
+set gb_sig enable
+set gb_sig_hash_size 4194304
+set gb_sig_hash_max 4000000
+set gb_sig_timeout 15
+set gb_pdp enable
+set gb_pdp_hash_max 10000000
+set gb_pdp_timeout 600
+set gb_pdp_check_timeout 60
+set s1_mme enable
+set s1_mme_hash_size 1048576
+set s1_mme_timeout 60 1
+set s1_mme_assoc_s10_hash_size 65536
+set s1_mme_assoc_s10_timeout 10
+set s1_assoc s6a enable
+set s1_assoc s11 enable
+set s1_assoc sgs disable
+set s1_assoc x2uu disable
+set s1_assoc s1 enable
+set s1_assoc s10 enable
+set s1_assoc s1_2_s11 enable
+set nas_emm enable
+set nas_esm enable
+set s1_sign enable
+set s1_sms enable
+set s1_sms_timeout 15
+set s1_csfb enable
+set s1_csfb_timeout 15
+set s1_paging_interval 12
+set s1_paging_timeout 10
+set s1_erab enable
+set s1_erab_hash_size 65536
+set s1_erab_timeout 20
+set s1_handover enable
+set s1_handover_hash_size 65536
+set s1_handover_timeout 10
+set s1_man enable
+set s1_man_hash_size 65536
+set s1_man_timeout 10
+set s1_uinfo enable
+set s1_uinfo_hash_size 6291469
+set s1_uinfo_timeout 1800 8
+set s1_send_uinfo disable
+set s1_pcl_send_decrypt_raw disable
+set diameter_decode enable
+set diameter_learning_port enable
+set diameter_vector enable
+set diameter_cdr enable
+set diameter_vector_timeout 300 1
+set diameter_vector_hashsize 8388608
+set diameter_vector_hashmax 8388608
+set diameter_vector_imsi_timeout 100
+set diameter_vector_imsi_guess 30 3000
+set diameter_cdr_timeout 20
+set diameter_cdr_hashsize 500000
+set diameter_cdr_hashmax 500000
+set nas_sms_decode  enable
+set nas_sms_peek  disable
+set x2_manage  disable
+set x2_manage_timeout  20
+set x2_manage_hash_size  65536
+set x2_manage_hash_max  100000
+set x2_handover  disable
+set x2_handover_timeout  20
+set x2_handover_hash_size  65536
+set x2_handover_hash_max  100000
+set uu_signal  disable
+set uu_signal_timeout  10
+set uu_signal_hash_size  65536
+set uu_signal_hash_max  100000
+set uu_mobility  disable
+set uu_mobility_timeout  10
+set uu_mobility_hash_size  65536
+set uu_mobility_hash_max  100000
+set uu_mr  disable
+set sgs_decode disable
+set sgs_mm  disable
+set sgs_mm_timeout  20
+set sgs_mm_hash_size  65536
+set sgs_mm_hash_max  100000
+set sgs_cs  disable
+set sgs_cs_timeout  60
+set sgs_cs_hash_size  65536
+set sgs_cs_hash_max  100000
+set radius_dec enable
+set radius_cdr enable
+set radius_timeout  30
+set radius_hash_size  4194304
+set radius_max_num  10000000
+set radius_corre enable
+set radius_corre_timeout  1800 1
+set radius_corre_hash_size  4194304
+set radius_corre_max_num  10000000
+set radius_userip_tbl enable
+set radius_userip_tbl_timeout  120 180
+set radius_userip_tbl_hash_size  10000000
+set radius_userip_tbl_max_num  10000000
+insert diameter_port 3868
+insert diameter_port 3869
+insert diameter_port 5868
+insert sgsap_port 29118
+insert sgsap_port 29119
+insert gb_port 16464
+
+set iups_all_cdr enable
+set iups_common_cdr enable
+set iups_rab_cdr enable
+set iups_pdp_cdr enable
+set iups_pdp_rab_assoc disable
+set iups_ranap_timeout 30
+set iups_common_timeout 6
+set iups_rab_timeout 6
+set iups_pdp_timeout 600
+set iups_uinfo_imsi_timeout 2592000
+set iups_pdp_rab_node_timeout 1800
+
+!---------s1_mme_ip_group-----------
+
+
+!---------cdr configuration---------
+
+set user_service enable
+set user_service_send_all disable
+set user_service_send_period 60
+set mms enable
+set mms_hash 32768
+set mms_node_num 100000
+set mms_timeout 180
+set dns enable
+set dns_timeout 30
+set dns_hash 2097152
+set dns_node_num 3000000
+set dns_learn_ip disable
+set dns_insert_max_depth 5000
+set wap_cnt enable
+set wap_cnt_timeout 18
+set wap_cnt_hash 32768
+set wap_cnt_node_num 100000
+set wap1x enable
+set wap1x_timeout 180
+set wap1x_hash 32768
+set wap1x_node_num 100000
+set ip_flow disable
+set ip_flow_timeout 30
+set ip_flow_hash 6291456
+set ip_flow_node_num 5000000
+set tcp_cnt disable
+set tcp_cnt_timeout 60
+set tcp_cnt_hash 4194304
+set tcp_cnt_node_num 3000000
+set tcp_trans disable
+set tcp_trans_timeout 20
+set tcp_trans_hash 6291456
+set tcp_trans_node_num 5000000
+set tcp_trans_s_timeout 2
+set http enable
+set http_hash 4194304
+set http_node_num 2500000
+set http_timeout 30
+set http_short_timeout 5
+set wechat disable
+set wechat_timeout 120
+set wechat_hash 4194304
+set wechat_node_num 2000000
+set wechat_pb_cdr enable
+set wechat_assoc enable
+set wechat_assoc_timeout 30
+set wechat_assoc_hash 4194304
+set wechat_assoc_node_num 2000000
+set qq enable
+set qq_timeout 10
+set qq_hash 4194304
+set qq_node_num 2000000
+set realtime_flow disable
+set realtime_flow_node_num 1000000
+set realtime_flow_timeout 30
+set wsp_frag_node_num 30000
+set wsp_frag_hash 30000
+set wsp_frag_timeout 30
+set rtsp enable
+set rtsp_hash 50000
+set rtsp_node_num 50000
+set rtsp_timeout 30
+set ftp enable
+set ftp_timeout 30
+set ftp_hash 50000
+set ftp_node_num 50000
+set p2p disable
+set p2p_timeout 30
+set p2p_hash 100000
+set p2p_node_num 100000
+set sip enable
+set sip_timeout 30
+set sip_hash 50000
+set sip_node_num 50000
+set email enable
+set email_timeout 30
+set email_hash 50000
+set email_node_num 50000
+
+!---------tunnel configuration---------
+
+set tunnel enable
+set tunnel_base_core 26
+set tunnel_core_num 6
+set resub_base_core 1
+set resub_core_num 25
+set udp_default_proto 0
+set sdtp_port 0
+
+!---------gtp configuration---------
+
+set gtp gtpv0v1v2
+set gtp_hash 65536
+set gtp_pdp_hash 6291469
+set gtp_timeout 30
+set gtp_pdp_timeout 1800 1
+set gtp_pdp_delete_delay 60
+set gtp_assoc_with_gtpv2 enable
+set gtp_bear_hashsize 5242880
+set gtp_bear_timeout 1800 1
+set gtp_bear_delete_delay 60
+set gtpv2_onlyprocs11keymsg disable
+set gtpv2_procs10msg        enable
+set gtpu_associate_area lte
+set gtpc_default_inteface s11
+set notunnel_resub disable
+set dev_addr enable
+set dev_addr_hashsize 393216
+set dev_addrnode_max  786432
+set dev_addr_timeout  1800 48
+set dev_addr_debuglevel 0
+
+!---------ip reassembly configuration---------
+
+set ip_reassembly_hash 1024
+set ip_reassembly_node_num 400000
+set ip_reassembly_timeout 6
+
+!---------global configuration---------
+
+set session enable
+set session_hash 524288
+set session_node_num 20000000
+set session_tcp_timeout 60
+set session_tcp_closing_timeout 5
+set session_tcp_outoforder_threshhold 5
+set session_udp_timeout 20
+set sub_work_mode disable
+set sig_packet_action drop
+
+!---------pcl configuration---------
+
+set pcl disable
+
+!---------pcl rules---------
+
+
+!---------send cdr configuration---------
+
+insert send_cdr 1 user_service
+insert send_cdr 1 wap
+insert send_cdr 1 wap
+insert send_cdr 1 wap_cnt
+insert send_cdr 1 dns
+insert send_cdr 1 gtp
+insert send_cdr 1 gtpv2
+insert send_cdr 1 ftp
+insert send_cdr 1 rtsp
+insert send_cdr 1 email
+insert send_cdr 1 sip
+insert send_cdr 1 gmm_attach
+insert send_cdr 1 gmm_detach
+insert send_cdr 1 gmm_rau
+insert send_cdr 1 gmm_service_request
+insert send_cdr 1 gmm_other
+insert send_cdr 1 sm_activate_pdp
+insert send_cdr 1 sm_deactivate_pdp
+insert send_cdr 1 sm_modify_pdp
+insert send_cdr 1 user_pdp
+insert send_cdr 1 iups_rab
+insert send_cdr 1 iups_relocation
+insert send_cdr 1 iups_ranap
+insert send_cdr 1 gb_bssgp
+insert send_cdr 1 gb_ns
+insert send_cdr 1 sgscs
+insert send_cdr 1 sgsmm
+insert send_cdr 1 diameter
+insert send_cdr 1 s1mme
+insert send_cdr 1 emm
+insert send_cdr 1 esm
+insert send_cdr 1 s1sig
+insert send_cdr 1 s1sms
+insert send_cdr 1 s1csfb
+insert send_cdr 1 s1erab
+insert send_cdr 1 s1hand
+insert send_cdr 1 s1man
+insert send_cdr 1 sip
+
+!---------server ip---------
+
+
+!
+ !
+
+
+!
+ !
+
+!
+end
