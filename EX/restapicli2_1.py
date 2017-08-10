@@ -741,7 +741,7 @@ if __name__ == '__main__':
         the Cubro REST API. \n'''
 
     #IP address to access REST data of device
-    deviceip = raw_input('What is the IP address of the Packetmaster you want to access: ')
+    deviceip = raw_input('What is the IP address of the Packetmaster you want to access?: ')
     address = 'http://' + deviceip + '/rest'
     #Device credentials
     username = raw_input('Enter your username: ')
