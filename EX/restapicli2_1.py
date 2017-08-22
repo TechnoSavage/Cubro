@@ -401,21 +401,24 @@ def resetrulecounter(address, uri, auth):
 def addrule(address, uri, auth):
     url = address + uri + auth
     params = {}
-    rulename = raw_input('Enter a name for the rule: ')
+    rulename = raw_input('Enter a name for the rule [none]: ')
     if rulename != '':
         params['name'] = rulename
-    ruledescrip = raw_input('Enter a description for the rule: ')
+    ruledescrip = raw_input('Enter a description for the rule [none]: ')
     if ruledescrip != '':
         params['description'] = ruledescrip
-    priority = int(raw_input('Enter the priority level of the rule; 0 - 65535 higher number = higher priority: '))
-    params['priority'] = priority
+    priority = int(raw_input('Enter the priority level of the rule; 0 - 65535 higher number = higher priority [32768]: '))
+    if priority != '':
+        params['priority'] = priority
+    else:
+        params['priority'] = '32768'
     portin = raw_input('Enter the port number or numbers for incoming traffic; multiple ports separated by a comma: ')
     params['match[in_port]'] = portin
     print '''\nMatch VLAN tag?
             1 - No, match all tagged and untagged traffic
             2 - No, match only untagged traffic
             3 - Yes, match a VLAN tag \n'''
-    trafmatch = raw_input('Enter the number of your selection: ')
+    trafmatch = raw_input('Enter the number of your selection [1]: ')
     if trafmatch == '' or int(trafmatch) == 1:
         pass
     elif int(trafmatch) == 2:
@@ -424,8 +427,14 @@ def addrule(address, uri, auth):
         params['match[vlan]'] = 'match'
         matchid = raw_input('Enter the VLAN ID to filter on: ')
         params['match[vlan_id]'] = matchid
-        vpri = raw_input('Enter the VLAN priority (Enter 0-7): ')
-        params['match[vlan_priority]'] = vpri
+        vpri = raw_input('Enter the VLAN priority (Enter 0-7) [0]: ')
+        if vpri != '' and int(vpri) >= 0 or int(vpri) <= 7:
+            params['match[vlan_priority]'] = vpri
+        elif vpri != '' and int(vpri) <0 or int(vpri) >7:
+            print "That is not a valid selection; VLAN priority defaulting to '0'"
+            params['match[vlan_priority]'] = '0'
+        else:
+            params['match[vlan_priority]'] = '0'
     else:
         print 'That is not a valid selection; restarting add rule\n'
         addrule(ip, uri, auth)
@@ -444,7 +453,7 @@ def addrule(address, uri, auth):
             6 - icmp
             7 - arp
             8 - Enter Ethertype\n'''
-    proto = raw_input('Enter the number of your selection: ')
+    proto = raw_input('Enter the number of your selection [1]: ')
     if proto == '' or int(proto) == 1:
         pass
     elif int(proto) == 2:
@@ -531,7 +540,7 @@ def addrule(address, uri, auth):
     extra = raw_input('Enter Extra Custom Match String: ')
     if extra != '':
         params['match[extra]'] = extra
-    ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - imporoper syntax will cause add rule to fail: ')
+    ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - improper syntax will cause add rule to fail: ')
     params['actions'] = ruleaction
     try:
         response = requests.post(url, data=params)
