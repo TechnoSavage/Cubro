@@ -407,11 +407,11 @@ def addrule(address, uri, auth):
     ruledescrip = raw_input('Enter a description for the rule [none]: ')
     if ruledescrip != '':
         params['description'] = ruledescrip
-    priority = int(raw_input('Enter the priority level of the rule; 0 - 65535 higher number = higher priority [32768]: '))
+    priority = raw_input('Enter the priority level of the rule; 0 - 65535 higher number = higher priority [32768]: ')
     if priority != '':
-        params['priority'] = priority
+        params['priority'] = int(priority)
     else:
-        params['priority'] = '32768'
+        params['priority'] = 32768
     portin = raw_input('Enter the port number or numbers for incoming traffic; multiple ports separated by a comma: ')
     params['match[in_port]'] = portin
     print '''\nMatch VLAN tag?
@@ -901,7 +901,7 @@ if __name__ == '__main__':
             getsfp(address, sfp, auth)
             topmenu()
         elif int(choice) == 11:
-            getrulesrun(address, rulesrun, auth)
+            getrulesrun(address, allrule, auth)
             topmenu()
         elif int(choice) == 12:
             getapps(address, apps, auth)
