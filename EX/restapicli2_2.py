@@ -321,12 +321,12 @@ def changeip(address, uri, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Change the device name
-def changename(address, uri, auth):
+def changename(address, uri, username=None, password=None):
     newname = raw_input('Enter device name: ')
-    url = address + uri + auth
+    url = address + uri
     params = {'devicename': newname}
     try:
-        response = requests.post(url, data=params)
+        response = requests.post(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -336,14 +336,14 @@ def changename(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Change the configuration of a port
-def changeportconfig(address, uri, auth): #Add additional parameters, add function to change multiple ports without exiting
+def changeportconfig(address, uri, username=None, password=None): #Add additional parameters, add function to change multiple ports without exiting
     interface = raw_input('Enter the interface name of the port you want to change: ')
     speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ')
     duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto": ')
     forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no: ')
     check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no: ')
     recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no: ')
-    url = address + uri + auth
+    url = address + uri
     params = {
         'if_name': interface,
         'speed': speed,
@@ -352,7 +352,7 @@ def changeportconfig(address, uri, auth): #Add additional parameters, add functi
         'crc_check': check,
         'crc_recalculation': recalc }
     try:
-        response = requests.post(url, data=params)
+        response = requests.post(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -362,13 +362,13 @@ def changeportconfig(address, uri, auth): #Add additional parameters, add functi
         print 'Device is unavailable \n'
 
 #Activate or deactivate a port
-def portonoff(address, uri, auth):
+def portonoff(address, uri, username=None, password=None):
     interface = raw_input('Enter the interface name of the port you want to change: ')
     updown = raw_input('Enter "true" to shut port down; Enter "false" to reactivate port: ')
-    url = address + uri + auth
+    url = address + uri
     params = {'if_name': interface, 'shutdown': updown}
     try:
-        response = requests.post(url, data=params)
+        response = requests.post(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -378,28 +378,28 @@ def portonoff(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Reset Port Counters
-def deletecounters(address, uri, auth):
-    url = address + uri + auth
+def deletecounters(address, uri, username=None, password=None):
+    url = address + uri
     try:
-        requests.delete(url)
+        requests.delete(url, auth=(username, password))
         print 'Counters deleted successfully'
     except ConnectionError as e:
         r = 'No Response'
         print 'Device is unavailable \n'
 
 #Reset Rule Counters
-def resetrulecounter(address, uri, auth):
-    url = address + uri + auth
+def resetrulecounter(address, uri, username=None, password=None):
+    url = address + uri
     try:
-        requests.delete(url)
+        requests.delete(url, auth=(username, password))
         print 'Counters deleted successfully'
     except ConnectionError as e:
         r = 'No Response'
         print 'Device is unavailable \n'
 
 #Add a rule
-def addrule(address, uri, auth):
-    url = address + uri + auth
+def addrule(address, uri, username=None, password=None):
+    url = address + uri
     params = {}
     rulename = raw_input('Enter a name for the rule [none]: ')
     if rulename != '':
@@ -543,7 +543,7 @@ def addrule(address, uri, auth):
     ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - improper syntax will cause add rule to fail: ')
     params['actions'] = ruleaction
     try:
-        response = requests.post(url, data=params)
+        response = requests.post(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -553,12 +553,12 @@ def addrule(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Make a port save point active
-def actspport(address, uri, auth):
+def actspport(address, uri, username=None, password=None):
     savename = raw_input('What is the name of the port save point to make active?: ')
-    url = address + uri + auth
+    url = address + uri
     params = {'name': savename}
     try:
-        response = requests.put(url, data=params)
+        response = requests.put(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -568,12 +568,12 @@ def actspport(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Make a rule save point active
-def actsprule(address, uri, auth):
+def actsprule(address, uri, username=None, password=None):
     savename = raw_input('What is the name of the rule save point to make active?: ')
-    url = address + uri + auth
+    url = address + uri
     params = {'name': savename}
     try:
-        response = requests.put(url, data=params)
+        response = requests.put(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -583,12 +583,12 @@ def actsprule(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Set a save point as the default boot configuration
-def setbootsp(address, uri, auth):
+def setbootsp(address, uri, username=None, password=None):
     savename = raw_input('What is the name of the save point to make the default at boot configuration?: ')
-    url = address + uri + auth
+    url = address + uri
     params = {'name': savename}
     try:
-        response = requests.put(url, data=params)
+        response = requests.put(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -598,15 +598,15 @@ def setbootsp(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Export a save point from the Packetmaster
-def exportsp(address, uri, auth):
+def exportsp(address, uri, username=None, password=None):
     rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
     rspname = '[' + rspname + ']'
     pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
     pspname = '[' + pspname + ']'
-    url = address + uri + auth
+    url = address + uri
     params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname} #Change to JSON encoding
     try:
-        response = requests.get(url, data=params)
+        response = requests.get(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -622,15 +622,15 @@ def exportsp(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Modify a port save point
-def modportsp(address, uri, auth):
+def modportsp(address, uri, username=None, password=None):
     oldname = raw_input("What is the name of the save point you would like to modify?")
     newname = raw_input("What would you like to rename this save point to?")
     desc = raw_input("What is the description of the save point?")
     saveports = raw_input('Hit enter to save the current active ports to this save point; type "false" to not save them (This overwrites port configuration of the save point): ')
-    url = address + uri + auth
+    url = address + uri
     params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saveports': saveports}
     try:
-        response = requests.post(url, data=params)
+        response = requests.post(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -640,15 +640,15 @@ def modportsp(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Modify a rule save point
-def modrulesp(address, uri, auth):
+def modrulesp(address, uri, username=None, password=None):
     oldname = raw_input("What is the name of the save point you would like to modify?")
     newname = raw_input("What would you like to rename this save point to?")
     desc = raw_input("What is the description of the save point?")
     saverules = raw_input('Hit enter to save the current active rules to this save point; type "false" to not save them (This overwrites rule configuration of the save point): ')
-    url = address + uri + auth
+    url = address + uri
     params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saverules': saverules}
     try:
-        response = requests.post(url, data=params)
+        response = requests.post(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -658,13 +658,13 @@ def modrulesp(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Create a port save point from current configuration
-def createportsp(address, uri, auth):
+def createportsp(address, uri, username=None, password=None):
     name = raw_input("What would you like to name the port save point?")
     desc = raw_input("Enter a description for the port save point")
-    url = address + uri + auth
+    url = address + uri
     params = {'name': name, 'description': desc}
     try:
-        response = requests.post(url, data=params)
+        response = requests.post(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -674,10 +674,10 @@ def createportsp(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Create a quicksave point of current configuration
-def createquick(address, uri, auth):
-    url = address + uri + auth
+def createquick(address, uri, username=None, password=None):
+    url = address + uri
     try:
-        response = requests.put(url)
+        response = requests.put(url, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -687,13 +687,13 @@ def createquick(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Create a rule save point from current configuration
-def createrulesp(address, uri, auth):
+def createrulesp(address, uri, username=None, password=None):
     name = raw_input("What would you like to name the rule save point?")
     desc = raw_input("Enter a description for the rule save point")
-    url = address + uri + auth
+    url = address + uri
     params = {'name': name, 'description': desc}
     try:
-        response = requests.post(url, data=params)
+        response = requests.post(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -703,12 +703,12 @@ def createrulesp(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Delete a port save point
-def deleteportsp(address, uri, auth):
+def deleteportsp(address, uri, username=None, password=None):
     name = raw_input("What is the name of the port save point you would like to delete?")
-    url = address + uri + auth
+    url = address + uri
     params = {'name': name}
     try:
-        response = requests.delete(url, data=params)
+        response = requests.delete(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -718,12 +718,12 @@ def deleteportsp(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Delete a rule save point
-def deleterulesp(address, uri, auth):
+def deleterulesp(address, uri, username=None, password=None):
     name = raw_input("What is the name of the rule save point you would like to delete?")
-    url = address + uri + auth
+    url = address + uri
     params = {'name': name}
     try:
-        response = requests.delete(url, data=params)
+        response = requests.delete(url, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -733,10 +733,10 @@ def deleterulesp(address, uri, auth):
         print 'Device is unavailable \n'
 
 #Reboot the Packetmaster
-def reboot(address, uri, auth):
-    url = address + uri + auth
+def reboot(address, uri, username=None, password=None):
+    url = address + uri
     try:
-        requests.post(url)
+        requests.post(url, auth=(username, password))
         print 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
     except ConnectionError as e:
         r = 'No Response'
