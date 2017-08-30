@@ -19,10 +19,11 @@ def getversion(address, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Retrieve IP configuration
-def getip(address, uri, username=None, password=None):
+def getip(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/ipconfig?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -32,10 +33,11 @@ def getip(address, uri, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Retrieve Packetmaster model
-def getmodel(address, uri, username=None, password=None):
+def getmodel(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/model?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -45,10 +47,11 @@ def getmodel(address, uri, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Retrieve Packetmaster name
-def getname(address, uri, username=None, password=None):
+def getname(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/name?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -58,10 +61,11 @@ def getname(address, uri, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Retrieve Packetmaster Name plus Notes
-def getlabel(address, uri, username=None, password=None):
+def getlabel(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/customident?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -758,10 +762,6 @@ if __name__ == '__main__':
     password = getpass()
     #Integrate all REST URIs and address concatenation into functions so that functions are independent of active code (more object-oriented)
     #options to append to device URL
-    ipconfig = '/device/ipconfig?' #good
-    devicemodel = '/device/model?' #good
-    devicename = '/device/name?' #good
-    devicelabel = '/device/customident?' #add post
     devicegen = '/device/generation?' #good
     deviceenv = '/device/environment?' #good
     deviceidled = '/device/idled?' #add post
@@ -816,8 +816,7 @@ if __name__ == '__main__':
 
         option = raw_input('Enter the number of what you would like to do: ')
         if int(option) == 1:
-            deviceip = raw_input('What is the IP address of the Packetmaster you want to access: ')
-            address = 'http://' + deviceip + '/rest'
+            address = raw_input('What is the IP address of the Packetmaster you want to access: ')
             topmenu()
         elif int(option) == 2:
             username = raw_input('Enter your username: ')
@@ -866,67 +865,67 @@ if __name__ == '__main__':
             getversion(address, username, password)
             topmenu()
         elif int(choice) == 2:
-            getip(address, ipconfig, username, password)
+            getip(address, username, password)
             topmenu()
         elif int(choice) == 3:
-            getmodel(address, devicemodel, username, password)
+            getmodel(address, username, password)
             topmenu()
         elif int(choice) == 4:
-            getlabel(address, devicelabel, username, password)
+            getlabel(address, username, password)
             topmenu()
         elif int(choice) == 5:
-            getserial(address, serial, username, password)
+            getserial(address, username, password)
             topmenu()
         elif int(choice) == 6:
-            getgen(address, devicegen, username, password)
+            getgen(address, username, password)
             topmenu()
         elif int(choice) == 7:
-            getportconfig(address, portconfig, username, password)
+            getportconfig(address, username, password)
             topmenu()
         elif int(choice) == 8:
-            getportinfo(address, portinfo, username, password)
+            getportinfo(address, username, password)
             topmenu()
         elif int(choice) == 9:
-            getportstat(address, portstat, username, password)
+            getportstat(address, username, password)
             topmenu()
         elif int(choice) == 10:
-            getsfp(address, sfp, username, password)
+            getsfp(address, username, password)
             topmenu()
         elif int(choice) == 11:
-            getrulesrun(address, allrule, username, password)
+            getrulesrun(address, username, password)
             topmenu()
         elif int(choice) == 12:
-            getapps(address, apps, username, password)
+            getapps(address, username, password)
             topmenu()
         elif int(choice) == 13:
-            getappsrun(address, appsrun, username, password)
+            getappsrun(address, username, password)
             topmenu()
         elif int(choice) == 14:
-            getsaves(address, sp, username, password)
+            getsaves(address, username, password)
             topmenu()
         elif int(choice) == 15:
-            gethash(address, devicehash, username, password)
+            gethash(address, username, password)
             topmenu()
         elif int(choice) == 16:
-            getperm(address, deviceperm, username, password)
+            getperm(address, username, password)
             topmenu()
         elif int(choice) == 17:
-            getstor(address, devicestor, username, password)
+            getstor(address, username, password)
             topmenu()
         elif int(choice) == 18:
-            getenv(address, deviceenv, username, password)
+            getenv(address, username, password)
             topmenu()
         elif int(choice) == 19:
-            getidled(address, deviceidled, username, password)
+            getidled(address, username, password)
             topmenu()
         elif int(choice) == 20:
-            getload(address, deviceload, username, password)
+            getload(address, username, password)
             topmenu()
         elif int(choice) == 21:
-            getmem(address, devicemem, username, password)
+            getmem(address, username, password)
             topmenu()
         elif int(choice) == 22:
-            getserver(address, deviceserver, username, password)
+            getserver(address, username, password)
             topmenu()
         elif int(choice) == 23:
             topmenu()
@@ -960,61 +959,61 @@ if __name__ == '__main__':
                 20 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         if int(change) == 1:
-            changeip(address, ipconfig, username, password)
+            changeip(address, username, password)
             topmenu()
         elif int(change) == 2:
-            changename(address, devicename, username, password)
+            changename(address, username, password)
             topmenu()
         elif int(change) == 3:
-            changeportconfig(address, portconfig, username, password)
+            changeportconfig(address, username, password)
             topmenu()
         elif int(change) == 4:
-            portonoff(address, portconfig, username, password)
+            portonoff(address, username, password)
             topmenu()
         elif int(change) == 5:
-            deletecounters(address, counters, username, password)
+            deletecounters(address, username, password)
             topmenu()
         elif int(change) == 6:
-            resetrulecounter(address, rulecount, username, password)
+            resetrulecounter(address, username, password)
             topmenu()
         elif int(change) == 7:
-            addrule(address, rule, username, password)
+            addrule(address, username, password)
             topmenu()
         elif int(change) == 8:
-            actspport(address, spaports, username, password)
+            actspport(address, username, password)
             topmenu()
         elif int(change) == 9:
-            actsprule(address, sparules, username, password)
+            actsprule(address, username, password)
             topmenu()
         elif int(change) == 10:
-            setbootsp(address, spset, username, password)
+            setbootsp(address, username, password)
             topmenu()
         elif int(change) == 11:
-            exportsp(address, spexport, username, password)
+            exportsp(address, username, password)
             topmenu()
         elif int(change) == 12:
-            modportsp(address, spmodport, username, password)
+            modportsp(address, username, password)
             topmenu()
         elif int(change) == 13:
-            modrulesp(address, spmodrule, username, password)
+            modrulesp(address, username, password)
             topmenu()
         elif int(change) == 14:
-            createportsp(address, spportsave, username, password)
+            createportsp(address, username, password)
             topmenu()
         elif int(change) == 15:
-            createquick(address, spquick, username, password)
+            createquick(address, username, password)
             topmenu()
         elif int(change) == 16:
-            createrulesp(address, sprulesave, username, password)
+            createrulesp(address, username, password)
             topmenu()
         elif int(change) == 17:
-            deleteportsp(address, spportsave, username, password)
+            deleteportsp(address, username, password)
             topmenu()
         elif int(change) == 18:
-            deleterulesp(address, sprulesave, username, password)
+            deleterulesp(address, username, password)
             topmenu()
         elif int(change) == 19:
-            reboot(address, reboot, username, password)
+            reboot(address, username, password)
             topmenu()
         elif int(change) == 20:
             topmenu()
