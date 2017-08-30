@@ -775,7 +775,8 @@ def reboot(address, uri, username=None, password=None):
     url = address + uri
     try:
         requests.post(url, auth=(username, password))
-        print 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
+        message = 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
+        return message
     except ConnectionError as e:
         r = 'No Response'
         raise e
@@ -988,61 +989,80 @@ if __name__ == '__main__':
                 20 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         if int(change) == 1:
-            changeip(address, username, password)
+            ipchange = changeip(address, username, password)
+            print ipchange
             topmenu()
         elif int(change) == 2:
-            changename(address, username, password)
+            namechange = changename(address, username, password)
+            print namechange
             topmenu()
         elif int(change) == 3:
-            changeportconfig(address, username, password)
+            configchange = changeportconfig(address, username, password)
+            print configchange
             topmenu()
         elif int(change) == 4:
-            portonoff(address, username, password)
+            onoff = portonoff(address, username, password)
+            print onoff
             topmenu()
         elif int(change) == 5:
-            deletecounters(address, username, password)
+            countersdelete = deletecounters(address, username, password)
+            print countersdelete
             topmenu()
         elif int(change) == 6:
-            resetrulecounter(address, username, password)
+            rulereset = resetrulecounter(address, username, password)
+            print rulereset
             topmenu()
         elif int(change) == 7:
-            addrule(address, username, password)
+            ruleadd = addrule(address, username, password)
+            print ruleadd
             topmenu()
         elif int(change) == 8:
-            actspport(address, username, password)
+            portspactive = actspport(address, username, password)
+            print portspactive
             topmenu()
         elif int(change) == 9:
-            actsprule(address, username, password)
+            rulespactive = actsprule(address, username, password)
+            print rulespactive
             topmenu()
         elif int(change) == 10:
-            setbootsp(address, username, password)
+            spset = setbootsp(address, username, password)
+            print spset
             topmenu()
         elif int(change) == 11:
-            exportsp(address, username, password)
+            spexport = exportsp(address, username, password)
+            print spexport
             topmenu()
         elif int(change) == 12:
-            modportsp(address, username, password)
+            portspmod = modportsp(address, username, password)
+            print portspmod
             topmenu()
         elif int(change) == 13:
-            modrulesp(address, username, password)
+            rulepsmod = modrulesp(address, username, password)
+            print rulepsmod
             topmenu()
         elif int(change) == 14:
-            createportsp(address, username, password)
+            portspcreate = createportsp(address, username, password)
+            print portspcreate
             topmenu()
         elif int(change) == 15:
-            createquick(address, username, password)
+            quickcreate = createquick(address, username, password)
+            print quickcreate
             topmenu()
         elif int(change) == 16:
-            createrulesp(address, username, password)
+            rulespcreate = createrulesp(address, username, password)
+            print rulespcreate
             topmenu()
         elif int(change) == 17:
-            deleteportsp(address, username, password)
+            portspdelete = deleteportsp(address, username, password)
+            print portspdelete
             topmenu()
         elif int(change) == 18:
-            deleterulesp(address, username, password)
+            rulepsdelete = deleterulesp(address, username, password)
+            print rulespdelete
             topmenu()
         elif int(change) == 19:
-            reboot(address, username, password)
+            restart = reboot(address, username, password)
+            print restart
             topmenu()
         elif int(change) == 20:
             topmenu()
