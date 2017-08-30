@@ -771,10 +771,11 @@ def deleterulesp(address, uri, username=None, password=None):
         raise e
 
 #Reboot the Packetmaster
-def reboot(address, uri, username=None, password=None):
-    url = address + uri
+def reboot(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints?'
+
     try:
-        requests.post(url, auth=(username, password))
+        requests.post(uri, auth=(username, password))
         message = 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
         return message
     except ConnectionError as e:
@@ -809,8 +810,7 @@ if __name__ == '__main__':
     spportsave = '/savepoints/portsavepoint?'
     spquick = '/savepoints/quicksaverules?'
     sprulesave = '/savepoints/rulesavepoint?'
-    reboot = '/device/reboot?'
-
+    
     #Initial menu to check or change settings
     def topmenu():
         global deviceip, address, username, password
