@@ -75,10 +75,11 @@ def getlabel(address, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Retrieve hardware generation of the device
-def getgen(address, uri, username=None, password=None):
+def getgen(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/generation?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -88,10 +89,11 @@ def getgen(address, uri, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Retrieve Packetmaster serial number
-def getserial(address, uri, username=None, password=None):
+def getserial(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/serialno?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -101,10 +103,11 @@ def getserial(address, uri, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Retrieve current port configuration
-def getportconfig(address, uri, username=None, password=None):
+def getportconfig(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/ports/config?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -113,11 +116,12 @@ def getportconfig(address, uri, username=None, password=None):
         r = 'No Response'
         print 'Device is unavailable \n'
 
-#Retrieve port statistics
-def getportinfo(address, uri, username=None, password=None):
+#Retrieve port information
+def getportinfo(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/ports/info?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -127,10 +131,11 @@ def getportinfo(address, uri, username=None, password=None):
         print 'Device is unavailable \n'
 
 #Retrieve port counters
-def getportstat(address, uri, username=None, password=None):
+def getportstat(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/ports/stats?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -762,7 +767,6 @@ if __name__ == '__main__':
     password = getpass()
     #Integrate all REST URIs and address concatenation into functions so that functions are independent of active code (more object-oriented)
     #options to append to device URL
-    devicegen = '/device/generation?' #good
     deviceenv = '/device/environment?' #good
     deviceidled = '/device/idled?' #add post
     deviceload = '/device/loadaverage?' #good
@@ -772,10 +776,6 @@ if __name__ == '__main__':
     deviceserver = '/device/serverrevision?' #good
     deviceperm = '/device/permanentrulesmode?' #Add post
     devicestor = '/device/rulestoragemode?' #Add post
-    serial = '/device/serialno?' #good
-    portconfig = '/ports/config?' #good
-    portinfo = '/ports/info?'
-    portstat = '/ports/stats?'
     sfp = '/ports/sfpstatus?'
     counters = '/ports/counters?'
     rulecount = '/rules/counters?'
