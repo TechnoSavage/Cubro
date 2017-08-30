@@ -822,11 +822,7 @@ if __name__ == '__main__':
             topmenu()
         elif int(option) == 2:
             username = raw_input('Enter your username: ')
-            password = raw_input('Enter your password: ')
-            auth = urllib.urlencode({
-                'username': username,
-                'password': password
-            })
+            password = getpass()
             topmenu()
         elif int(option) == 3:
             checkmenu()
@@ -868,70 +864,70 @@ if __name__ == '__main__':
                  23 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
         if int(choice) == 1:
-            getversion(address, version, auth)
+            getversion(address, version, username, password)
             topmenu()
         elif int(choice) == 2:
-            getip(address, ipconfig, auth)
+            getip(address, ipconfig, username, password)
             topmenu()
         elif int(choice) == 3:
-            getmodel(address, devicemodel, auth)
+            getmodel(address, devicemodel, username, password)
             topmenu()
         elif int(choice) == 4:
-            getlabel(address, devicelabel, auth)
+            getlabel(address, devicelabel, username, password)
             topmenu()
         elif int(choice) == 5:
-            getserial(address, serial, auth)
+            getserial(address, serial, username, password)
             topmenu()
         elif int(choice) == 6:
-            getgen(address, devicegen, auth)
+            getgen(address, devicegen, username, password)
             topmenu()
         elif int(choice) == 7:
-            getportconfig(address, portconfig, auth)
+            getportconfig(address, portconfig, username, password)
             topmenu()
         elif int(choice) == 8:
-            getportinfo(address, portinfo, auth)
+            getportinfo(address, portinfo, username, password)
             topmenu()
         elif int(choice) == 9:
-            getportstat(address, portstat, auth)
+            getportstat(address, portstat, username, password)
             topmenu()
         elif int(choice) == 10:
-            getsfp(address, sfp, auth)
+            getsfp(address, sfp, username, password)
             topmenu()
         elif int(choice) == 11:
-            getrulesrun(address, allrule, auth)
+            getrulesrun(address, allrule, username, password)
             topmenu()
         elif int(choice) == 12:
-            getapps(address, apps, auth)
+            getapps(address, apps, username, password)
             topmenu()
         elif int(choice) == 13:
-            getappsrun(address, appsrun, auth)
+            getappsrun(address, appsrun, username, password)
             topmenu()
         elif int(choice) == 14:
-            getsaves(address, sp, auth)
+            getsaves(address, sp, username, password)
             topmenu()
         elif int(choice) == 15:
-            gethash(address, devicehash, auth)
+            gethash(address, devicehash, username, password)
             topmenu()
         elif int(choice) == 16:
-            getperm(address, deviceperm, auth)
+            getperm(address, deviceperm, username, password)
             topmenu()
         elif int(choice) == 17:
-            getstor(address, devicestor, auth)
+            getstor(address, devicestor, username, password)
             topmenu()
         elif int(choice) == 18:
-            getenv(address, deviceenv, auth)
+            getenv(address, deviceenv, username, password)
             topmenu()
         elif int(choice) == 19:
-            getidled(address, deviceidled, auth)
+            getidled(address, deviceidled, username, password)
             topmenu()
         elif int(choice) == 20:
-            getload(address, deviceload, auth)
+            getload(address, deviceload, username, password)
             topmenu()
         elif int(choice) == 21:
-            getmem(address, devicemem, auth)
+            getmem(address, devicemem, username, password)
             topmenu()
         elif int(choice) == 22:
-            getserver(address, deviceserver, auth)
+            getserver(address, deviceserver, username, password)
             topmenu()
         elif int(choice) == 23:
             topmenu()
@@ -965,61 +961,61 @@ if __name__ == '__main__':
                 20 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         if int(change) == 1:
-            changeip(address, ipconfig, auth)
+            changeip(address, ipconfig, username, password)
             topmenu()
         elif int(change) == 2:
-            changename(address, devicename, auth)
+            changename(address, devicename, username, password)
             topmenu()
         elif int(change) == 3:
-            changeportconfig(address, portconfig, auth)
+            changeportconfig(address, portconfig, username, password)
             topmenu()
         elif int(change) == 4:
-            portonoff(address, portconfig, auth)
+            portonoff(address, portconfig, username, password)
             topmenu()
         elif int(change) == 5:
-            deletecounters(address, counters, auth)
+            deletecounters(address, counters, username, password)
             topmenu()
         elif int(change) == 6:
-            resetrulecounter(address, rulecount, auth)
+            resetrulecounter(address, rulecount, username, password)
             topmenu()
         elif int(change) == 7:
-            addrule(address, rule, auth)
+            addrule(address, rule, username, password)
             topmenu()
         elif int(change) == 8:
-            actspport(address, spaports, auth)
+            actspport(address, spaports, username, password)
             topmenu()
         elif int(change) == 9:
-            actsprule(address, sparules, auth)
+            actsprule(address, sparules, username, password)
             topmenu()
         elif int(change) == 10:
-            setbootsp(address, spset, auth)
+            setbootsp(address, spset, username, password)
             topmenu()
         elif int(change) == 11:
-            exportsp(address, spexport, auth)
+            exportsp(address, spexport, username, password)
             topmenu()
         elif int(change) == 12:
-            modportsp(address, spmodport, auth)
+            modportsp(address, spmodport, username, password)
             topmenu()
         elif int(change) == 13:
-            modrulesp(address, spmodrule, auth)
+            modrulesp(address, spmodrule, username, password)
             topmenu()
         elif int(change) == 14:
-            createportsp(address, spportsave, auth)
+            createportsp(address, spportsave, username, password)
             topmenu()
         elif int(change) == 15:
-            createquick(address, spquick, auth)
+            createquick(address, spquick, username, password)
             topmenu()
         elif int(change) == 16:
-            createrulesp(address, sprulesave, auth)
+            createrulesp(address, sprulesave, username, password)
             topmenu()
         elif int(change) == 17:
-            deleteportsp(address, spportsave, auth)
+            deleteportsp(address, spportsave, username, password)
             topmenu()
         elif int(change) == 18:
-            deleterulesp(address, sprulesave, auth)
+            deleterulesp(address, sprulesave, username, password)
             topmenu()
         elif int(change) == 19:
-            reboot(address, reboot, auth)
+            reboot(address, reboot, username, password)
             topmenu()
         elif int(change) == 20:
             topmenu()
