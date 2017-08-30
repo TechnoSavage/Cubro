@@ -1,8 +1,22 @@
-#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.  Written by Derek Burke 12/2016
+#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
 #Import necessary Python libraries for interacting with the REST API
 import requests, json
 from getpass import getpass
 from requests.exceptions import ConnectionError
+
+# devicelabel = '/device/customident?' #add post
+# devicehash = '/device/grouphash?' #Add post
+# users = '/users?' #add
+# raduser = '/users/radius?' #add
+# uac = '/users/uac?' #add
+# weblog = '/weblog?' #add
+# deviceperm = '/device/permanentrulesmode?' #Add post
+# devicestor = '/device/rulestoragemode?' #Add post
+# deviceidled = '/device/idled?' #add post
+# devicehttps = '/device/https?' #Add post
+# appsact = '/apps/action?' #add
+# groups = '/groups?' #add
+# allgroup = '/groups/all?' #add
 
 #Retrieve firmware version
 def getversion(address, username=None, password=None):
@@ -13,10 +27,10 @@ def getversion(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve IP configuration
 def getip(address, username=None, password=None):
@@ -27,10 +41,10 @@ def getip(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve Packetmaster model
 def getmodel(address, username=None, password=None):
@@ -41,10 +55,10 @@ def getmodel(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve Packetmaster name
 def getname(address, username=None, password=None):
@@ -55,10 +69,10 @@ def getname(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve Packetmaster Name plus Notes
 def getlabel(address, username=None, password=None):
@@ -69,10 +83,10 @@ def getlabel(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve hardware generation of the device
 def getgen(address, username=None, password=None):
@@ -83,10 +97,10 @@ def getgen(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve Packetmaster serial number
 def getserial(address, username=None, password=None):
@@ -97,10 +111,10 @@ def getserial(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve current port configuration
 def getportconfig(address, username=None, password=None):
@@ -111,10 +125,10 @@ def getportconfig(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve port information
 def getportinfo(address, username=None, password=None):
@@ -125,10 +139,10 @@ def getportinfo(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve port counters
 def getportstat(address, username=None, password=None):
@@ -139,211 +153,225 @@ def getportstat(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve SFP information
-def getsfp(address, uri, username=None, password=None):
+def getsfp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/ports/sfpstatus?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve active rules
-def getrulesrun(address, uri, username=None, password=None):
+def getrulesrun(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/rules/all?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #List all available apps
-def getapps(address, uri, username=None, password=None):
+def getapps(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/apps?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve running apps
-def getappsrun(address, uri, username=None, password=None):
+def getappsrun(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/apps/running?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve hash algorithm information
-def gethash(address, uri, username=None, password=None):
+def gethash(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/grouphash?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve rule permanence mode
-def getperm(address, uri, username=None, password=None):
+def getperm(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/permanentrulesmode?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve rule storage model
-def getstor(address, uri, username=None, password=None):
+def getstor(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/rulestoragemode?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve environment information
-def getenv(address, uri, username=None, password=None):
+def getenv(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/environment?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve deice ID LED status_code
-def getidled(address, uri, username=None, password=None):
+def getidled(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/idled?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve load information
-def getload(address, uri, username=None, password=None):
+def getload(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/loadaverage?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve memory usage
-def getmem(address, uri, username=None, password=None):
+def getmem(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/memoryusage?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Retrieve cch machinery server revision
-def getserver(address, uri, username=None, password=None):
+def getserver(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/serverrevision?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #List all save points
-def getsaves(address, uri, username=None, password=None):
+def getsaves(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Change the management IP configuration
-def changeip(address, uri, username=None, password=None):
+def changeip(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/ipconfig?'
     newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ')
     newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ')
     newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ')
-    url = address + uri
+    #Implement checks to validate IP input
     params = {'ip': newip, 'mask': newmask, 'gw': newgate}
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Change the device name
-def changename(address, uri, username=None, password=None):
+def changename(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/name?'
     newname = raw_input('Enter device name: ')
-    url = address + uri
     params = {'devicename': newname}
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Change the configuration of a port
 def changeportconfig(address, uri, username=None, password=None): #Add additional parameters, add function to change multiple ports without exiting
@@ -366,10 +394,10 @@ def changeportconfig(address, uri, username=None, password=None): #Add additiona
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Activate or deactivate a port
 def portonoff(address, uri, username=None, password=None):
@@ -382,10 +410,10 @@ def portonoff(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Reset Port Counters
 def deletecounters(address, uri, username=None, password=None):
@@ -395,7 +423,7 @@ def deletecounters(address, uri, username=None, password=None):
         print 'Counters deleted successfully'
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Reset Rule Counters
 def resetrulecounter(address, uri, username=None, password=None):
@@ -405,7 +433,7 @@ def resetrulecounter(address, uri, username=None, password=None):
         print 'Counters deleted successfully'
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Add a rule
 def addrule(address, uri, username=None, password=None):
@@ -557,10 +585,10 @@ def addrule(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Make a port save point active
 def actspport(address, uri, username=None, password=None):
@@ -572,10 +600,10 @@ def actspport(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Make a rule save point active
 def actsprule(address, uri, username=None, password=None):
@@ -587,10 +615,10 @@ def actsprule(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Set a save point as the default boot configuration
 def setbootsp(address, uri, username=None, password=None):
@@ -602,10 +630,10 @@ def setbootsp(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Export a save point from the Packetmaster
 def exportsp(address, uri, username=None, password=None):
@@ -620,7 +648,7 @@ def exportsp(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
         filename = raw_input("Enter a file name for the savepoint: ")
         try:
             with open(filename, "w") as f:
@@ -629,7 +657,7 @@ def exportsp(address, uri, username=None, password=None):
             print "Invalid filename\n"
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Modify a port save point
 def modportsp(address, uri, username=None, password=None):
@@ -644,10 +672,10 @@ def modportsp(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Modify a rule save point
 def modrulesp(address, uri, username=None, password=None):
@@ -662,10 +690,10 @@ def modrulesp(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Create a port save point from current configuration
 def createportsp(address, uri, username=None, password=None):
@@ -678,10 +706,10 @@ def createportsp(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Create a quicksave point of current configuration
 def createquick(address, uri, username=None, password=None):
@@ -691,10 +719,10 @@ def createquick(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Create a rule save point from current configuration
 def createrulesp(address, uri, username=None, password=None):
@@ -707,10 +735,10 @@ def createrulesp(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Delete a port save point
 def deleteportsp(address, uri, username=None, password=None):
@@ -722,10 +750,10 @@ def deleteportsp(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Delete a rule save point
 def deleterulesp(address, uri, username=None, password=None):
@@ -737,10 +765,10 @@ def deleterulesp(address, uri, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 #Reboot the Packetmaster
 def reboot(address, uri, username=None, password=None):
@@ -750,7 +778,7 @@ def reboot(address, uri, username=None, password=None):
         print 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
 
 if __name__ == '__main__':
     #Welcome statement
@@ -767,27 +795,10 @@ if __name__ == '__main__':
     password = getpass()
     #Integrate all REST URIs and address concatenation into functions so that functions are independent of active code (more object-oriented)
     #options to append to device URL
-    deviceenv = '/device/environment?' #good
-    deviceidled = '/device/idled?' #add post
-    deviceload = '/device/loadaverage?' #good
-    devicemem = '/device/memoryusage?' #good
-    devicehash = '/device/grouphash?' #Add post
-    devicehttps = '/device/https?' #Add post
-    deviceserver = '/device/serverrevision?' #good
-    deviceperm = '/device/permanentrulesmode?' #Add post
-    devicestor = '/device/rulestoragemode?' #Add post
-    sfp = '/ports/sfpstatus?'
     counters = '/ports/counters?'
     rulecount = '/rules/counters?'
     rule = '/rules?' #change
-    allrule = '/rules/all?' #change/add
     flows = '/flownumbers?' #change/add
-    apps = '/apps?'
-    appsrun = '/apps/running?'
-    appsact = '/apps/action?' #add
-    groups = '/groups?' #add
-    allgroup = '/groups/all?' #add
-    sp = '/savepoints?'
     spaports = '/savepoints/activeportsavepoint?'
     sparules = '/savepoints/activerulesavepoint?'
     spset = '/savepoints/defaultrulesavepoint?'
@@ -798,10 +809,6 @@ if __name__ == '__main__':
     spquick = '/savepoints/quicksaverules?'
     sprulesave = '/savepoints/rulesavepoint?'
     reboot = '/device/reboot?'
-    users = '/users?' #add
-    raduser = '/users/radius?' #add
-    uac = '/users/uac?' #add
-    weblog = '/weblog?' #add
 
     #Initial menu to check or change settings
     def topmenu():
@@ -862,70 +869,92 @@ if __name__ == '__main__':
                  23 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
         if int(choice) == 1:
-            getversion(address, username, password)
+            version = getversion(address, username, password)
+            print version
             topmenu()
         elif int(choice) == 2:
-            getip(address, username, password)
+            ip = getip(address, username, password)
+            print ip
             topmenu()
         elif int(choice) == 3:
-            getmodel(address, username, password)
+            model = getmodel(address, username, password)
+            print model
             topmenu()
         elif int(choice) == 4:
-            getlabel(address, username, password)
+            label = getlabel(address, username, password)
+            print label
             topmenu()
         elif int(choice) == 5:
-            getserial(address, username, password)
+            serial = getserial(address, username, password)
+            print serial
             topmenu()
         elif int(choice) == 6:
-            getgen(address, username, password)
+            gen = getgen(address, username, password)
+            print gen
             topmenu()
         elif int(choice) == 7:
-            getportconfig(address, username, password)
+            config = getportconfig(address, username, password)
+            print config
             topmenu()
         elif int(choice) == 8:
-            getportinfo(address, username, password)
+            info = getportinfo(address, username, password)
+            print info
             topmenu()
         elif int(choice) == 9:
-            getportstat(address, username, password)
+            stat = getportstat(address, username, password)
+            print stat
             topmenu()
         elif int(choice) == 10:
-            getsfp(address, username, password)
+            spf = getsfp(address, username, password)
+            print sfp
             topmenu()
         elif int(choice) == 11:
-            getrulesrun(address, username, password)
+            rulesrun = getrulesrun(address, username, password)
+            print rulesrun
             topmenu()
         elif int(choice) == 12:
-            getapps(address, username, password)
+            apps = getapps(address, username, password)
+            print apps
             topmenu()
         elif int(choice) == 13:
-            getappsrun(address, username, password)
+            appsrun = getappsrun(address, username, password)
+            print appsrun
             topmenu()
         elif int(choice) == 14:
-            getsaves(address, username, password)
+            saves = getsaves(address, username, password)
+            print saves
             topmenu()
         elif int(choice) == 15:
-            gethash(address, username, password)
+            hashes = gethash(address, username, password)
+            print hashes
             topmenu()
         elif int(choice) == 16:
-            getperm(address, username, password)
+            perm = getperm(address, username, password)
+            print perm
             topmenu()
         elif int(choice) == 17:
-            getstor(address, username, password)
+            storage = getstor(address, username, password)
+            print storage
             topmenu()
         elif int(choice) == 18:
-            getenv(address, username, password)
+            env = getenv(address, username, password)
+            print env
             topmenu()
         elif int(choice) == 19:
-            getidled(address, username, password)
+            led = getidled(address, username, password)
+            print led
             topmenu()
         elif int(choice) == 20:
-            getload(address, username, password)
+            load = getload(address, username, password)
+            print load
             topmenu()
         elif int(choice) == 21:
-            getmem(address, username, password)
+            memory = getmem(address, username, password)
+            print memory
             topmenu()
         elif int(choice) == 22:
-            getserver(address, username, password)
+            server = getserver(address, username, password)
+            print server
             topmenu()
         elif int(choice) == 23:
             topmenu()
