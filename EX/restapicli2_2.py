@@ -5,10 +5,11 @@ from getpass import getpass
 from requests.exceptions import ConnectionError
 
 #Retrieve firmware version
-def getversion(address, uri, username=None, password=None):
+def getversion(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/device/imageversion?'
+
     try:
-        url = address + uri
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -750,15 +751,13 @@ if __name__ == '__main__':
         the Cubro REST API. \n'''
 
     #IP address to access REST data of device
-    deviceip = raw_input('What is the IP address of the Packetmaster you want to access?: ')
+    address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
     #Write a check against valid IPv4 address
-    address = 'http://' + deviceip + '/rest'
     #Device credentials
     username = raw_input('Enter your username: ')
     password = getpass()
-
+    #Integrate all REST URIs and address concatenation into functions so that functions are independent of active code (more object-oriented)
     #options to append to device URL
-    version = '/device/imageversion?' #good
     ipconfig = '/device/ipconfig?' #good
     devicemodel = '/device/model?' #good
     devicename = '/device/name?' #good
@@ -864,7 +863,7 @@ if __name__ == '__main__':
                  23 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
         if int(choice) == 1:
-            getversion(address, version, username, password)
+            getversion(address, username, password)
             topmenu()
         elif int(choice) == 2:
             getip(address, ipconfig, username, password)
