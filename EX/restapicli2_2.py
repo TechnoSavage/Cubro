@@ -17,11 +17,12 @@ from requests.exceptions import ConnectionError
 # appsact = '/apps/action?' #add
 # groups = '/groups?' #add
 # allgroup = '/groups/all?' #add
+# rule = '/rules?' #change
+# flows = '/flownumbers?' #change/add
 
 #Retrieve firmware version
 def getversion(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/imageversion?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -35,7 +36,6 @@ def getversion(address, username=None, password=None):
 #Retrieve IP configuration
 def getip(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/ipconfig?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -49,7 +49,6 @@ def getip(address, username=None, password=None):
 #Retrieve Packetmaster model
 def getmodel(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/model?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -63,7 +62,6 @@ def getmodel(address, username=None, password=None):
 #Retrieve Packetmaster name
 def getname(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/name?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -77,7 +75,6 @@ def getname(address, username=None, password=None):
 #Retrieve Packetmaster Name plus Notes
 def getlabel(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/customident?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -91,7 +88,6 @@ def getlabel(address, username=None, password=None):
 #Retrieve hardware generation of the device
 def getgen(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/generation?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -105,7 +101,6 @@ def getgen(address, username=None, password=None):
 #Retrieve Packetmaster serial number
 def getserial(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/serialno?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -119,7 +114,6 @@ def getserial(address, username=None, password=None):
 #Retrieve current port configuration
 def getportconfig(address, username=None, password=None):
     uri = 'http://' + address + '/rest/ports/config?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -133,7 +127,6 @@ def getportconfig(address, username=None, password=None):
 #Retrieve port information
 def getportinfo(address, username=None, password=None):
     uri = 'http://' + address + '/rest/ports/info?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -147,7 +140,6 @@ def getportinfo(address, username=None, password=None):
 #Retrieve port counters
 def getportstat(address, username=None, password=None):
     uri = 'http://' + address + '/rest/ports/stats?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -161,7 +153,6 @@ def getportstat(address, username=None, password=None):
 #Retrieve SFP information
 def getsfp(address, username=None, password=None):
     uri = 'http://' + address + '/rest/ports/sfpstatus?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -175,7 +166,6 @@ def getsfp(address, username=None, password=None):
 #Retrieve active rules
 def getrulesrun(address, username=None, password=None):
     uri = 'http://' + address + '/rest/rules/all?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -189,7 +179,6 @@ def getrulesrun(address, username=None, password=None):
 #List all available apps
 def getapps(address, username=None, password=None):
     uri = 'http://' + address + '/rest/apps?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -203,7 +192,6 @@ def getapps(address, username=None, password=None):
 #Retrieve running apps
 def getappsrun(address, username=None, password=None):
     uri = 'http://' + address + '/rest/apps/running?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -217,7 +205,6 @@ def getappsrun(address, username=None, password=None):
 #Retrieve hash algorithm information
 def gethash(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/grouphash?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -231,7 +218,6 @@ def gethash(address, username=None, password=None):
 #Retrieve rule permanence mode
 def getperm(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/permanentrulesmode?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -245,7 +231,6 @@ def getperm(address, username=None, password=None):
 #Retrieve rule storage model
 def getstor(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/rulestoragemode?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -259,7 +244,6 @@ def getstor(address, username=None, password=None):
 #Retrieve environment information
 def getenv(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/environment?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -273,7 +257,6 @@ def getenv(address, username=None, password=None):
 #Retrieve deice ID LED status_code
 def getidled(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/idled?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -287,7 +270,6 @@ def getidled(address, username=None, password=None):
 #Retrieve load information
 def getload(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/loadaverage?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -301,7 +283,6 @@ def getload(address, username=None, password=None):
 #Retrieve memory usage
 def getmem(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/memoryusage?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -315,7 +296,6 @@ def getmem(address, username=None, password=None):
 #Retrieve cch machinery server revision
 def getserver(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/serverrevision?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -329,7 +309,6 @@ def getserver(address, username=None, password=None):
 #List all save points
 def getsaves(address, username=None, password=None):
     uri = 'http://' + address + '/rest/savepoints?'
-
     try:
         response = requests.get(uri, auth=(username, password))
         print response.status_code
@@ -374,14 +353,14 @@ def changename(address, username=None, password=None):
         raise e
 
 #Change the configuration of a port
-def changeportconfig(address, uri, username=None, password=None): #Add additional parameters, add function to change multiple ports without exiting
+def changeportconfig(address, username=None, password=None): #Add additional parameters, add function to change multiple ports without exiting
+    uri = 'http://' + address + '/rest/ports/config?'
     interface = raw_input('Enter the interface name of the port you want to change: ')
     speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ')
     duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto": ')
     forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no: ')
     check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no: ')
     recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no: ')
-    url = address + uri
     params = {
         'if_name': interface,
         'speed': speed,
@@ -390,7 +369,7 @@ def changeportconfig(address, uri, username=None, password=None): #Add additiona
         'crc_check': check,
         'crc_recalculation': recalc }
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -400,13 +379,13 @@ def changeportconfig(address, uri, username=None, password=None): #Add additiona
         raise e
 
 #Activate or deactivate a port
-def portonoff(address, uri, username=None, password=None):
+def portonoff(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/ports/config?'
     interface = raw_input('Enter the interface name of the port you want to change: ')
     updown = raw_input('Enter "true" to shut port down; Enter "false" to reactivate port: ')
-    url = address + uri
     params = {'if_name': interface, 'shutdown': updown}
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -416,28 +395,28 @@ def portonoff(address, uri, username=None, password=None):
         raise e
 
 #Reset Port Counters
-def deletecounters(address, uri, username=None, password=None):
-    url = address + uri
+def deletecounters(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/ports/counters?'
     try:
-        requests.delete(url, auth=(username, password))
+        requests.delete(uri, auth=(username, password))
         print 'Counters deleted successfully'
     except ConnectionError as e:
         r = 'No Response'
         raise e
 
 #Reset Rule Counters
-def resetrulecounter(address, uri, username=None, password=None):
-    url = address + uri
+def resetrulecounter(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/rules/counters?'
     try:
-        requests.delete(url, auth=(username, password))
+        requests.delete(uri, auth=(username, password))
         print 'Counters deleted successfully'
     except ConnectionError as e:
         r = 'No Response'
         raise e
 
 #Add a rule
-def addrule(address, uri, username=None, password=None):
-    url = address + uri
+def addrule(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/rules?'
     params = {}
     rulename = raw_input('Enter a name for the rule [none]: ')
     if rulename != '':
@@ -581,7 +560,7 @@ def addrule(address, uri, username=None, password=None):
     ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - improper syntax will cause add rule to fail: ')
     params['actions'] = ruleaction
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -591,12 +570,12 @@ def addrule(address, uri, username=None, password=None):
         raise e
 
 #Make a port save point active
-def actspport(address, uri, username=None, password=None):
+def actspport(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/activeportsavepoint?'
     savename = raw_input('What is the name of the port save point to make active?: ')
-    url = address + uri
     params = {'name': savename}
     try:
-        response = requests.put(url, data=params, auth=(username, password))
+        response = requests.put(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -606,12 +585,12 @@ def actspport(address, uri, username=None, password=None):
         raise e
 
 #Make a rule save point active
-def actsprule(address, uri, username=None, password=None):
+def actsprule(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/activerulesavepoint?'
     savename = raw_input('What is the name of the rule save point to make active?: ')
-    url = address + uri
     params = {'name': savename}
     try:
-        response = requests.put(url, data=params, auth=(username, password))
+        response = requests.put(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -621,12 +600,12 @@ def actsprule(address, uri, username=None, password=None):
         raise e
 
 #Set a save point as the default boot configuration
-def setbootsp(address, uri, username=None, password=None):
+def setbootsp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/defaultrulesavepoint?'
     savename = raw_input('What is the name of the save point to make the default at boot configuration?: ')
-    url = address + uri
     params = {'name': savename}
     try:
-        response = requests.put(url, data=params, auth=(username, password))
+        response = requests.put(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -636,15 +615,15 @@ def setbootsp(address, uri, username=None, password=None):
         raise e
 
 #Export a save point from the Packetmaster
-def exportsp(address, uri, username=None, password=None):
+def exportsp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/export?'
     rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
     rspname = '[' + rspname + ']'
     pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
     pspname = '[' + pspname + ']'
-    url = address + uri
     params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname} #Change to JSON encoding
     try:
-        response = requests.get(url, data=params, auth=(username, password))
+        response = requests.get(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -660,15 +639,15 @@ def exportsp(address, uri, username=None, password=None):
         raise e
 
 #Modify a port save point
-def modportsp(address, uri, username=None, password=None):
+def modportsp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/modportsavepoint?'
     oldname = raw_input("What is the name of the save point you would like to modify?")
     newname = raw_input("What would you like to rename this save point to?")
     desc = raw_input("What is the description of the save point?")
     saveports = raw_input('Hit enter to save the current active ports to this save point; type "false" to not save them (This overwrites port configuration of the save point): ')
-    url = address + uri
     params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saveports': saveports}
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -678,15 +657,15 @@ def modportsp(address, uri, username=None, password=None):
         raise e
 
 #Modify a rule save point
-def modrulesp(address, uri, username=None, password=None):
+def modrulesp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/modrulesavepoint?'
     oldname = raw_input("What is the name of the save point you would like to modify?")
     newname = raw_input("What would you like to rename this save point to?")
     desc = raw_input("What is the description of the save point?")
     saverules = raw_input('Hit enter to save the current active rules to this save point; type "false" to not save them (This overwrites rule configuration of the save point): ')
-    url = address + uri
     params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saverules': saverules}
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -696,13 +675,13 @@ def modrulesp(address, uri, username=None, password=None):
         raise e
 
 #Create a port save point from current configuration
-def createportsp(address, uri, username=None, password=None):
+def createportsp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/portsavepoint?'
     name = raw_input("What would you like to name the port save point?")
     desc = raw_input("Enter a description for the port save point")
-    url = address + uri
     params = {'name': name, 'description': desc}
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -712,10 +691,10 @@ def createportsp(address, uri, username=None, password=None):
         raise e
 
 #Create a quicksave point of current configuration
-def createquick(address, uri, username=None, password=None):
-    url = address + uri
+def createquick(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/quicksaverules?'
     try:
-        response = requests.put(url, auth=(username, password))
+        response = requests.put(uri, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -725,13 +704,13 @@ def createquick(address, uri, username=None, password=None):
         raise e
 
 #Create a rule save point from current configuration
-def createrulesp(address, uri, username=None, password=None):
+def createrulesp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/rulesavepoint?'
     name = raw_input("What would you like to name the rule save point?")
     desc = raw_input("Enter a description for the rule save point")
-    url = address + uri
     params = {'name': name, 'description': desc}
     try:
-        response = requests.post(url, data=params, auth=(username, password))
+        response = requests.post(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -741,12 +720,12 @@ def createrulesp(address, uri, username=None, password=None):
         raise e
 
 #Delete a port save point
-def deleteportsp(address, uri, username=None, password=None):
+def deleteportsp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/portsavepoint?'
     name = raw_input("What is the name of the port save point you would like to delete?")
-    url = address + uri
     params = {'name': name}
     try:
-        response = requests.delete(url, data=params, auth=(username, password))
+        response = requests.delete(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -756,12 +735,12 @@ def deleteportsp(address, uri, username=None, password=None):
         raise e
 
 #Delete a rule save point
-def deleterulesp(address, uri, username=None, password=None):
+def deleterulesp(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/savepoints/rulesavepoint?'
     name = raw_input("What is the name of the rule save point you would like to delete?")
-    url = address + uri
     params = {'name': name}
     try:
-        response = requests.delete(url, data=params, auth=(username, password))
+        response = requests.delete(uri, data=params, auth=(username, password))
         print response.status_code
         r = response.content
         data = json.loads(r)
@@ -795,22 +774,7 @@ if __name__ == '__main__':
     #Device credentials
     username = raw_input('Enter your username: ')
     password = getpass()
-    #Integrate all REST URIs and address concatenation into functions so that functions are independent of active code (more object-oriented)
-    #options to append to device URL
-    counters = '/ports/counters?'
-    rulecount = '/rules/counters?'
-    rule = '/rules?' #change
-    flows = '/flownumbers?' #change/add
-    spaports = '/savepoints/activeportsavepoint?'
-    sparules = '/savepoints/activerulesavepoint?'
-    spset = '/savepoints/defaultrulesavepoint?'
-    spexport = '/savepoints/export?'
-    spmodport = '/savepoints/modportsavepoint?'
-    spmodrule = '/savepoints/modrulesavepoint?'
-    spportsave = '/savepoints/portsavepoint?'
-    spquick = '/savepoints/quicksaverules?'
-    sprulesave = '/savepoints/rulesavepoint?'
-    
+
     #Initial menu to check or change settings
     def topmenu():
         global deviceip, address, username, password
