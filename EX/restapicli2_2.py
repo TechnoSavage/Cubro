@@ -362,15 +362,19 @@ def changeportconfig(address, username=None, password=None):
     #Add shutdown true/false parameter for EX2 (more?)
     uri = 'http://' + address + '/rest/ports/config?'
     interface = raw_input('Enter the interface name of the port you want to change: ').strip()
-    port_no = re.find('[1-9]+.', interface)
+    port_no = re.find('[1-9]+.*[1-4]', interface)
     interface = 'eth-0-' + port_no
     speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ').strip()
     if speed.lower() == 'auto':
         speed = 'auto'
     else:
-        speed = speed.upper()
+        speed = speed.upper() #More checks needed here
     duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto": ').strip()
-    duplex = duplex.lower()
+    if duplex.lower() =='auto' or duplex.lower() == 'full' or duplex.lower() == 'half':
+        duplex = duplex.lower()
+    else:
+        print "That is not a valid duplex; defaulting to auto"
+        duplex = 'auto'
     forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no: ').strip()
     forcetx = forcetx.lower()
     check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no: ').strip()
@@ -398,6 +402,8 @@ def changeportconfig(address, username=None, password=None):
 def portonoff(address, username=None, password=None):
     uri = 'http://' + address + '/rest/ports/config?'
     interface = raw_input('Enter the interface name of the port you want to change: ').strip()
+    port_no = re.find('[1-9]+.*[1-4]', interface)
+    interface = 'eth-0-' + port_no
     updown = raw_input('Enter "true" to shut port down; Enter "false" to reactivate port: ').strip()
     updown = updown.lower()
     params = {'if_name': interface, 'shutdown': updown}
