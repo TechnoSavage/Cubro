@@ -1,5 +1,6 @@
 #Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
 #Import necessary Python libraries for interacting with the REST API
+#!/usr/bin/python
 import requests, json
 from getpass import getpass
 from requests.exceptions import ConnectionError
@@ -777,8 +778,8 @@ if __name__ == '__main__':
 
     #Initial menu to check or change settings
     def topmenu():
-        global deviceip, address, username, password
-        print 'Options for device at', deviceip,'acting as User', username
+        global address, address, username, password
+        print 'Options for device at', address,'acting as User', username
         print '''
             1 - Change My working device
             2 - Change My user credentials
@@ -786,19 +787,23 @@ if __name__ == '__main__':
             4 - Change Packetmaster Settings
             5 - Quit \n'''
 
-        option = raw_input('Enter the number of what you would like to do: ')
-        if int(option) == 1:
+        option = raw_input('Enter the number of the action you would like to perform: ')
+        try:
+            option = int(option)
+        except:
+            topmenu()
+        if option == 1:
             address = raw_input('What is the IP address of the Packetmaster you want to access: ')
             topmenu()
-        elif int(option) == 2:
+        elif option == 2:
             username = raw_input('Enter your username: ')
             password = getpass()
             topmenu()
-        elif int(option) == 3:
+        elif option == 3:
             checkmenu()
-        elif int(option) == 4:
+        elif option == 4:
             changemenu()
-        elif int(option) == 5:
+        elif option == 5:
             print 'Goodbye'
             exit()
         else:
@@ -807,7 +812,7 @@ if __name__ == '__main__':
 
     #Check settings menu
     def checkmenu():
-        print 'Check settings for device at', deviceip,'acting as User', username
+        print 'Check settings for device at', address,'acting as User', username
         print '''
                   1 - Software Version
                   2 - IP Configuration
@@ -833,95 +838,99 @@ if __name__ == '__main__':
                  22 - CCH Server Revision
                  23 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
-        if int(choice) == 1:
+        try:
+            choice = int(choice)
+        except:
+            checkmenu()
+        if choice == 1:
             version = getversion(address, username, password)
             print version
             topmenu()
-        elif int(choice) == 2:
+        elif choice == 2:
             ip = getip(address, username, password)
             print ip
             topmenu()
-        elif int(choice) == 3:
+        elif choice == 3:
             model = getmodel(address, username, password)
             print model
             topmenu()
-        elif int(choice) == 4:
+        elif choice == 4:
             label = getlabel(address, username, password)
             print label
             topmenu()
-        elif int(choice) == 5:
+        elif choice == 5:
             serial = getserial(address, username, password)
             print serial
             topmenu()
-        elif int(choice) == 6:
+        elif choice == 6:
             gen = getgen(address, username, password)
             print gen
             topmenu()
-        elif int(choice) == 7:
+        elif choice == 7:
             config = getportconfig(address, username, password)
             print config
             topmenu()
-        elif int(choice) == 8:
+        elif choice == 8:
             info = getportinfo(address, username, password)
             print info
             topmenu()
-        elif int(choice) == 9:
+        elif choice == 9:
             stat = getportstat(address, username, password)
             print stat
             topmenu()
-        elif int(choice) == 10:
+        elif choice == 10:
             spf = getsfp(address, username, password)
             print sfp
             topmenu()
-        elif int(choice) == 11:
+        elif choice == 11:
             rulesrun = getrulesrun(address, username, password)
             print rulesrun
             topmenu()
-        elif int(choice) == 12:
+        elif choice == 12:
             apps = getapps(address, username, password)
             print apps
             topmenu()
-        elif int(choice) == 13:
+        elif choice == 13:
             appsrun = getappsrun(address, username, password)
             print appsrun
             topmenu()
-        elif int(choice) == 14:
+        elif choice == 14:
             saves = getsaves(address, username, password)
             print saves
             topmenu()
-        elif int(choice) == 15:
+        elif choice == 15:
             hashes = gethash(address, username, password)
             print hashes
             topmenu()
-        elif int(choice) == 16:
+        elif choice == 16:
             perm = getperm(address, username, password)
             print perm
             topmenu()
-        elif int(choice) == 17:
+        elif choice == 17:
             storage = getstor(address, username, password)
             print storage
             topmenu()
-        elif int(choice) == 18:
+        elif choice == 18:
             env = getenv(address, username, password)
             print env
             topmenu()
-        elif int(choice) == 19:
+        elif choice == 19:
             led = getidled(address, username, password)
             print led
             topmenu()
-        elif int(choice) == 20:
+        elif choice == 20:
             load = getload(address, username, password)
             print load
             topmenu()
-        elif int(choice) == 21:
+        elif choice == 21:
             memory = getmem(address, username, password)
             print memory
             topmenu()
-        elif int(choice) == 22:
+        elif choice == 22:
             server = getserver(address, username, password)
             print server
             topmenu()
-        elif int(choice) == 23:
+        elif choice == 23:
             topmenu()
         else:
             print 'That is not a valid choice \n'
@@ -929,7 +938,7 @@ if __name__ == '__main__':
 
     #Change settings menu
     def changemenu():
-        print 'Change settings for device at', deviceip,'acting as User', username
+        print 'Change settings for device at', address,'acting as User', username
         print '''
                  1 - Change IP Configuration
                  2 - Change Device Name
@@ -952,83 +961,87 @@ if __name__ == '__main__':
                 19 - Reboot Packetmaster
                 20 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
-        if int(change) == 1:
+        try:
+            change = int(change)
+        except:
+            changemenu()
+        if change == 1:
             ipchange = changeip(address, username, password)
             print ipchange
             topmenu()
-        elif int(change) == 2:
+        elif change == 2:
             namechange = changename(address, username, password)
             print namechange
             topmenu()
-        elif int(change) == 3:
+        elif change == 3:
             configchange = changeportconfig(address, username, password)
             print configchange
             topmenu()
-        elif int(change) == 4:
+        elif change == 4:
             onoff = portonoff(address, username, password)
             print onoff
             topmenu()
-        elif int(change) == 5:
+        elif change == 5:
             countersdelete = deletecounters(address, username, password)
             print countersdelete
             topmenu()
-        elif int(change) == 6:
+        elif change == 6:
             rulereset = resetrulecounter(address, username, password)
             print rulereset
             topmenu()
-        elif int(change) == 7:
+        elif change == 7:
             ruleadd = addrule(address, username, password)
             print ruleadd
             topmenu()
-        elif int(change) == 8:
+        elif change == 8:
             portspactive = actspport(address, username, password)
             print portspactive
             topmenu()
-        elif int(change) == 9:
+        elif change == 9:
             rulespactive = actsprule(address, username, password)
             print rulespactive
             topmenu()
-        elif int(change) == 10:
+        elif change == 10:
             spset = setbootsp(address, username, password)
             print spset
             topmenu()
-        elif int(change) == 11:
+        elif change == 11:
             spexport = exportsp(address, username, password)
             print spexport
             topmenu()
-        elif int(change) == 12:
+        elif change == 12:
             portspmod = modportsp(address, username, password)
             print portspmod
             topmenu()
-        elif int(change) == 13:
+        elif change == 13:
             rulepsmod = modrulesp(address, username, password)
             print rulepsmod
             topmenu()
-        elif int(change) == 14:
+        elif change == 14:
             portspcreate = createportsp(address, username, password)
             print portspcreate
             topmenu()
-        elif int(change) == 15:
+        elif change == 15:
             quickcreate = createquick(address, username, password)
             print quickcreate
             topmenu()
-        elif int(change) == 16:
+        elif change == 16:
             rulespcreate = createrulesp(address, username, password)
             print rulespcreate
             topmenu()
-        elif int(change) == 17:
+        elif change == 17:
             portspdelete = deleteportsp(address, username, password)
             print portspdelete
             topmenu()
-        elif int(change) == 18:
+        elif change == 18:
             rulepsdelete = deleterulesp(address, username, password)
             print rulespdelete
             topmenu()
-        elif int(change) == 19:
+        elif change == 19:
             restart = reboot(address, username, password)
             print restart
             topmenu()
-        elif int(change) == 20:
+        elif change == 20:
             topmenu()
         else:
             print 'That is not a valid choice \n'
