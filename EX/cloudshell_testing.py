@@ -1,7 +1,6 @@
 from common.configuration_parser import ConfigurationParser
 from common.resource_info import ResourceInfo
 import requests, json, re
-from requests.auth import HTTPBasicAuth
 from requests.exceptions import ConnectionError
 
 class EXDriverHandler(object):
