@@ -28,6 +28,25 @@ class PacketmasterEX(object):
         self.username = username
         self.password = password
 
+    def get_port_count(self):
+        address = self.address
+        username = self.username
+        password = self.password
+        uri = 'http://' + address + '/rest/ports/config?'
+        ports = list()
+        try:
+            response = requests.get(uri, auth=(username, password))
+            r = response.content
+            data = json.loads(r)
+            count = 0
+            for port in data['port_config']:
+                ports.append(data['port_config'][count]['if_name'])
+                count += 1
+            self.ports = len(ports)
+            return len(ports)
+        except ConnectionError as e:
+            raise e
+
     #Retrieve firmware version
     def getversion(self):
         address = self.address
@@ -39,6 +58,7 @@ class PacketmasterEX(object):
             # print response.status_code
             r = response.content
             data = json.loads(r)
+            self.firmware = data['version']
             return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
@@ -55,6 +75,8 @@ class PacketmasterEX(object):
             # print response.status_code
             r = response.content
             data = json.loads(r)
+            self.netmask = data['current_netmask']
+            self.gateway = data['current_gateway']
             return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
@@ -71,10 +93,12 @@ class PacketmasterEX(object):
             # print response.status_code
             r = response.content
             data = json.loads(r)
+            self.model = data['model']
             return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
             raise e
+        self.model = data['model']
 
     #Retrieve Packetmaster name
     def getname(self):
@@ -87,6 +111,7 @@ class PacketmasterEX(object):
             # print response.status_code
             r = response.content
             data = json.loads(r)
+            self.name = data['name']
             return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
@@ -103,6 +128,8 @@ class PacketmasterEX(object):
             # print response.status_code
             r = response.content
             data = json.loads(r)
+            self.name = data['name']
+            self.notes = data['notes']
             return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
@@ -119,6 +146,7 @@ class PacketmasterEX(object):
             # print response.status_code
             r = response.content
             data = json.loads(r)
+            self.hardware = data['generation']
             return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
@@ -135,6 +163,7 @@ class PacketmasterEX(object):
             # print response.status_code
             r = response.content
             data = json.loads(r)
+            self.serial = data['serial']
             return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
