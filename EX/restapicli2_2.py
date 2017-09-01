@@ -33,7 +33,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/imageversion?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -46,7 +46,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/ipconfig?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -59,7 +59,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/model?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -72,7 +72,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/name?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -85,7 +85,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/customident?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -98,7 +98,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/generation?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -111,7 +111,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/serialno?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -124,7 +124,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/ports/config?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -137,7 +137,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/ports/info?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -150,7 +150,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/ports/stats?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -163,7 +163,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/ports/sfpstatus?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             result = data['result']
@@ -177,7 +177,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/rules/all?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -190,7 +190,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/apps?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -203,7 +203,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/apps/running?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -216,7 +216,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/grouphash?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -229,7 +229,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/permanentrulesmode?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -242,7 +242,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/rulestoragemode?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -255,7 +255,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/environment?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -268,7 +268,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/idled?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -281,7 +281,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/loadaverage?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -294,7 +294,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/memoryusage?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -307,7 +307,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/device/serverrevision?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -320,7 +320,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/savepoints?'
         try:
             response = requests.get(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -338,7 +338,7 @@ class PacketmasterEX(object):
         params = {'ip': newip, 'mask': newmask, 'gw': newgate}
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -353,7 +353,7 @@ class PacketmasterEX(object):
         params = {'devicename': newname}
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -396,7 +396,7 @@ class PacketmasterEX(object):
             'crc_recalculation': recalc }
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -415,7 +415,7 @@ class PacketmasterEX(object):
         params = {'if_name': interface, 'shutdown': updown}
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -428,7 +428,8 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/ports/counters?'
         try:
             requests.delete(uri, auth=(username, password))
-            print 'Counters deleted successfully'
+            success = 'Counters deleted successfully'
+            return success
         except ConnectionError as e:
             r = 'No Response'
             raise e
@@ -438,7 +439,8 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/rules/counters?'
         try:
             requests.delete(uri, auth=(username, password))
-            print 'Counters deleted successfully'
+            success = 'Counters deleted successfully'
+            return success
         except ConnectionError as e:
             r = 'No Response'
             raise e
@@ -596,7 +598,7 @@ class PacketmasterEX(object):
         params['actions'] = ruleaction
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -611,7 +613,7 @@ class PacketmasterEX(object):
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -626,7 +628,7 @@ class PacketmasterEX(object):
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -641,7 +643,7 @@ class PacketmasterEX(object):
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -659,7 +661,7 @@ class PacketmasterEX(object):
         params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname} #Change to JSON encoding
         try:
             response = requests.get(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -683,7 +685,7 @@ class PacketmasterEX(object):
         params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saveports': saveports}
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -701,7 +703,7 @@ class PacketmasterEX(object):
         params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saverules': saverules}
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -717,7 +719,7 @@ class PacketmasterEX(object):
         params = {'name': name, 'description': desc}
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -730,7 +732,7 @@ class PacketmasterEX(object):
         uri = 'http://' + address + '/rest/savepoints/quicksaverules?'
         try:
             response = requests.put(uri, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -746,7 +748,7 @@ class PacketmasterEX(object):
         params = {'name': name, 'description': desc}
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -761,7 +763,7 @@ class PacketmasterEX(object):
         params = {'name': name}
         try:
             response = requests.delete(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -776,7 +778,7 @@ class PacketmasterEX(object):
         params = {'name': name}
         try:
             response = requests.delete(uri, data=params, auth=(username, password))
-            print response.status_code
+            # print response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
