@@ -159,7 +159,8 @@ def getsfp(address, username=None, password=None):
         print response.status_code
         r = response.content
         data = json.loads(r)
-        return json.dumps(data, indent=4)
+        result = data['result']
+        return json.dumps(result, indent=4)
     except ConnectionError as e:
         r = 'No Response'
         raise e
@@ -831,7 +832,7 @@ if __name__ == '__main__':
                  15 - Show Active Load-Balancing Hashes
                  16 - Permanence Mode
                  17 - Rule Storage Mode
-                 18 - Environment
+                 18 - Temerature and Fans
                  19 - ID LED Status
                  20 - OS and CPU Load Averages
                  21 - Memory Usage
@@ -879,7 +880,7 @@ if __name__ == '__main__':
             print stat
             topmenu()
         elif choice == 10:
-            spf = getsfp(address, username, password)
+            sfp = getsfp(address, username, password)
             print sfp
             topmenu()
         elif choice == 11:
