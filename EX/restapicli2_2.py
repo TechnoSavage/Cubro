@@ -1,9 +1,10 @@
 #Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
 #Import necessary Python libraries for interacting with the REST API
 #!/usr/bin/python
-import requests, json
+import requests, json, re
 from getpass import getpass
 from requests.exceptions import ConnectionError
+# Add code to handle case and verify input in all areas where needed
 
 # devicelabel = '/device/customident?' #add post
 # devicehash = '/device/grouphash?' #Add post
@@ -324,9 +325,9 @@ def getsaves(address, username=None, password=None):
 #Change the management IP configuration
 def changeip(address, username=None, password=None):
     uri = 'http://' + address + '/rest/device/ipconfig?'
-    newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ')
-    newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ')
-    newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ')
+    newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ').strip()
+    newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ').strip()
+    newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ').strip()
     #Implement checks to validate IP input
     params = {'ip': newip, 'mask': newmask, 'gw': newgate}
     try:
@@ -355,14 +356,27 @@ def changename(address, username=None, password=None):
         raise e
 
 #Change the configuration of a port
-def changeportconfig(address, username=None, password=None): #Add additional parameters, add function to change multiple ports without exiting
+def changeportconfig(address, username=None, password=None):
+    #Add additional parameters, add function to change multiple ports without exiting
+    #Add provision to handle devices which require reboot for speed change e.g. EX2 (10G is XG)
+    #Add shutdown true/false parameter for EX2 (more?)
     uri = 'http://' + address + '/rest/ports/config?'
-    interface = raw_input('Enter the interface name of the port you want to change: ')
-    speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ')
-    duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto": ')
-    forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no: ')
-    check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no: ')
-    recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no: ')
+    interface = raw_input('Enter the interface name of the port you want to change: ').strip()
+    port_no = re.find('[1-9]+.', interface)
+    interface = 'eth-0-' + port_no
+    speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ').strip()
+    if speed.lower() == 'auto':
+        speed = 'auto'
+    else:
+        speed = speed.upper()
+    duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto": ').strip()
+    duplex = duplex.lower()
+    forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no: ').strip()
+    forcetx = forcetx.lower()
+    check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no: ').strip()
+    check = check.lower()
+    recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no: ').strip()
+    recalc = recalc.lower
     params = {
         'if_name': interface,
         'speed': speed,
@@ -383,8 +397,9 @@ def changeportconfig(address, username=None, password=None): #Add additional par
 #Activate or deactivate a port
 def portonoff(address, username=None, password=None):
     uri = 'http://' + address + '/rest/ports/config?'
-    interface = raw_input('Enter the interface name of the port you want to change: ')
-    updown = raw_input('Enter "true" to shut port down; Enter "false" to reactivate port: ')
+    interface = raw_input('Enter the interface name of the port you want to change: ').strip()
+    updown = raw_input('Enter "true" to shut port down; Enter "false" to reactivate port: ').strip()
+    updown = updown.lower()
     params = {'if_name': interface, 'shutdown': updown}
     try:
         response = requests.post(uri, data=params, auth=(username, password))
