@@ -29,7 +29,10 @@ class PacketmasterEX(object):
         self.password = password
 
     #Retrieve firmware version
-    def getversion(self, address, username=None, password=None):
+    def getversion(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/imageversion?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -42,7 +45,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve IP configuration
-    def getip(self, address, username=None, password=None):
+    def getip(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/ipconfig?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -55,7 +61,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve Packetmaster model
-    def getmodel(self, address, username=None, password=None):
+    def getmodel(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/model?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -68,7 +77,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve Packetmaster name
-    def getname(self, address, username=None, password=None):
+    def getname(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/name?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -81,7 +93,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve Packetmaster Name plus Notes
-    def getlabel(self, address, username=None, password=None):
+    def getlabel(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/customident?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -94,7 +109,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve hardware generation of the device
-    def getgen(self, address, username=None, password=None):
+    def getgen(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/generation?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -107,7 +125,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve Packetmaster serial number
-    def getserial(self, address, username=None, password=None):
+    def getserial(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/serialno?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -120,7 +141,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve current port configuration
-    def getportconfig(self, address, username=None, password=None):
+    def getportconfig(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/ports/config?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -133,7 +157,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve port information
-    def getportinfo(self, address, username=None, password=None):
+    def getportinfo(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/ports/info?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -146,7 +173,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve port counters
-    def getportstat(self, address, username=None, password=None):
+    def getportstat(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/ports/stats?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -159,7 +189,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve SFP information
-    def getsfp(self, address, username=None, password=None):
+    def getsfp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/ports/sfpstatus?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -173,7 +206,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve active rules
-    def getrulesrun(self, address, username=None, password=None):
+    def getrulesrun(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/rules/all?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -186,7 +222,10 @@ class PacketmasterEX(object):
             raise e
 
     #List all available apps
-    def getapps(self, address, username=None, password=None):
+    def getapps(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/apps?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -199,7 +238,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve running apps
-    def getappsrun(self, address, username=None, password=None):
+    def getappsrun(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/apps/running?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -212,7 +254,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve hash algorithm information
-    def gethash(self, address, username=None, password=None):
+    def gethash(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/grouphash?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -225,7 +270,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve rule permanence mode
-    def getperm(self, address, username=None, password=None):
+    def getperm(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/permanentrulesmode?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -238,7 +286,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve rule storage model
-    def getstor(self, address, username=None, password=None):
+    def getstor(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/rulestoragemode?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -251,7 +302,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve environment information
-    def getenv(self, address, username=None, password=None):
+    def getenv(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/environment?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -264,7 +318,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve deice ID LED status_code
-    def getidled(self, address, username=None, password=None):
+    def getidled(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/idled?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -277,7 +334,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve load information
-    def getload(self, address, username=None, password=None):
+    def getload(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/loadaverage?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -290,7 +350,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve memory usage
-    def getmem(self, address, username=None, password=None):
+    def getmem(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/memoryusage?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -303,7 +366,10 @@ class PacketmasterEX(object):
             raise e
 
     #Retrieve cch machinery server revision
-    def getserver(self, address, username=None, password=None):
+    def getserver(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/serverrevision?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -316,7 +382,10 @@ class PacketmasterEX(object):
             raise e
 
     #List all save points
-    def getsaves(self, address, username=None, password=None):
+    def getsaves(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints?'
         try:
             response = requests.get(uri, auth=(username, password))
@@ -329,7 +398,10 @@ class PacketmasterEX(object):
             raise e
 
     #Change the management IP configuration
-    def changeip(self, address, username=None, password=None):
+    def changeip(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/ipconfig?'
         newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ').strip()
         newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ').strip()
@@ -347,7 +419,10 @@ class PacketmasterEX(object):
             raise e
 
     #Change the device name
-    def changename(self, address, username=None, password=None):
+    def changename(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/device/name?'
         newname = raw_input('Enter device name: ')
         params = {'devicename': newname}
@@ -362,7 +437,10 @@ class PacketmasterEX(object):
             raise e
 
     #Change the configuration of a port
-    def changeportconfig(self, address, username=None, password=None):
+    def changeportconfig(self):
+        address = self.address
+        username = self.username
+        password = self.password
         #Add additional parameters, add function to change multiple ports without exiting
         #Add provision to handle devices which require reboot for speed change e.g. EX2 (10G is XG)
         #Add shutdown true/false parameter for EX2 (more?)
@@ -405,7 +483,10 @@ class PacketmasterEX(object):
             raise e
 
     #Activate or deactivate a port
-    def portonoff(self, address, username=None, password=None):
+    def portonoff(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/ports/config?'
         interface = raw_input('Enter the interface name of the port you want to change: ').strip()
         port_no = re.find('[1-9]+.*[1-4]', interface)
@@ -424,7 +505,10 @@ class PacketmasterEX(object):
             raise e
 
     #Reset Port Counters
-    def deletecounters(self, address, username=None, password=None):
+    def deletecounters(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/ports/counters?'
         try:
             requests.delete(uri, auth=(username, password))
@@ -435,7 +519,10 @@ class PacketmasterEX(object):
             raise e
 
     #Reset Rule Counters
-    def resetrulecounter(self, address, username=None, password=None):
+    def resetrulecounter(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/rules/counters?'
         try:
             requests.delete(uri, auth=(username, password))
@@ -446,7 +533,10 @@ class PacketmasterEX(object):
             raise e
 
     #Add a rule
-    def addrule(self, address, username=None, password=None):
+    def addrule(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/rules?'
         params = {}
         rulename = raw_input('Enter a name for the rule [none]: ')
@@ -607,7 +697,10 @@ class PacketmasterEX(object):
             raise e
 
     #Make a port save point active
-    def actspport(self, address, username=None, password=None):
+    def actspport(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/activeportsavepoint?'
         savename = raw_input('What is the name of the port save point to make active?: ')
         params = {'name': savename}
@@ -622,7 +715,10 @@ class PacketmasterEX(object):
             raise e
 
     #Make a rule save point active
-    def actsprule(self, address, username=None, password=None):
+    def actsprule(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/activerulesavepoint?'
         savename = raw_input('What is the name of the rule save point to make active?: ')
         params = {'name': savename}
@@ -637,7 +733,10 @@ class PacketmasterEX(object):
             raise e
 
     #Set a save point as the default boot configuration
-    def setbootsp(self, address, username=None, password=None):
+    def setbootsp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/defaultrulesavepoint?'
         savename = raw_input('What is the name of the save point to make the default at boot configuration?: ')
         params = {'name': savename}
@@ -652,7 +751,10 @@ class PacketmasterEX(object):
             raise e
 
     #Export a save point from the Packetmaster
-    def exportsp(self, address, username=None, password=None):
+    def exportsp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/export?'
         rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
         rspname = '[' + rspname + ']'
@@ -676,7 +778,10 @@ class PacketmasterEX(object):
             raise e
 
     #Modify a port save point
-    def modportsp(self, address, username=None, password=None):
+    def modportsp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/modportsavepoint?'
         oldname = raw_input("What is the name of the save point you would like to modify?")
         newname = raw_input("What would you like to rename this save point to?")
@@ -694,7 +799,10 @@ class PacketmasterEX(object):
             raise e
 
     #Modify a rule save point
-    def modrulesp(self, address, username=None, password=None):
+    def modrulesp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/modrulesavepoint?'
         oldname = raw_input("What is the name of the save point you would like to modify?")
         newname = raw_input("What would you like to rename this save point to?")
@@ -712,7 +820,10 @@ class PacketmasterEX(object):
             raise e
 
     #Create a port save point from current configuration
-    def createportsp(self, address, username=None, password=None):
+    def createportsp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/portsavepoint?'
         name = raw_input("What would you like to name the port save point?")
         desc = raw_input("Enter a description for the port save point")
@@ -728,7 +839,10 @@ class PacketmasterEX(object):
             raise e
 
     #Create a quicksave point of current configuration
-    def createquick(self, address, username=None, password=None):
+    def createquick(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/quicksaverules?'
         try:
             response = requests.put(uri, auth=(username, password))
@@ -741,7 +855,10 @@ class PacketmasterEX(object):
             raise e
 
     #Create a rule save point from current configuration
-    def createrulesp(self, address, username=None, password=None):
+    def createrulesp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/rulesavepoint?'
         name = raw_input("What would you like to name the rule save point?")
         desc = raw_input("Enter a description for the rule save point")
@@ -757,7 +874,10 @@ class PacketmasterEX(object):
             raise e
 
     #Delete a port save point
-    def deleteportsp(self, address, username=None, password=None):
+    def deleteportsp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/portsavepoint?'
         name = raw_input("What is the name of the port save point you would like to delete?")
         params = {'name': name}
@@ -772,7 +892,10 @@ class PacketmasterEX(object):
             raise e
 
     #Delete a rule save point
-    def deleterulesp(self, address, username=None, password=None):
+    def deleterulesp(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints/rulesavepoint?'
         name = raw_input("What is the name of the rule save point you would like to delete?")
         params = {'name': name}
@@ -787,7 +910,10 @@ class PacketmasterEX(object):
             raise e
 
     #Reboot the Packetmaster
-    def reboot(self, address, username=None, password=None):
+    def reboot(self):
+        address = self.address
+        username = self.username
+        password = self.password
         uri = 'http://' + address + '/rest/savepoints?'
 
         try:
@@ -881,91 +1007,91 @@ if __name__ == '__main__':
         except:
             checkmenu()
         if choice == 1:
-            version = packetmaster.getversion(address, username, password)
+            version = packetmaster.getversion()
             print version
             topmenu()
         elif choice == 2:
-            ip = packetmaster.getip(address, username, password)
+            ip = packetmaster.getip()
             print ip
             topmenu()
         elif choice == 3:
-            model = packetmaster.getmodel(address, username, password)
+            model = packetmaster.getmodel()
             print model
             topmenu()
         elif choice == 4:
-            label = packetmaster.getlabel(address, username, password)
+            label = packetmaster.getlabel()
             print label
             topmenu()
         elif choice == 5:
-            serial = packetmaster.getserial(address, username, password)
+            serial = packetmaster.getserial()
             print serial
             topmenu()
         elif choice == 6:
-            gen = packetmaster.getgen(address, username, password)
+            gen = packetmaster.getgen()
             print gen
             topmenu()
         elif choice == 7:
-            config = packetmaster.getportconfig(address, username, password)
+            config = packetmaster.getportconfig()
             print config
             topmenu()
         elif choice == 8:
-            info = packetmaster.getportinfo(address, username, password)
+            info = packetmaster.getportinfo()
             print info
             topmenu()
         elif choice == 9:
-            stat = packetmaster.getportstat(address, username, password)
+            stat = packetmaster.getportstat()
             print stat
             topmenu()
         elif choice == 10:
-            sfp = packetmaster.getsfp(address, username, password)
+            sfp = packetmaster.getsfp()
             print sfp
             topmenu()
         elif choice == 11:
-            rulesrun = packetmaster.getrulesrun(address, username, password)
+            rulesrun = packetmaster.getrulesrun()
             print rulesrun
             topmenu()
         elif choice == 12:
-            apps = packetmaster.getapps(address, username, password)
+            apps = packetmaster.getapps()
             print apps
             topmenu()
         elif choice == 13:
-            appsrun = packetmaster.getappsrun(address, username, password)
+            appsrun = packetmaster.getappsrun()
             print appsrun
             topmenu()
         elif choice == 14:
-            saves = packetmaster.getsaves(address, username, password)
+            saves = packetmaster.getsaves()
             print saves
             topmenu()
         elif choice == 15:
-            hashes = packetmaster.gethash(address, username, password)
+            hashes = packetmaster.gethash()
             print hashes
             topmenu()
         elif choice == 16:
-            perm = packetmaster.getperm(address, username, password)
+            perm = packetmaster.getperm()
             print perm
             topmenu()
         elif choice == 17:
-            storage = packetmaster.getstor(address, username, password)
+            storage = packetmaster.getstor()
             print storage
             topmenu()
         elif choice == 18:
-            env = packetmaster.getenv(address, username, password)
+            env = packetmaster.getenv()
             print env
             topmenu()
         elif choice == 19:
-            led = packetmaster.getidled(address, username, password)
+            led = packetmaster.getidled()
             print led
             topmenu()
         elif choice == 20:
-            load = packetmaster.getload(address, username, password)
+            load = packetmaster.getload()
             print load
             topmenu()
         elif choice == 21:
-            memory = packetmaster.getmem(address, username, password)
+            memory = packetmaster.getmem()
             print memory
             topmenu()
         elif choice == 22:
-            server = packetmaster.getserver(address, username, password)
+            server = packetmaster.getserver()
             print server
             topmenu()
         elif choice == 23:
@@ -1004,79 +1130,79 @@ if __name__ == '__main__':
         except:
             changemenu()
         if change == 1:
-            ipchange = packetmaster.changeip(address, username, password)
+            ipchange = packetmaster.changeip()
             print ipchange
             topmenu()
         elif change == 2:
-            namechange = packetmaster.changename(address, username, password)
+            namechange = packetmaster.changename()
             print namechange
             topmenu()
         elif change == 3:
-            configchange = packetmaster.changeportconfig(address, username, password)
+            configchange = packetmaster.changeportconfig()
             print configchange
             topmenu()
         elif change == 4:
-            onoff = packetmaster.portonoff(address, username, password)
+            onoff = packetmaster.portonoff()
             print onoff
             topmenu()
         elif change == 5:
-            countersdelete = packetmaster.deletecounters(address, username, password)
+            countersdelete = packetmaster.deletecounters()
             print countersdelete
             topmenu()
         elif change == 6:
-            rulereset = packetmaster.resetrulecounter(address, username, password)
+            rulereset = packetmaster.resetrulecounter()
             print rulereset
             topmenu()
         elif change == 7:
-            ruleadd = packetmaster.addrule(address, username, password)
+            ruleadd = packetmaster.addrule()
             print ruleadd
             topmenu()
         elif change == 8:
-            portspactive = packetmaster.actspport(address, username, password)
+            portspactive = packetmaster.actspport()
             print portspactive
             topmenu()
         elif change == 9:
-            rulespactive = packetmaster.actsprule(address, username, password)
+            rulespactive = packetmaster.actsprule()
             print rulespactive
             topmenu()
         elif change == 10:
-            spset = packetmaster.setbootsp(address, username, password)
+            spset = packetmaster.setbootsp()
             print spset
             topmenu()
         elif change == 11:
-            spexport = packetmaster.exportsp(address, username, password)
+            spexport = packetmaster.exportsp()
             print spexport
             topmenu()
         elif change == 12:
-            portspmod = packetmaster.modportsp(address, username, password)
+            portspmod = packetmaster.modportsp()
             print portspmod
             topmenu()
         elif change == 13:
-            rulepsmod = packetmaster.modrulesp(address, username, password)
+            rulepsmod = packetmaster.modrulesp()
             print rulepsmod
             topmenu()
         elif change == 14:
-            portspcreate = packetmaster.createportsp(address, username, password)
+            portspcreate = packetmaster.createportsp()
             print portspcreate
             topmenu()
         elif change == 15:
-            quickcreate = packetmaster.createquick(address, username, password)
+            quickcreate = packetmaster.createquick()
             print quickcreate
             topmenu()
         elif change == 16:
-            rulespcreate = packetmaster.createrulesp(address, username, password)
+            rulespcreate = packetmaster.createrulesp()
             print rulespcreate
             topmenu()
         elif change == 17:
-            portspdelete = packetmaster.deleteportsp(address, username, password)
+            portspdelete = packetmaster.deleteportsp()
             print portspdelete
             topmenu()
         elif change == 18:
-            rulepsdelete = packetmaster.deleterulesp(address, username, password)
+            rulepsdelete = packetmaster.deleterulesp()
             print rulespdelete
             topmenu()
         elif change == 19:
-            restart = packetmaster.reboot(address, username, password)
+            restart = packetmaster.reboot()
             print restart
             topmenu()
         elif change == 20:
