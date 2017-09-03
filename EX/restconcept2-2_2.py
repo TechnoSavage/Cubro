@@ -1,25 +1,17 @@
-#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST proof of concept v2.1.  Written by Derek Burke 12/2016
+#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST proof of concept v2.2
 #Use a Packetmaster to detect the presence of an excessive amount of ICMP packets on a link and drop ICMP packets for one minute if they exceed threshold.
 #Import necessary Python libraries for interacting with the REST API
-import urllib, requests, json, time
+import requests, json, time
+from getpass import getpass
 from requests.exceptions import ConnectionError
 
-#Initiate variable for EX authentication, EX IP address and needed rest paths
-auth = urllib.urlencode({
-'username': 'admin',
-'password': 'cubro'
-})
-ip = raw_input('What is the IP address of the Packetmaster?: ')
-ipadd = 'http://' + ip + '/rest'
-rulestats = '/flows/all?'
-rule = '/flows?'
-
 #Function that repeatedly queries flow statisctics and parses the JSON response down to the datarate of a rule passing ICMP packets at a specific port.  Calls dropicmp function if daterate exceeds 2.5Kbps
-def query():
+def query(address, username=None, password=None):
     l = list()
+    uri = 'http://' + address + '/rest/rules/all?'S
     try:
-        url = ipadd + rulestats + auth
-        response = requests.get(url)
+        response = requests.post(uri, data=params, auth=(username, password))
+        # print response.status_code
         r = response.content
         data = json.loads(r)
         count = 0
@@ -33,18 +25,18 @@ def query():
         field = datarate.split()
         if float(field[0]) > 2.5 and 'Kbit' in datarate:
             print line
-            dropicmp()
+            dropicmp(address, username, password)
         else:
             print datarate
-            query()
+            query(address, username, password)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        return e
 
 #Function that creates two rules: One that drops all ICMP packets and another that passes all other traffic.  Calls recreate function after 60 seconds.
-def dropicmp():
+def dropicmp(address, username=None, password=None):
     print 'ICMP flood detected; blocking ICMP packets for the next 60 seconds'
-    url = ipadd + rule + auth
+    uri = 'http://' + address + '/rest/rules?'
     priority1 = 50000
     priority2 = 32768
     params1 = {
@@ -63,7 +55,7 @@ def dropicmp():
     'actions': '4'
     }
     try:
-        response1 = requests.post(url, data=params1)
+        response1 = requests.post(uri, data=params1, auth=(username, password))
         print response1.status_code
         r1 = response1.content
         data1 = json.loads(r1)
@@ -72,7 +64,7 @@ def dropicmp():
         r = 'No Response'
         print 'Device is unavailable \n'
     try:
-        response2 = requests.post(url, data=params2)
+        response2 = requests.post(uri, data=params2, auth=(username, password))
         print response2.status_code
         r2 = response2.content
         data2 = json.loads(r2)
@@ -81,11 +73,11 @@ def dropicmp():
         r = 'No Response'
         print 'Device is unavailable \n'
     time.sleep(60)
-    recreate()
+    recreate(address, username, password)
 
 #Function that recreates the original rules present on the EX device prior to dropicmp function.  Calls query function.
-def recreate():
-    url = ipadd + rule + auth
+def recreate(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/rules?'
     priority1 = 50000
     priority2 = 32768
     params1 = {
@@ -104,7 +96,7 @@ def recreate():
     'actions': '4'
     }
     try:
-        response1 = requests.post(url, data=params1)
+        response1 = requests.post(uri, data=params1, auth=(username, password))
         print response1.status_code
         r1 = response1.content
         data1 = json.loads(r1)
@@ -113,7 +105,7 @@ def recreate():
         r = 'No Response'
         print 'Device is unavailable \n'
     try:
-        response2 = requests.post(url, data=params2)
+        response2 = requests.post(uri, data=params2, auth=(username, password))
         print response2.status_code
         r2 = response2.content
         data2 = json.loads(r2)
@@ -123,6 +115,11 @@ def recreate():
         print 'Device is unavailable \n'
     print 'Returning to standard traffic flow'
     time.sleep(10)
-    query()
+    query(address, username, password)
 
-query()
+if __name__ == '__main__':
+    address = raw_input('IP address of the Packetmaster to monitor: ')
+    #Implement check on valid IP address
+    username = raw_input('Username for Packetmaster if required: ')
+    password = getpass()
+    query(address, username, password)
