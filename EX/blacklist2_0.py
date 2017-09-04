@@ -6,7 +6,7 @@ from getpass import getpass
 from requests.exceptions import ConnectionError
 
 #Drop the retrieved IPs on the Packetmaster
-def createblacklist(match, uri, username=None, password=None):
+def createblacklist(match, address, username=None, password=None):
     uri = 'http://' + address + '/rest/rules?'
     count = 0
     priority = 65536
@@ -28,10 +28,10 @@ def createblacklist(match, uri, username=None, password=None):
         }
         try:
             response = requests.post(uri, data=params, auth=(username, password))
-            # print response.status_code
+            print response.status_code
             r = response.content
             data = json.loads(r)
-            return json.dumps(data, indent=4)
+            print json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
             return e
