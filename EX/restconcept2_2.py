@@ -1,6 +1,7 @@
 #Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST proof of concept v2.2
 #Use a Packetmaster to detect the presence of an excessive amount of ICMP packets on a link and drop ICMP packets for one minute if they exceed threshold.
 #Import necessary Python libraries for interacting with the REST API
+#!/usr/bin/python
 import requests, json, time
 from getpass import getpass
 from requests.exceptions import ConnectionError
@@ -8,9 +9,9 @@ from requests.exceptions import ConnectionError
 #Function that repeatedly queries flow statisctics and parses the JSON response down to the datarate of a rule passing ICMP packets at a specific port.  Calls dropicmp function if daterate exceeds 2.5Kbps
 def query(address, username=None, password=None):
     l = list()
-    uri = 'http://' + address + '/rest/rules/all?'S
+    uri = 'http://' + address + '/rest/rules/all?'
     try:
-        response = requests.post(uri, data=params, auth=(username, password))
+        response = requests.get(uri, auth=(username, password))
         # print response.status_code
         r = response.content
         data = json.loads(r)
