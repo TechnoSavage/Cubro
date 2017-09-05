@@ -9,7 +9,7 @@ from datetime import datetime
 from requests.exceptions import ConnectionError
 
 #Check system time
-def checktime(address, username, password):
+def checktime(address, username=None, password=None):
     currenttime = datetime.now().strftime('%H:%M')
     # print currenttime
     if str(currenttime) == '01:00': #Edit this time to match your use case
