@@ -1,75 +1,69 @@
 #Drop SMB traffic script.  Drop SMB traffic starting at a specified time for a duration of time.
-#Use with firmware version 2.0.0.x or earlier. Python2.7.  Written by Derek Burke 12/2016
+#Use with firmware version 2.1.0.x or later. Python2.7.
+#!/usr/bin/python
+
 #Import necessary libraries
-import urllib, requests, json, time
+import requests, json, time
+from getpass import getpass
 from datetime import datetime
 from requests.exceptions import ConnectionError
 
-#IP address to access REST data of device
-deviceip = raw_input('What is the IP address of the Packetmaster you want to access: ')
-ip = 'http://' + deviceip + '/rest'
-#Device credentials
-username = raw_input('Enter your username: ')
-password = raw_input('Enter your password: ')
-auth = urllib.urlencode({
-    'username': username,
-    'password': password
-})
-
-#Options to append to device url
-rule = '/flows?'
-
 #Check system time
-def checktime():
+def checktime(address, username, password):
     currenttime = datetime.now().strftime('%H:%M')
-    print currenttime
-    if str(currenttime) == '16:59':
+    # print currenttime
+    if str(currenttime) == '01:00': #Edit this time to match your use case
         try:
-            addrule()
+            addrule(address, username, password)
         except ConnectionError as e:
             r = 'No Response'
-            print 'Device is unavailable \n'
+            raise e
 
-def addrule():
-    url = ip + rule + auth
+def addrule(address, username=None, password=None):
+    uri = 'http://' + address + '/rest/rules?'
     params = {"name": "dropsmb temporary",
-    "description": "This rule will drop SMB traffic for the duration from 5:00PM to 5:00AM",
-    "priority": "65535", "match[in_port]": "1",
+    "description": "This rule will drop SMB traffic for the specified duration",
+    "priority": 65535, "match[in_port]": "1",
     "match[protocol]": "tcp",
     "match[tcp_dst]": "445",
     "match[match_extra]": "hard_timeout=43200",
     "actions": "drop"}
     try:
-        response = requests.post(url, data=params)
-        print response.status_code
+        response = requests.post(uri, data=params, auth=(username, password))
+        # print response.status_code
         r = response.content
         data = json.loads(r)
-        print json.dumps(data, indent=4)
+        return json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
-        print 'Device is unavailable \n'
+        raise e
     addruletwo()
 
-def addruletwo():
-        url = ip + rule + auth
+def addruletwo(address, username=None, password=None):
+        uri = 'http://' + address + '/rest/rules?'
         params = {"name": "dropsmb temporary",
         "description": "This rule will drop SMB traffic for the specified duration",
-        "priority": "65535",
+        "priority": 65535,
         "match[in_port]": "2",
         "match[protocol]": "tcp",
         "match[tcp_dst]": "445",
         "match[match_extra]": "hard_timeout=43200",
         "actions": "drop"}
         try:
-            response = requests.post(url, data=params)
-            print response.status_code
+            response = requests.post(uri, data=params, auth=(uername, password))
+            # print response.status_code
             r = response.content
             data = json.loads(r)
-            print json.dumps(data, indent=4)
+            return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
-            print 'Device is unavailable \n'
+            raise e
 
-while True:
-    checktime()
-    time.sleep(30)
+if __name__ == '__main__':
+    deviceip = raw_input('What is the IP address of the Packetmaster you want to access: ')
+    username = raw_input('Username for Packetmaster if required: ')
+    password = getpass()
+
+    while True:
+        checktime(address, username, password)
+        time.sleep(30)
