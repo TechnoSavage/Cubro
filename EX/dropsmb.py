@@ -33,7 +33,7 @@ def addrule(address, username=None, password=None):
         # print response.status_code
         r = response.content
         data = json.loads(r)
-        return json.dumps(data, indent=4)
+        print json.dumps(data, indent=4)
     except ConnectionError as e:
         r = 'No Response'
         raise e
@@ -54,7 +54,7 @@ def addruletwo(address, username=None, password=None):
             # print response.status_code
             r = response.content
             data = json.loads(r)
-            return json.dumps(data, indent=4)
+            print json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
             raise e
