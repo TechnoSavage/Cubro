@@ -29,13 +29,10 @@ class PacketmasterEX(object):
         self.password = password
 
     def get_port_count(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/ports/config?'
+        uri = 'http://' + self.address + '/rest/ports/config?'
         ports = list()
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             r = response.content
             data = json.loads(r)
             count = 0
@@ -49,12 +46,9 @@ class PacketmasterEX(object):
 
     #Retrieve firmware version
     def firmware_version(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/imageversion?'
+        uri = 'http://' + self.address + '/rest/device/imageversion?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -66,12 +60,9 @@ class PacketmasterEX(object):
 
     #Retrieve IP configuration
     def ip_config(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/ipconfig?'
+        uri = 'http://' + self.address + '/rest/device/ipconfig?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -84,12 +75,9 @@ class PacketmasterEX(object):
 
     #Retrieve Packetmaster model
     def device_model(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/model?'
+        uri = 'http://' + self.address + '/rest/device/model?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -102,12 +90,9 @@ class PacketmasterEX(object):
 
     #Retrieve Packetmaster name
     def device_name(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/name?'
+        uri = 'http://' + self.address + '/rest/device/name?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -119,12 +104,9 @@ class PacketmasterEX(object):
 
     #Retrieve Packetmaster Name plus Notes
     def device_label(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/customident?'
+        uri = 'http://' + self.address + '/rest/device/customident?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -137,12 +119,9 @@ class PacketmasterEX(object):
 
     #Retrieve hardware generation of the device
     def hardware_generation(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/generation?'
+        uri = 'http://' + self.address + '/rest/device/generation?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -154,12 +133,9 @@ class PacketmasterEX(object):
 
     #Retrieve Packetmaster serial number
     def serial_number(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/serialno?'
+        uri = 'http://' + self.address + '/rest/device/serialno?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -171,12 +147,9 @@ class PacketmasterEX(object):
 
     #Retrieve current port configuration
     def port_config(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/ports/config?'
+        uri = 'http://' + self.address + '/rest/ports/config?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -187,12 +160,9 @@ class PacketmasterEX(object):
 
     #Retrieve port information
     def port_info(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/ports/info?'
+        uri = 'http://' + self.address + '/rest/ports/info?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -203,12 +173,9 @@ class PacketmasterEX(object):
 
     #Retrieve port counters
     def port_statistics(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/ports/stats?'
+        uri = 'http://' + self.address + '/rest/ports/stats?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -219,12 +186,9 @@ class PacketmasterEX(object):
 
     #Retrieve SFP information
     def sfp_info(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/ports/sfpstatus?'
+        uri = 'http://' + self.address + '/rest/ports/sfpstatus?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -236,12 +200,9 @@ class PacketmasterEX(object):
 
     #Retrieve active rules
     def rules_active(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/rules/all?'
+        uri = 'http://' + self.address + '/rest/rules/all?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -252,12 +213,9 @@ class PacketmasterEX(object):
 
     #List all available apps
     def device_apps(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/apps?'
+        uri = 'http://' + self.address + '/rest/apps?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -268,12 +226,9 @@ class PacketmasterEX(object):
 
     #Retrieve running apps
     def apps_active(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/apps/running?'
+        uri = 'http://' + self.address + '/rest/apps/running?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -284,12 +239,9 @@ class PacketmasterEX(object):
 
     #Retrieve hash algorithm information
     def hash_algorithms(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/grouphash?'
+        uri = 'http://' + self.address + '/rest/device/grouphash?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -300,12 +252,9 @@ class PacketmasterEX(object):
 
     #Retrieve rule permanence mode
     def rule_permanence(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/permanentrulesmode?'
+        uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -316,12 +265,9 @@ class PacketmasterEX(object):
 
     #Retrieve rule storage model
     def storage_model(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/rulestoragemode?'
+        uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -332,12 +278,9 @@ class PacketmasterEX(object):
 
     #Retrieve environment information
     def env_info(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/environment?'
+        uri = 'http://' + self.address + '/rest/device/environment?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -348,12 +291,9 @@ class PacketmasterEX(object):
 
     #Retrieve deice ID LED status_code
     def id_led(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/idled?'
+        uri = 'http://' + self.address + '/rest/device/idled?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -364,12 +304,9 @@ class PacketmasterEX(object):
 
     #Retrieve load information
     def load_info(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/loadaverage?'
+        uri = 'http://' + self.address + '/rest/device/loadaverage?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -380,12 +317,9 @@ class PacketmasterEX(object):
 
     #Retrieve memory usage
     def mem_free(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/memoryusage?'
+        uri = 'http://' + self.address + '/rest/device/memoryusage?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -396,12 +330,9 @@ class PacketmasterEX(object):
 
     #Retrieve cch machinery server revision
     def server_revision(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/serverrevision?'
+        uri = 'http://' + self.address + '/rest/device/serverrevision?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -412,12 +343,9 @@ class PacketmasterEX(object):
 
     #List all save points
     def save_points(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints?'
+        uri = 'http://' + self.address + '/rest/savepoints?'
         try:
-            response = requests.get(uri, auth=(username, password))
+            response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
