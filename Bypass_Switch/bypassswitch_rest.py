@@ -3,7 +3,7 @@
 import requests, json
 from requests.exceptions import ConnectionError
 
-#Implement chacks against valid input for config settings
+#TO-DO Implement chacks against valid input for config settings
 class BypassSwitch(object):
 
         def __init__(self, address):
@@ -21,7 +21,7 @@ class BypassSwitch(object):
                 r = 'No Response'
                 raise e
 
-        #Function to disengage the bypass
+        #Method to disengage the bypass
         def disengage(self):
             uri = 'http://' + self.address + '/takeUp?'
             try:
@@ -33,7 +33,7 @@ class BypassSwitch(object):
                 r = 'No Response'
                 raise e
 
-        #Function to disengage bypass for timeout period
+        #Method to disengage bypass for timeout period
         def timeout(self):
             uri = 'http://' + self.address + '/setTimeout?'
             try:
@@ -45,7 +45,7 @@ class BypassSwitch(object):
                 r = 'No Response'
                 raise e
 
-        #Function to change device configuration with guided choices
+        #Method to change device configuration with guided choices
         def set_config_guided(self):
             ipadd = raw_input("Enter the Management IP Address; leave blank for factory default 192.168.0.201: ")
             if len(ipadd) <= 0:
@@ -79,7 +79,7 @@ class BypassSwitch(object):
                 r = 'No Response'
                 raise e
 
-        #Function to change device configuration with arguments
+        #Method to change device configuration with arguments
         def set_config(self, address, subnet, gateway, mac, timeout):
             uri = 'http://' + self.address + '/setConfig?'
             try:

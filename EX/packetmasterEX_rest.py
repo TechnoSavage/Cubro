@@ -2,7 +2,10 @@
 
 import requests, json, re
 from requests.exceptions import ConnectionError
-# Add code to handle case and verify input in all areas where needed
+#TO-DO Add code to handle case and verify input in all areas where needed
+#Change methods including menus for user input to 'guided' methods; make necessary changes in restapicli2_2
+#Finish deleting unnecessary variables and use 'self.x'
+#Create methods that accept arguments to post changes 
 
 # devicelabel = '/device/customident?' #add post
 # devicehash = '/device/grouphash?' #Add post
