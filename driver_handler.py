@@ -3,10 +3,10 @@ from common.resource_info import ResourceInfo
 import requests, json, re
 from requests.exceptions import ConnectionError
 
-class EXDriverHandler(object):
+class EXDriverHandler(DriverHandlerBase):
 
     def __init__(self):
-        #DriverHandlerBase.__init__(self)
+        DriverHandlerBase.__init__(self)
         self._switch_model = 'EX'
         self._blade_model = "Ex Blade"
         self._port_model = "Ex Port"
@@ -328,35 +328,3 @@ class EXDriverHandler(object):
         :return: None
         """
         pass
-
-if __name__ == '__main__':
-    address = '10.90.100.244'
-    username = 'admin'
-    password = 'cubro'
-    src_port = raw_input('Enter port A: ')
-    dst_port = raw_input('Enter port B: ')
-
-    EX2 = EXDriverHandler()
-
-    #model = EX2.model(address, username, password)
-    #print type(model)
-    #software = EX2.version(address, username, password)
-    #print type(software)
-    #hardware = EX2.generation(address, username, password)
-    #print type(hardware)
-    #name = EX2.label(address, username, password)
-    #print type(name)
-    #portcount = EX2.port_count(address, username, password)
-    #print type(portcount)
-    #config = EX2.interface_description(address, src_port)
-    #print type(config)
-    #bidi = EX2.map_bidi(address, src_port, dst_port,username, password)
-    #print bidi
-    # uni = EX2.map_uni(address, src_port, dst_port,username, password)
-    # print uni
-    #interfaces = EX2.interface_description(address, src_port)
-    #print type(interfaces)
-    #port_count = EX2.port_count(address, username, password)
-    #print port_count
-    #for port_no in xrange(port_count):
-        #print port_no
