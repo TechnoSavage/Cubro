@@ -916,7 +916,7 @@ class PacketmasterEX(object):
 
     #Change rule mode permanence with guided options
     def set_rule_permanence_guided(self):
-        uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
+        uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
         perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off: ')
         perm = perm.lower()
         if perm == 'true':
@@ -939,13 +939,15 @@ class PacketmasterEX(object):
 
     #Change rule mode permanence with arguments
     def set_rule_permanence(self, permanence='false'):
-        uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
+        uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
         perm = permanence.lower()
-        if perm != 'true' or perm != 'false':
-            print 'That is not a valid choice; setting rule permanence to off.'
-            perm = 'false'
+        if perm == 'true':
+            perm = True
+        elif perm == 'false':
+            perm = False
         else:
-            pass
+            print 'That is not a valid choice; setting rule permanence to off.'
+            perm = False
         params = {'state': perm }
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
