@@ -454,8 +454,14 @@ class PacketmasterEX(object):
         #Add shutdown true/false parameter for EX2 (more?)
         uri = 'http://' + self.address + '/rest/ports/config?'
         interface = raw_input('Enter the interface name of the port you want to change: ').strip()
-        port_no = re.find('[1-9]+.*[1-4]', interface)
-        interface = 'eth-0-' + port_no
+        port_no = re.findall('[1-9][0-9]*', if_name)
+        if len(port_no) == 1:
+            interface = 'eth-0-' + port_no[0]
+        elif len(port_no) == 2 and int(port_no[1]) <= 4:
+            interface = 'eth-0-' + port_no[0] + '/' + port_no[1]
+        else:
+            error = 'that is not a valid port number; please try again'
+            return error
         speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ').strip()
         if speed.lower() == 'auto':
             speed = 'auto'
@@ -473,6 +479,46 @@ class PacketmasterEX(object):
         check = check.lower()
         recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no: ').strip()
         recalc = recalc.lower
+        params = {
+            'if_name': interface,
+            'speed': speed,
+            'duplex': duplex,
+            'unidirectional': forcetx,
+            'crc_check': check,
+            'crc_recalculation': recalc }
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    def set_port_config(self, interface, speed='auto', duplex='auto', forcetx='false', check='false', recalc='false'):
+        uri = 'http://' + self.address + '/rest/ports/config?'
+        if_name = str(interface).strip()
+        port_no = re.findall('[1-9][0-9]*', if_name)
+        if len(port_no) == 1:
+            interface = 'eth-0-' + port_no[0]
+        elif len(port_no) == 2 and int(port_no[1]) <= 4:
+            interface = 'eth-0-' + port_no[0] + '/' + port_no[1]
+        else:
+            error = 'that is not a valid port number; please try again'
+            return error
+        if speed.lower() == 'auto':
+            speed = 'auto'
+        else:
+            speed = speed.upper()
+        if duplex.lower() =='auto' or duplex.lower() == 'full' or duplex.lower() == 'half':
+            duplex = duplex.lower()
+        else:
+            print "That is not a valid duplex; defaulting to auto"
+            duplex = 'auto'
+        forcetx = forcetx.lower()
+        check = check.lower()
+        recalc = recalc.lower()
         params = {
             'if_name': interface,
             'speed': speed,
