@@ -1,4 +1,4 @@
-#Packetmaster EX device class for REST API interaction
+#Packetmaster EX device class for REST API interaction,  Use with firmware version 2.1.x or newer.
 
 import requests, json, re
 from requests.exceptions import ConnectionError
@@ -454,7 +454,7 @@ class PacketmasterEX(object):
         #Add shutdown true/false parameter for EX2 (more?)
         uri = 'http://' + self.address + '/rest/ports/config?'
         interface = raw_input('Enter the interface name of the port you want to change: ').strip()
-        port_no = re.findall('[1-9][0-9]*', if_name)
+        port_no = re.findall('[1-9][0-9]*', interface)
         if len(port_no) == 1:
             interface = 'eth-0-' + port_no[0]
         elif len(port_no) == 2 and int(port_no[1]) <= 4:
@@ -911,6 +911,51 @@ class PacketmasterEX(object):
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Turn the ID LED on or off with guided options
+    def set_id_led_guided(self):
+        uri = 'http://' + self.address + '/rest/device/idled'
+        led = raw_input('type "true" to turn the ID LED on type "false" to turn it off: ')
+        led = led.lower()
+        if led == 'true':
+            led = True
+        elif led == 'false':
+            led = False
+        else:
+            print 'That is not a valid choice; setting ID LED to off'
+            led = False
+        params = {'activated': led}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Turn the ID LED on or off with arguments
+    def set_id_led(self, led='false'):
+        uri = 'http://' + self.address + '/rest/device/idled'
+        led = led.lower()
+        if led == 'true':
+            led = True
+        elif led == 'false':
+            led = False
+        else:
+            print 'That is not a valid choice; setting ID LED to off'
+            led = False
+        params = {'activated': led}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
