@@ -189,7 +189,7 @@ if __name__ == '__main__':
         print 'Change settings for device at', address,'acting as User', username
         print '''
                  1 - Change IP Configuration
-                 2 - Change Device Name
+                 2 - Change Device Name + Notes
                  3 - Change Port Configuration
                  4 - Shut Down or Activate Port
                  5 - Delete Port Counters
@@ -214,19 +214,19 @@ if __name__ == '__main__':
         except:
             changemenu()
         if change == 1:
-            ipchange = packetmaster.set_ip_config()
+            ipchange = packetmaster.set_ip_config_guided()
             print ipchange
             topmenu()
         elif change == 2:
-            namechange = packetmaster.set_name()
+            namechange = packetmaster.set_label_guided()
             print namechange
             topmenu()
         elif change == 3:
-            configchange = packetmaster.set_port_config()
+            configchange = packetmaster.set_port_config_guided()
             print configchange
             topmenu()
         elif change == 4:
-            onoff = packetmaster.port_on_off()
+            onoff = packetmaster.port_on_off_guided()
             print onoff
             topmenu()
         elif change == 5:
@@ -238,35 +238,35 @@ if __name__ == '__main__':
             print rulereset
             topmenu()
         elif change == 7:
-            ruleadd = packetmaster.add_rule()
+            ruleadd = packetmaster.add_rule_guided()
             print ruleadd
             topmenu()
         elif change == 8:
-            portspactive = packetmaster.set_port_savepoint()
+            portspactive = packetmaster.set_port_savepoint_guided()
             print portspactive
             topmenu()
         elif change == 9:
-            rulespactive = packetmaster.set_rule_savepoint()
+            rulespactive = packetmaster.set_rule_savepoint_guided()
             print rulespactive
             topmenu()
         elif change == 10:
-            spset = packetmaster.set_boot_savepoint()
+            spset = packetmaster.set_boot_savepoint_guided()
             print spset
             topmenu()
         elif change == 11:
-            spexport = packetmaster.export_savepoint()
+            spexport = packetmaster.export_savepoint_guided()
             print spexport
             topmenu()
         elif change == 12:
-            portspmod = packetmaster.modify_port_savepoint()
+            portspmod = packetmaster.modify_port_savepoint_guided()
             print portspmod
             topmenu()
         elif change == 13:
-            rulepsmod = packetmaster.modify_rule_savepoint()
+            rulepsmod = packetmaster.modify_rule_savepoint_guided()
             print rulepsmod
             topmenu()
         elif change == 14:
-            portspcreate = packetmaster.create_port_savepoint()
+            portspcreate = packetmaster.create_port_savepoint_guided()
             print portspcreate
             topmenu()
         elif change == 15:
@@ -274,15 +274,15 @@ if __name__ == '__main__':
             print quickcreate
             topmenu()
         elif change == 16:
-            rulespcreate = packetmaster.create_rule_savepoint()
+            rulespcreate = packetmaster.create_rule_savepoint_guided()
             print rulespcreate
             topmenu()
         elif change == 17:
-            portspdelete = packetmaster.delete_port_savepoint()
+            portspdelete = packetmaster.delete_port_savepoint_guided()
             print portspdelete
             topmenu()
         elif change == 18:
-            rulepsdelete = packetmaster.delete_rule_savepoint()
+            rulepsdelete = packetmaster.delete_rule_savepoint_guided()
             print rulespdelete
             topmenu()
         elif change == 19:

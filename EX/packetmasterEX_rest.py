@@ -3,9 +3,7 @@
 import requests, json, re
 from requests.exceptions import ConnectionError
 #TO-DO Add code to handle case and verify input in all areas where needed
-#Change methods including menus for user input to 'guided' methods; make necessary changes in restapicli2_2
-#Finish deleting unnecessary variables and use 'self.x'
-#Create methods that accept arguments to post changes 
+#Create methods that accept arguments to post changes
 
 # devicelabel = '/device/customident?' #add post
 # devicehash = '/device/grouphash?' #Add post
@@ -355,19 +353,34 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Change the management IP configuration
-    def set_ip_config(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/ipconfig?'
+    #Change the management IP configuration with guided options
+    def set_ip_config_guided(self):
+        uri = 'http://' + self.address + '/rest/device/ipconfig?'
         newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ').strip()
         newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ').strip()
         newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ').strip()
         #Implement checks to validate IP input
         params = {'ip': newip, 'mask': newmask, 'gw': newgate}
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Change the management IP configuration with arguments
+    def set_ip_config(self, address, netmask, gateway):
+        uri = 'http://' + self.address + '/rest/device/ipconfig?'
+        newip = address.strip()
+        newmask = netmask.strip()
+        newgate = gateway.strip()
+        #Implement checks to validate IP input
+        params = {'ip': newip, 'mask': newmask, 'gw': newgate}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -377,15 +390,55 @@ class PacketmasterEX(object):
             raise e
 
     #Change the device name
-    def set_name(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/device/name?'
+    def set_name_guided(self):
+        uri = 'http://' + self.address + '/rest/device/name?'
         newname = raw_input('Enter device name: ')
-        params = {'devicename': newname}
+        params = {'name': newname}
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    def set_name(self, name):
+        uri = 'http://' + self.address + '/rest/device/name?'
+        params = {'name': name}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    def set_label_guided(self):
+        uri = 'http://' + self.address + '/rest/device/customident?'
+        newname = raw_input('Enter device name: ')
+        newnotes = raw_input('Enter device notes: ')
+        params = {'name': newname,
+                  'notes': newnotes}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    def set_label(self, name, notes):
+        uri = 'http://' + self.address + '/rest/device/customident?'
+        params = {'name': name,
+                  'notes': notes}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -395,14 +448,11 @@ class PacketmasterEX(object):
             raise e
 
     #Change the configuration of a port
-    def set_port_config(self):
-        address = self.address
-        username = self.username
-        password = self.password
+    def set_port_config_guided(self):
         #Add additional parameters, add function to change multiple ports without exiting
         #Add provision to handle devices which require reboot for speed change e.g. EX2 (10G is XG)
         #Add shutdown true/false parameter for EX2 (more?)
-        uri = 'http://' + address + '/rest/ports/config?'
+        uri = 'http://' + self.address + '/rest/ports/config?'
         interface = raw_input('Enter the interface name of the port you want to change: ').strip()
         port_no = re.find('[1-9]+.*[1-4]', interface)
         interface = 'eth-0-' + port_no
@@ -431,7 +481,7 @@ class PacketmasterEX(object):
             'crc_check': check,
             'crc_recalculation': recalc }
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -441,11 +491,8 @@ class PacketmasterEX(object):
             raise e
 
     #Activate or deactivate a port
-    def port_on_off(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/ports/config?'
+    def port_on_off_guided(self):
+        uri = 'http://' + self.address + '/rest/ports/config?'
         interface = raw_input('Enter the interface name of the port you want to change: ').strip()
         port_no = re.find('[1-9]+.*[1-4]', interface)
         interface = 'eth-0-' + port_no
@@ -453,7 +500,7 @@ class PacketmasterEX(object):
         updown = updown.lower()
         params = {'if_name': interface, 'shutdown': updown}
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -464,12 +511,9 @@ class PacketmasterEX(object):
 
     #Reset Port Counters
     def delete_counters(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/ports/counters?'
+        uri = 'http://' + self.address + '/rest/ports/counters?'
         try:
-            requests.delete(uri, auth=(username, password))
+            requests.delete(uri, auth=(self.username, self.password))
             success = 'Counters deleted successfully'
             return success
         except ConnectionError as e:
@@ -478,12 +522,9 @@ class PacketmasterEX(object):
 
     #Reset Rule Counters
     def reset_rule_counters(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/rules/counters?'
+        uri = 'http://' + self.address + '/rest/rules/counters?'
         try:
-            requests.delete(uri, auth=(username, password))
+            requests.delete(uri, auth=(self.username, self.password))
             success = 'Counters deleted successfully'
             return success
         except ConnectionError as e:
@@ -491,11 +532,8 @@ class PacketmasterEX(object):
             raise e
 
     #Add a rule
-    def add_rule(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/rules?'
+    def add_rule_guided(self):
+        uri = 'http://' + self.address + '/rest/rules?'
         params = {}
         rulename = raw_input('Enter a name for the rule [none]: ')
         if rulename != '':
@@ -538,8 +576,8 @@ class PacketmasterEX(object):
                     print "That is not a valid selection; VLAN priority defaulting to '0'"
                     params['match[vlan_priority]'] = '0'
         else:
-            print 'That is not a valid selection; restarting add rule\n'
-            addrule(ip, uri, auth)
+            error = 'That is not a valid selection; please try again \n'
+            return error
         macsrc = raw_input('Filter by source MAC address?  Leave blank for no or enter MAC address: ')
         if macsrc != '':
             params['dl_src'] = macsrc
@@ -633,8 +671,8 @@ class PacketmasterEX(object):
             if nwproto != '':
                 params['match[nw_proto]'] = nwproto
         else:
-            print 'That is not a valid selection; restarting add rule \n'
-            addrule(ip, uri, auth)
+            error = 'That is not a valid selection; please try again \n'
+            return error
         print '''\nAdd Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, QinQ
         Leave blank for none
@@ -645,7 +683,7 @@ class PacketmasterEX(object):
         ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - improper syntax will cause add rule to fail: ')
         params['actions'] = ruleaction
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -655,15 +693,12 @@ class PacketmasterEX(object):
             raise e
 
     #Make a port save point active
-    def set_port_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/activeportsavepoint?'
+    def set_port_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/activeportsavepoint?'
         savename = raw_input('What is the name of the port save point to make active?: ')
         params = {'name': savename}
         try:
-            response = requests.put(uri, data=params, auth=(username, password))
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -673,15 +708,12 @@ class PacketmasterEX(object):
             raise e
 
     #Make a rule save point active
-    def set_rule_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/activerulesavepoint?'
+    def set_rule_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/activerulesavepoint?'
         savename = raw_input('What is the name of the rule save point to make active?: ')
         params = {'name': savename}
         try:
-            response = requests.put(uri, data=params, auth=(username, password))
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -691,15 +723,12 @@ class PacketmasterEX(object):
             raise e
 
     #Set a save point as the default boot configuration
-    def set_boot_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/defaultrulesavepoint?'
+    def set_boot_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/defaultrulesavepoint?'
         savename = raw_input('What is the name of the save point to make the default at boot configuration?: ')
         params = {'name': savename}
         try:
-            response = requests.put(uri, data=params, auth=(username, password))
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -709,18 +738,15 @@ class PacketmasterEX(object):
             raise e
 
     #Export a save point from the Packetmaster
-    def export_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/export?'
+    def export_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/export?'
         rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
         rspname = '[' + rspname + ']'
         pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
         pspname = '[' + pspname + ']'
         params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname} #Change to JSON encoding
         try:
-            response = requests.get(uri, data=params, auth=(username, password))
+            response = requests.get(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -736,18 +762,15 @@ class PacketmasterEX(object):
             raise e
 
     #Modify a port save point
-    def modify_port_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/modportsavepoint?'
+    def modify_port_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/modportsavepoint?'
         oldname = raw_input("What is the name of the save point you would like to modify?")
         newname = raw_input("What would you like to rename this save point to?")
         desc = raw_input("What is the description of the save point?")
         saveports = raw_input('Hit enter to save the current active ports to this save point; type "false" to not save them (This overwrites port configuration of the save point): ')
         params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saveports': saveports}
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -757,18 +780,15 @@ class PacketmasterEX(object):
             raise e
 
     #Modify a rule save point
-    def modify_rule_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/modrulesavepoint?'
+    def modify_rule_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/modrulesavepoint?'
         oldname = raw_input("What is the name of the save point you would like to modify?")
         newname = raw_input("What would you like to rename this save point to?")
         desc = raw_input("What is the description of the save point?")
         saverules = raw_input('Hit enter to save the current active rules to this save point; type "false" to not save them (This overwrites rule configuration of the save point): ')
         params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saverules': saverules}
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -778,16 +798,13 @@ class PacketmasterEX(object):
             raise e
 
     #Create a port save point from current configuration
-    def create_port_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/portsavepoint?'
+    def create_port_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
         name = raw_input("What would you like to name the port save point?")
         desc = raw_input("Enter a description for the port save point")
         params = {'name': name, 'description': desc}
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -798,12 +815,9 @@ class PacketmasterEX(object):
 
     #Create a quicksave point of current configuration
     def create_quick_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/quicksaverules?'
+        uri = 'http://' + self.address + '/rest/savepoints/quicksaverules?'
         try:
-            response = requests.put(uri, auth=(username, password))
+            response = requests.put(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -813,16 +827,13 @@ class PacketmasterEX(object):
             raise e
 
     #Create a rule save point from current configuration
-    def create_rule_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/rulesavepoint?'
+    def create_rule_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
         name = raw_input("What would you like to name the rule save point?")
         desc = raw_input("Enter a description for the rule save point")
         params = {'name': name, 'description': desc}
         try:
-            response = requests.post(uri, data=params, auth=(username, password))
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -832,15 +843,12 @@ class PacketmasterEX(object):
             raise e
 
     #Delete a port save point
-    def delete_port_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/portsavepoint?'
+    def delete_port_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
         name = raw_input("What is the name of the port save point you would like to delete?")
         params = {'name': name}
         try:
-            response = requests.delete(uri, data=params, auth=(username, password))
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -850,15 +858,12 @@ class PacketmasterEX(object):
             raise e
 
     #Delete a rule save point
-    def delete_rule_savepoint(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints/rulesavepoint?'
+    def delete_rule_savepoint_guided(self):
+        uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
         name = raw_input("What is the name of the rule save point you would like to delete?")
         params = {'name': name}
         try:
-            response = requests.delete(uri, data=params, auth=(username, password))
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -869,13 +874,10 @@ class PacketmasterEX(object):
 
     #Reboot the Packetmaster
     def reboot(self):
-        address = self.address
-        username = self.username
-        password = self.password
-        uri = 'http://' + address + '/rest/savepoints?'
+        uri = 'http://' + self.address + '/rest/savepoints?'
 
         try:
-            requests.post(uri, auth=(username, password))
+            requests.post(uri, auth=(self.username, self.password))
             message = 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
             return message
         except ConnectionError as e:
