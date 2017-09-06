@@ -8,9 +8,6 @@ from requests.exceptions import ConnectionError
 # devicehash = '/device/grouphash?' #Add post
 # users = '/users?' #add
 # raduser = '/users/radius?' #add
-# uac = '/users/uac?' #add
-# weblog = '/weblog?' #add
-# deviceperm = '/device/permanentrulesmode?' #Add post
 # devicestor = '/device/rulestoragemode?' #Add post
 # devicehttps = '/device/https?' #Add post
 # appsact = '/apps/action?' #add
@@ -342,6 +339,32 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Retrieve Web Log
+    def web_log(self):
+        uri = 'http://' + self.address + '/rest/weblog'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Retrieve User Authentication settings
+    def user_uac(self):
+        uri = 'http://' + self.address + '/rest/users/uac?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            code = response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
@@ -917,8 +940,7 @@ class PacketmasterEX(object):
     #Change rule mode permanence with guided options
     def set_rule_permanence_guided(self):
         uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
-        perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off: ')
-        perm = perm.lower()
+        perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off: ').lower()
         if perm == 'true':
             perm = True
         elif perm == 'false':
@@ -951,6 +973,63 @@ class PacketmasterEX(object):
         params = {'state': perm }
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Turn mandatory user authentication on or off with guided options
+    def set_uac_guided(self):
+        uri = 'http://' + self.address + '/rest/users/uac?'
+        access = raw_input('type "true" to turn on UAC; type "false" to turn it off: ').lower()
+        if access == 'true':
+            access = True
+        elif access == 'false':
+            access = False
+        else:
+            print 'That is not a valid choice; setting UAC to off.'
+            access = False
+        params = {'state': access }
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Turn mandatory user authentication on or off with arguments
+    def set_uac(self, uac='false'):
+        uri = 'http://' + self.address + '/rest/users/uac?'
+        access = uac.lower()
+        if access == 'true':
+            access = True
+        elif access == 'false':
+            access = False
+        else:
+            print 'That is not a valid choice; setting UAC to off.'
+            access = False
+        params = {'state': access }
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Delete Web Logs
+    def del_web_log(self):
+        uri = 'http://' + self.address + '/rest/weblog'
+        try:
+            response = requests.delete(uri, auth=(self.username, self.password))
             code = response.status_code
             r = response.content
             data = json.loads(r)

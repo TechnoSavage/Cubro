@@ -84,7 +84,9 @@ if __name__ == '__main__':
                  20 - OS and CPU Load Averages
                  21 - Memory Usage
                  22 - CCH Server Revision
-                 23 - Go back to Top Menu \n'''
+                 23 - Web Log
+                 24 - UAC
+                 25 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
         try:
             choice = int(choice)
@@ -179,6 +181,14 @@ if __name__ == '__main__':
             print server
             topmenu()
         elif choice == 23:
+            log = packetmaster.web_log()
+            print log
+            topmenu()
+        elif choice == 24:
+            access = packetmaster.user_uac()
+            print access
+            topmenu()
+        elif choice == 25:
             topmenu()
         else:
             print 'That is not a valid choice \n'
@@ -207,9 +217,11 @@ if __name__ == '__main__':
                 17 - Delete a port save point
                 18 - Delete a rule save point
                 19 - Rule permanence on/off
-                20 - ID LED on/off
-                21 - Reboot Packetmaster
-                22 - Go back to Top Menu \n'''
+                20 - Delete Web Logs
+                21 - UAC on/off
+                22 - ID LED on/off
+                23 - Reboot Packetmaster
+                24 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -292,14 +304,22 @@ if __name__ == '__main__':
             print ruleperm
             topmenu()
         elif change == 20:
+            logdelete = packetmaster.del_web_log()
+            print logdelete
+            topmenu()
+        elif change == 21:
+            changeaccess = packetmaster.set_uac_guided()
+            print changeaccess
+            topmenu()
+        elif change == 22:
             led = packetmaster.set_id_led_guided()
             print led
             topmenu()
-        elif change == 21:
+        elif change == 23:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 22:
+        elif change == 24:
             topmenu()
         else:
             print 'That is not a valid choice \n'
