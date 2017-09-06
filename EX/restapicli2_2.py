@@ -206,9 +206,10 @@ if __name__ == '__main__':
                 16 - Create a save point from current rules
                 17 - Delete a port save point
                 18 - Delete a rule save point
-                19 - ID LED on/off
-                20 - Reboot Packetmaster
-                21 - Go back to Top Menu \n'''
+                19 - Rule permanence on/off
+                20 - ID LED on/off
+                21 - Reboot Packetmaster
+                22 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -287,14 +288,18 @@ if __name__ == '__main__':
             print rulespdelete
             topmenu()
         elif change == 19:
+            ruleperm = packetmaster.set_rule_permanence_guided()
+            print ruleperm
+            topmenu()
+        elif change == 20:
             led = packetmaster.set_id_led_guided()
             print led
             topmenu()
-        elif change == 20:
+        elif change == 21:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 21:
+        elif change == 22:
             topmenu()
         else:
             print 'That is not a valid choice \n'

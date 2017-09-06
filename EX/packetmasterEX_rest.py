@@ -5,7 +5,6 @@ from requests.exceptions import ConnectionError
 #TO-DO Add code to handle case and verify input in all areas where needed
 #Create methods that accept arguments to post changes
 
-# devicelabel = '/device/customident?' #add post
 # devicehash = '/device/grouphash?' #Add post
 # users = '/users?' #add
 # raduser = '/users/radius?' #add
@@ -13,13 +12,10 @@ from requests.exceptions import ConnectionError
 # weblog = '/weblog?' #add
 # deviceperm = '/device/permanentrulesmode?' #Add post
 # devicestor = '/device/rulestoragemode?' #Add post
-# deviceidled = '/device/idled?' #add post
 # devicehttps = '/device/https?' #Add post
 # appsact = '/apps/action?' #add
 # groups = '/groups?' #add
 # allgroup = '/groups/all?' #add
-# rule = '/rules?' #change
-# flows = '/flownumbers?' #change/add
 class PacketmasterEX(object):
 
     def __init__(self, address, username=None, password=None):
@@ -918,17 +914,60 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Change rule mode permanence with guided options
+    def set_rule_permanence_guided(self):
+        uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
+        perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off: ')
+        perm = perm.lower()
+        if perm == 'true':
+            perm = True
+        elif perm == 'false':
+            perm = False
+        else:
+            print 'That is not a valid choice; setting rule permanence to off.'
+            perm = False
+        params = {'state': perm}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Change rule mode permanence with arguments
+    def set_rule_permanence(self, permanence='false'):
+        uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
+        perm = permanence.lower()
+        if perm != 'true' or perm != 'false':
+            print 'That is not a valid choice; setting rule permanence to off.'
+            perm = 'false'
+        else:
+            pass
+        params = {'state': perm }
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Turn the ID LED on or off with guided options
     def set_id_led_guided(self):
         uri = 'http://' + self.address + '/rest/device/idled'
-        led = raw_input('type "true" to turn the ID LED on type "false" to turn it off: ')
+        led = raw_input('type "true" to turn the ID LED on; type "false" to turn it off: ')
         led = led.lower()
         if led == 'true':
             led = True
         elif led == 'false':
             led = False
         else:
-            print 'That is not a valid choice; setting ID LED to off'
+            print 'That is not a valid choice; setting ID LED to off.'
             led = False
         params = {'activated': led}
         try:
