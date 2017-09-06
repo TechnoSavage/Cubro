@@ -5,7 +5,6 @@ from requests.exceptions import ConnectionError
 #TO-DO Add code to handle case and verify input in all areas where needed
 #Create methods that accept arguments to post changes
 
-# devicehash = '/device/grouphash?' #Add post
 # users = '/users?' #add
 # raduser = '/users/radius?' #add
 # devicestor = '/device/rulestoragemode?' #Add post
@@ -561,8 +560,11 @@ class PacketmasterEX(object):
         interface = raw_input('Enter the interface name of the port you want to change: ').strip()
         port_no = re.find('[1-9]+.*[1-4]', interface)
         interface = 'eth-0-' + port_no
-        updown = raw_input('Enter "true" to shut port down; Enter "false" to reactivate port: ').strip()
-        updown = updown.lower()
+        updown = raw_input('Enter "true" to shut port down; Enter "false" to activate port [false]: ').lower()
+        if updown == 'true':
+            updown = True
+        else:
+            updown = False
         params = {'if_name': interface, 'shutdown': updown}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -937,16 +939,135 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Change group hash algorithms with guided options
+    def set_hash_algorithms_guided(self):
+        uri = 'http://' + self.address + '/rest/device/grouphash?'
+        macsa = raw_input('Type "true" to use MAC source address; type "false" to ignore [true]: ').lower()
+        if macsa == 'false':
+            macsa = False
+        else:
+            macsa = True
+        macda = raw_input('Type "true" to use MAC destination address; type "false" to ignore [true]: ').lower()
+        if macda == 'false':
+            macda = False
+        else:
+            macda = True
+        ether = raw_input('Type "true" to use ether type; type "false" to ignore [true]: ').lower()
+        if ether == 'false':
+            ether = False
+        else:
+            ether = True
+        ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ').lower()
+        if ipsa == 'false':
+            ipsa = False
+        else:
+            ipsa = True
+        ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ').lower()
+        if ipda == 'false':
+            ipda = False
+        else:
+            ipda = True
+        proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ').lower()
+        if proto == 'false':
+            proto = False
+        else:
+            proto = True
+        src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ').lower()
+        if src == 'false':
+            src = False
+        else:
+            src = True
+        dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ').lower()
+        if dst == 'false':
+            dst = False
+        else:
+            dst = True
+        params = {'macsa': macsa,
+                  'macda': macda,
+                  'ether_type': ether,
+                  'ipsa': ipsa,
+                  'ipda': ipda,
+                  'ip_protocol': proto,
+                  'src_port': src,
+                  'dst_port': dst}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Change group hash algorithms with arguments
+    def set_hash_algorithms(self, macsa, madca, ether, ipsa, ipda, proto, src, dst):
+        uri = 'http://' + self.address + '/rest/device/grouphash?'
+        macsa = macsa.lower()
+        if macsa == 'false':
+            macsa = False
+        else:
+            macsa = True
+        macda = macda.lower()
+        if macda == 'false':
+            macda = False
+        else:
+            macda = True
+        ether = ether.lower()
+        if ether == 'false':
+            ether = False
+        else:
+            ether = True
+        ipsa = ipsa.lower()
+        if ipsa == 'false':
+            ipsa = False
+        else:
+            ipsa = True
+        ipda = ipda.lower()
+        if ipda == 'false':
+            ipda = False
+        else:
+            ipda = True
+        proto = proto.lower()
+        if proto == 'false':
+            proto = False
+        else:
+            proto = True
+        src = src.lower()
+        if src == 'false':
+            src = False
+        else:
+            src = True
+        dst = dst.lower()
+        if dst == 'false':
+            dst = False
+        else:
+            dst = True
+        params = {'macsa': macsa,
+                  'macda': macda,
+                  'ether_type': ether,
+                  'ipsa': ipsa,
+                  'ipda': ipda,
+                  'ip_protocol': proto,
+                  'src_port': src,
+                  'dst_port': dst}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Change rule mode permanence with guided options
     def set_rule_permanence_guided(self):
         uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
-        perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off: ').lower()
+        perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off [false]: ').lower()
         if perm == 'true':
             perm = True
-        elif perm == 'false':
-            perm = False
         else:
-            print 'That is not a valid choice; setting rule permanence to off.'
             perm = False
         params = {'state': perm}
         try:
@@ -960,16 +1081,13 @@ class PacketmasterEX(object):
             raise e
 
     #Change rule mode permanence with arguments
-    def set_rule_permanence(self, permanence='false'):
+    def set_rule_permanence(self, permanence):
         uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
         perm = permanence.lower()
         if perm == 'true':
             perm = True
-        elif perm == 'false':
-            perm = False
         else:
-            print 'That is not a valid choice; setting rule permanence to off.'
-            perm = False
+            perm == False
         params = {'state': perm }
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -984,13 +1102,10 @@ class PacketmasterEX(object):
     #Turn mandatory user authentication on or off with guided options
     def set_uac_guided(self):
         uri = 'http://' + self.address + '/rest/users/uac?'
-        access = raw_input('type "true" to turn on UAC; type "false" to turn it off: ').lower()
+        access = raw_input('type "true" to turn on UAC; type "false" to turn it off [false]: ').lower()
         if access == 'true':
             access = True
-        elif access == 'false':
-            access = False
         else:
-            print 'That is not a valid choice; setting UAC to off.'
             access = False
         params = {'state': access }
         try:
@@ -1004,15 +1119,12 @@ class PacketmasterEX(object):
             raise e
 
     #Turn mandatory user authentication on or off with arguments
-    def set_uac(self, uac='false'):
+    def set_uac(self, uac):
         uri = 'http://' + self.address + '/rest/users/uac?'
         access = uac.lower()
         if access == 'true':
             access = True
-        elif access == 'false':
-            access = False
         else:
-            print 'That is not a valid choice; setting UAC to off.'
             access = False
         params = {'state': access }
         try:
@@ -1041,14 +1153,10 @@ class PacketmasterEX(object):
     #Turn the ID LED on or off with guided options
     def set_id_led_guided(self):
         uri = 'http://' + self.address + '/rest/device/idled'
-        led = raw_input('type "true" to turn the ID LED on; type "false" to turn it off: ')
-        led = led.lower()
+        led = raw_input('type "true" to turn the ID LED on; type "false" to turn it off [false]: ').lower()
         if led == 'true':
             led = True
-        elif led == 'false':
-            led = False
         else:
-            print 'That is not a valid choice; setting ID LED to off.'
             led = False
         params = {'activated': led}
         try:
@@ -1062,15 +1170,12 @@ class PacketmasterEX(object):
             raise e
 
     #Turn the ID LED on or off with arguments
-    def set_id_led(self, led='false'):
+    def set_id_led(self, led):
         uri = 'http://' + self.address + '/rest/device/idled'
         led = led.lower()
         if led == 'true':
             led = True
-        elif led == 'false':
-            led = False
         else:
-            print 'That is not a valid choice; setting ID LED to off'
             led = False
         params = {'activated': led}
         try:
