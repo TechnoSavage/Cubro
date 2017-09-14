@@ -288,8 +288,7 @@ if __name__ == '__main__':
     packetmaster = CubroEXDriverHandler()
     login = packetmaster.login(address, username, password)
     ports = packetmaster.port_count()
-    print "This is ports[0] %r" % (ports[0])
-    print "This is ports[1] %r" % (ports[1])
-    print "This is the for loop of ports[1]"
-    for item in ports[1]:
-        print item[0]
+    number_ports = ports[0]
+    interfaces = ports[1]
+    for port_no in xrange(number_ports):
+        print interfaces[port_no][0]
