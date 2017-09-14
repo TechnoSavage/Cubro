@@ -81,14 +81,11 @@ class CubroEXDriverHandler(object):
             for port in data['port_config']:
                 ports.append(data['port_config'][count]['if_name'])
                 count += 1
-            print "This is the port list %r" % (ports)
             #Return the number of entries in the ports list
             interfaces = list()
             for item in ports:
                 interfaces.append(re.findall('[1-9][0-9/]*', item))
-            print "This is the interfaces list %r" % (interfaces)
             number_ports = len(interfaces)
-            print "This is the number of ports %r" % (number_ports)
             return (number_ports, interfaces)
         except ConnectionError as e:
             raise e
@@ -295,4 +292,4 @@ if __name__ == '__main__':
     print "This is ports[1] %r" % (ports[1])
     print "This is the for loop of ports[1]"
     for item in ports[1]:
-        print item
+        print item[0]
