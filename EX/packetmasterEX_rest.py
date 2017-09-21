@@ -472,11 +472,9 @@ class PacketmasterEX(object):
         #Add shutdown true/false parameter for EX2 (more?)
         uri = 'http://' + self.address + '/rest/ports/config?'
         interface = raw_input('Enter the interface name of the port you want to change: ').strip()
-        port_no = re.findall('[1-9][0-9]*', interface)
+        port_no = re.findall('[1-9][0-9/]*', interface)
         if len(port_no) == 1:
             interface = 'eth-0-' + port_no[0]
-        elif len(port_no) == 2 and int(port_no[1]) <= 4:
-            interface = 'eth-0-' + port_no[0] + '/' + port_no[1]
         else:
             error = 'that is not a valid port number; please try again'
             return error
@@ -514,14 +512,12 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    def set_port_config(self, interface, speed='auto', duplex='auto', forcetx='false', check='false', recalc='false'):
+    def set_port_config(self, interface, speed='auto', duplex='auto', forcetx='true', check='false', recalc='false'):
         uri = 'http://' + self.address + '/rest/ports/config?'
         if_name = str(interface).strip()
-        port_no = re.findall('[1-9][0-9]*', if_name)
+        port_no = re.findall('[1-9][0-9/]*', if_name)
         if len(port_no) == 1:
             interface = 'eth-0-' + port_no[0]
-        elif len(port_no) == 2 and int(port_no[1]) <= 4:
-            interface = 'eth-0-' + port_no[0] + '/' + port_no[1]
         else:
             error = 'that is not a valid port number; please try again'
             return error
@@ -558,7 +554,7 @@ class PacketmasterEX(object):
     def port_on_off_guided(self):
         uri = 'http://' + self.address + '/rest/ports/config?'
         interface = raw_input('Enter the interface name of the port you want to change: ').strip()
-        port_no = re.find('[1-9]+.*[1-4]', interface)
+        port_no = re.find('[1-9][0-9/]*', interface)
         interface = 'eth-0-' + port_no
         updown = raw_input('Enter "true" to shut port down; Enter "false" to activate port [false]: ').lower()
         if updown == 'true':
