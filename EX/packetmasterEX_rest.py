@@ -2,6 +2,8 @@
 
 import requests, json, re
 from requests.exceptions import ConnectionError
+from getpass import getpass
+
 #TO-DO Add code to handle case and verify input in all areas where needed
 #Create methods that accept arguments to post changes
 
@@ -1133,9 +1135,46 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Turn HTTPS secure web interface on or off with guided options
+    def set_https_guided(self):
+        uri = 'http://' + self.address + '/rest/device/https?'
+        enabled = raw_input('Type "true" to enable HTTPS on web interface; type "false" to turn it off [false]: ').lower()
+        if enabled == 'true':
+            enabled = True
+            print ("Please enter the SSL password")
+            ssl = getpass()
+        else:
+            enabled = False
+            ssl = 'none'
+        params = {'https_enabled': enabled,
+                  'ssl_password': ssl}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = "No Response"
+            raise e
+    #Turn HTTPS secure web interface on or off with arguments
+    def set_https(self, enabled=False, ssl=None):
+        uri = 'http://' + self.address + '/rest/device/https?'
+        params = {'https_enabled': enabled,
+                  'ssl_password': ssl}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = "No Response"
+            raise e
+
     #Delete Web Logs
     def del_web_log(self):
-        uri = 'http://' + self.address + '/rest/weblog'
+        uri = 'http://' + self.address + '/rest/weblog?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -1148,7 +1187,7 @@ class PacketmasterEX(object):
 
     #Turn the ID LED on or off with guided options
     def set_id_led_guided(self):
-        uri = 'http://' + self.address + '/rest/device/idled'
+        uri = 'http://' + self.address + '/rest/device/idled?'
         led = raw_input('type "true" to turn the ID LED on; type "false" to turn it off [false]: ').lower()
         if led == 'true':
             led = True
@@ -1167,7 +1206,7 @@ class PacketmasterEX(object):
 
     #Turn the ID LED on or off with arguments
     def set_id_led(self, led):
-        uri = 'http://' + self.address + '/rest/device/idled'
+        uri = 'http://' + self.address + '/rest/device/idled?'
         led = led.lower()
         if led == 'true':
             led = True

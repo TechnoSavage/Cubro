@@ -220,9 +220,10 @@ if __name__ == '__main__':
                 20 - Rule permanence on/off
                 21 - Delete Web Logs
                 22 - UAC on/off
-                23 - ID LED on/off
-                24 - Reboot Packetmaster
-                25 - Go back to Top Menu \n'''
+                23 - Enable or Disable HTTPS secure web interface
+                24 - ID LED on/off
+                25 - Reboot Packetmaster
+                26 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -317,14 +318,18 @@ if __name__ == '__main__':
             print changeaccess
             topmenu()
         elif change == 23:
+            secure = packetmaster.set_https_guided()
+            print secure
+            topmenu()
+        elif change == 24:
             led = packetmaster.set_id_led_guided()
             print led
             topmenu()
-        elif change == 24:
+        elif change == 25:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 25:
+        elif change == 26:
             topmenu()
         else:
             print 'That is not a valid choice \n'
