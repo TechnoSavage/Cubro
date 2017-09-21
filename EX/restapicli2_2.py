@@ -205,23 +205,24 @@ if __name__ == '__main__':
                  5 - Delete Port Counters
                  6 - Reset Rule Counters
                  7 - Add Rule
-                 8 - Activate a save point for ports
-                 9 - Activate a save point for rules
-                10 - Set the rule save point to be loaded on boot
-                11 - Export a save point
-                12 - Modify a save point for port configuration
-                13 - Modify a save point for rules
-                14 - Create save point from current port configuration
-                15 - Create a quicksave point from current configuration
-                16 - Create a save point from current rules
-                17 - Delete a port save point
-                18 - Delete a rule save point
-                19 - Rule permanence on/off
-                20 - Delete Web Logs
-                21 - UAC on/off
-                22 - ID LED on/off
-                23 - Reboot Packetmaster
-                24 - Go back to Top Menu \n'''
+                 8 - Set Load Balancing Group Hash Algorithms
+                 9 - Activate a save point for ports
+                10 - Activate a save point for rules
+                11 - Set the rule save point to be loaded on boot
+                12 - Export a save point
+                13 - Modify a save point for port configuration
+                14 - Modify a save point for rules
+                15 - Create save point from current port configuration
+                16 - Create a quicksave point from current configuration
+                17 - Create a save point from current rules
+                18 - Delete a port save point
+                19 - Delete a rule save point
+                20 - Rule permanence on/off
+                21 - Delete Web Logs
+                22 - UAC on/off
+                23 - ID LED on/off
+                24 - Reboot Packetmaster
+                25 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -256,70 +257,74 @@ if __name__ == '__main__':
             print ruleadd
             topmenu()
         elif change == 8:
+            hashes = packetmaster.set_hash_algorithms_guided()
+            print hashes
+            topmenu()
+        elif change == 9:
             portspactive = packetmaster.set_port_savepoint_guided()
             print portspactive
             topmenu()
-        elif change == 9:
+        elif change == 10:
             rulespactive = packetmaster.set_rule_savepoint_guided()
             print rulespactive
             topmenu()
-        elif change == 10:
+        elif change == 11:
             spset = packetmaster.set_boot_savepoint_guided()
             print spset
             topmenu()
-        elif change == 11:
+        elif change == 12:
             spexport = packetmaster.export_savepoint_guided()
             print spexport
             topmenu()
-        elif change == 12:
+        elif change == 13:
             portspmod = packetmaster.modify_port_savepoint_guided()
             print portspmod
             topmenu()
-        elif change == 13:
+        elif change == 14:
             rulepsmod = packetmaster.modify_rule_savepoint_guided()
             print rulepsmod
             topmenu()
-        elif change == 14:
+        elif change == 15:
             portspcreate = packetmaster.create_port_savepoint_guided()
             print portspcreate
             topmenu()
-        elif change == 15:
+        elif change == 16:
             quickcreate = packetmaster.create_quick_savepoint()
             print quickcreate
             topmenu()
-        elif change == 16:
+        elif change == 17:
             rulespcreate = packetmaster.create_rule_savepoint_guided()
             print rulespcreate
             topmenu()
-        elif change == 17:
+        elif change == 18:
             portspdelete = packetmaster.delete_port_savepoint_guided()
             print portspdelete
             topmenu()
-        elif change == 18:
+        elif change == 19:
             rulepsdelete = packetmaster.delete_rule_savepoint_guided()
             print rulespdelete
             topmenu()
-        elif change == 19:
+        elif change == 20:
             ruleperm = packetmaster.set_rule_permanence_guided()
             print ruleperm
             topmenu()
-        elif change == 20:
+        elif change == 21:
             logdelete = packetmaster.del_web_log()
             print logdelete
             topmenu()
-        elif change == 21:
+        elif change == 22:
             changeaccess = packetmaster.set_uac_guided()
             print changeaccess
             topmenu()
-        elif change == 22:
+        elif change == 23:
             led = packetmaster.set_id_led_guided()
             print led
             topmenu()
-        elif change == 23:
+        elif change == 24:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 24:
+        elif change == 25:
             topmenu()
         else:
             print 'That is not a valid choice \n'
