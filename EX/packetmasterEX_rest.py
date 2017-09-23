@@ -1241,7 +1241,7 @@ class PacketmasterEX(object):
         uri = 'http://' + self.address + '/rest/device/restartwebserver'
 
         try:
-            requests.post(uri, auth=(self.username, self.password))
+            response = requests.post(uri, auth=(self.username, self.password))
             code = response.status_code
             r = response.content
             data = json.loads(r)
