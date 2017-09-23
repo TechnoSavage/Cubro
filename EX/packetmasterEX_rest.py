@@ -386,6 +386,19 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Retrieve DNS settings
+    def get_dns(self):
+        uri = 'http://' + self.address + '/rest/device/nameresolution?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Change the management IP configuration with guided options
     def set_ip_config_guided(self):
         uri = 'http://' + self.address + '/rest/device/ipconfig?'
@@ -1170,6 +1183,7 @@ class PacketmasterEX(object):
         except ConnectionError as e:
             r = "No Response"
             raise e
+
     #Turn HTTPS secure web interface on or off with arguments
     def set_https(self, enabled=False, ssl=None):
         uri = 'http://' + self.address + '/rest/device/https?'
@@ -1197,6 +1211,56 @@ class PacketmasterEX(object):
         except ConnectionError as e:
             r = 'No Response'
             raise e
+
+    #Set DNS server settings with guided options
+    def set_dns_guided(self):
+        uri = 'http://' + self.address + '/rest/device/nameresolution?'
+        params = {}
+        print 'You may set up to three DNS servers.'
+        dns1 = raw_input('Enter the IP address of the first DNS server or leave blank for none [none]: ').strip()
+        if dns1 != '':
+            params['dns1'] = dns1
+        dns2 = raw_input('Enter the IP address of the second DNS server or leave blank for none [none]: ').strip()
+        if dns2 != '':
+            params['dns2'] = dns2
+        dns3 = raw_input('Enter the IP address of the third DNS server or leave blank for none [none]: ').strip()
+        if dns3 != '':
+            params['dns3'] = dns3
+        if len(params) > 0:
+            try:
+                response = requests.post(uri, data=params, auth=(self.username, self.password))
+                code = response.status_code
+                r = response.content
+                data = json.loads(r)
+                return json.dumps(data, indent=4)
+            except ConnectionError as e:
+                r = 'No Response'
+                raise e
+        else:
+            return 'No valid DNS server addresses given'
+
+    #Set DNS server settings
+    def set_dns(self, dns1=None, dns2=None, dns3=None):
+        uri = 'http://' + self.address + '/rest/device/nameresolution?'
+        params = {}
+        if dns1 != '':
+            params['dns1'] = dns1
+        if dns2 != '':
+            params['dns2'] = dns2
+        if dns3 != '':
+            params['dns3'] = dns3
+        if len(params) > 0:
+            try:
+                response = requests.post(uri, data=params, auth=(self.username, self.password))
+                code = response.status_code
+                r = response.content
+                data = json.loads(r)
+                return json.dumps(data, indent=4)
+            except ConnectionError as e:
+                r = 'No Response'
+                raise e
+        else:
+            return 'No valid DNS server addresses given'
 
     #Turn the ID LED on or off with guided options
     def set_id_led_guided(self):

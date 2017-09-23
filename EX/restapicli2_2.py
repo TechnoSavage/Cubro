@@ -87,7 +87,8 @@ if __name__ == '__main__':
                  23 - CCH Server Revision
                  24 - Web Log
                  25 - UAC
-                 26 - Go back to Top Menu \n'''
+                 26 - DNS settings
+                 27 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
         try:
             choice = int(choice)
@@ -194,6 +195,10 @@ if __name__ == '__main__':
             print access
             topmenu()
         elif choice == 26:
+            dns = packetmaster.get_dns()
+            print dns
+            topmenu()
+        elif choice == 27:
             topmenu()
         else:
             print 'That is not a valid choice \n'
@@ -226,10 +231,11 @@ if __name__ == '__main__':
                 21 - Delete Web Logs
                 22 - UAC on/off
                 23 - Enable or Disable HTTPS secure web interface
-                24 - ID LED on/off
-                25 - Restart Web Server
-                26 - Reboot Packetmaster
-                27 - Go back to Top Menu \n'''
+                24 - Set DNS servers
+                25 - ID LED on/off
+                26 - Restart Web Server
+                27 - Reboot Packetmaster
+                28 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -328,18 +334,22 @@ if __name__ == '__main__':
             print secure
             topmenu()
         elif change == 24:
+            setdns = packetmaster.set_dns_guided()
+            print setdns
+            topmenu()
+        elif change == 25:
             led = packetmaster.set_id_led_guided()
             print led
             topmenu()
-        elif change == 25:
+        elif change == 26:
             restartweb = packetmaster.restart_webserver()
             print restartweb
             topmenu()
-        elif change == 26:
+        elif change == 27:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 27:
+        elif change == 28:
             topmenu()
         else:
             print 'That is not a valid choice \n'
