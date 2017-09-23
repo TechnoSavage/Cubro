@@ -308,6 +308,19 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Retrieve the maximum and currently used TCAM flows
+    def tcam(self):
+        uri = 'http://' + self.address + '/rest/flownumbers'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Retrieve memory usage
     def mem_free(self):
         uri = 'http://' + self.address + '/rest/device/memoryusage?'
@@ -1215,6 +1228,20 @@ class PacketmasterEX(object):
         params = {'activated': led}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Restart Web Server without rebooting the device
+    def restart_webserver(self):
+        uri = 'http://' + self.address + '/rest/device/restartwebserver'
+
+        try:
+            requests.post(uri, auth=(self.username, self.password))
             code = response.status_code
             r = response.content
             data = json.loads(r)

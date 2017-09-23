@@ -82,11 +82,12 @@ if __name__ == '__main__':
                  18 - Temerature and Fans
                  19 - ID LED Status
                  20 - OS and CPU Load Averages
-                 21 - Memory Usage
-                 22 - CCH Server Revision
-                 23 - Web Log
-                 24 - UAC
-                 25 - Go back to Top Menu \n'''
+                 21 - TCAM Flows
+                 22 - Memory Usage
+                 23 - CCH Server Revision
+                 24 - Web Log
+                 25 - UAC
+                 26 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
         try:
             choice = int(choice)
@@ -173,22 +174,26 @@ if __name__ == '__main__':
             print load
             topmenu()
         elif choice == 21:
+            tcam = packetmaster.tcam()
+            print tcam
+            topmenu()
+        elif choice == 22:
             memory = packetmaster.mem_free()
             print memory
             topmenu()
-        elif choice == 22:
+        elif choice == 23:
             server = packetmaster.server_revision()
             print server
             topmenu()
-        elif choice == 23:
+        elif choice == 24:
             log = packetmaster.web_log()
             print log
             topmenu()
-        elif choice == 24:
+        elif choice == 25:
             access = packetmaster.user_uac()
             print access
             topmenu()
-        elif choice == 25:
+        elif choice == 26:
             topmenu()
         else:
             print 'That is not a valid choice \n'
@@ -222,8 +227,9 @@ if __name__ == '__main__':
                 22 - UAC on/off
                 23 - Enable or Disable HTTPS secure web interface
                 24 - ID LED on/off
-                25 - Reboot Packetmaster
-                26 - Go back to Top Menu \n'''
+                25 - Restart Web Server
+                26 - Reboot Packetmaster
+                27 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -326,10 +332,14 @@ if __name__ == '__main__':
             print led
             topmenu()
         elif change == 25:
+            restartweb = packetmaster.restart_webserver()
+            print restartweb
+            topmenu()
+        elif change == 26:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 26:
+        elif change == 27:
             topmenu()
         else:
             print 'That is not a valid choice \n'
