@@ -399,6 +399,19 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Retrieve telnet service status_code
+    def get_telnet(self):
+        uri = 'http://' + self.address + '/rest/device/telnet?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Change the management IP configuration with guided options
     def set_ip_config_guided(self):
         uri = 'http://' + self.address + '/rest/device/ipconfig?'
@@ -1199,6 +1212,43 @@ class PacketmasterEX(object):
             r = "No Response"
             raise e
 
+    #Turn Telnet service on or off with guided options
+    def set_telnet_guided(self):
+        uri = 'http://' + self.address + '/rest/device/telnet?'
+        enabled = raw_input('Type "true" to enable Telnet; type "false" to turn it off [false]: ').lower()
+        if enabled == 'true':
+            enabled = True
+        else:
+            enabled = False
+        params = {'activated': enabled}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = "No Response"
+            raise e
+
+    #Turn Telnet service on or off with arguments
+    def set_telnet(self, enabled=False):
+        uri = 'http://' + self.address + '/rest/device/telnet?'
+        if enabled.lower() == 'true':
+            enabled = True
+        else:
+            enabled = False
+        params = {'activated': enabled}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = "No Response"
+            raise e
+
     #Delete Web Logs
     def del_web_log(self):
         uri = 'http://' + self.address + '/rest/weblog?'
@@ -1316,7 +1366,7 @@ class PacketmasterEX(object):
 
     #Reboot the Packetmaster
     def reboot(self):
-        uri = 'http://' + self.address + '/rest/savepoints?'
+        uri = 'http://' + self.address + '/rest/device/reboot?'
 
         try:
             requests.post(uri, auth=(self.username, self.password))
