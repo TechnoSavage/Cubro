@@ -1200,7 +1200,7 @@ class PacketmasterEX(object):
     #Turn HTTPS secure web interface on or off with arguments
     def set_https(self, enabled=False, ssl=None):
         uri = 'http://' + self.address + '/rest/device/https?'
-        if enabled.lower() = 'true':
+        if enabled.lower() == 'true':
             enabled = True
         else:
             enabled = False
