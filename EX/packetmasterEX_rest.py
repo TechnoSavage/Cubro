@@ -386,6 +386,19 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Retrieve RADIUS settings
+    def get_radius(self):
+        uri = 'http://' + self.address + '/rest/users/radius?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Retrieve DNS settings
     def get_dns(self):
         uri = 'http://' + self.address + '/rest/device/nameresolution?'
@@ -1164,6 +1177,92 @@ class PacketmasterEX(object):
         else:
             access = False
         params = {'state': access }
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Set RADIUS settings with guided options
+    def set_radius_guided(self):
+        uri = 'http://' + self.address + '/rest/users/radius?'
+        server = raw_input('Enter the IP address of the RADIUS server: ').strip()
+        port = raw_input('Enter the UDP port of the RADIUS server [1812]: ')
+        if port == '':
+            port = 1812
+        try:
+            port = int(port)
+        except:
+            return "That is not a valid port input; cancelling RADIUS settings call."
+        print "Enter the RADIUS secret."
+        secret = getpass()
+        level = raw_input('''Enter the RADIUS login level.
+        Determines the user access level that a user has logging in via RADIUS but without a local user account.
+                             0 - no access
+                             1 - read access
+                             7 - write access
+                            31 - super user access
+                            [0]: ''')
+        try:
+            level = int(level)
+        except:
+            return "That is not a valid input for login level; cancelling RADIUS settings call."
+        print level
+        if level == 0 or level == 1 or level == 7 or level == 31:
+            level = level
+        else:
+            print "That is not a valid input for login level; setting RADIUS login level to 0"
+            level = 0
+        refresh = raw_input("Enter the refresh rate of the RADIUS session in seconds: ")
+        try:
+            refresh = int(refresh)
+        except:
+            return "That is not a valid input for refresh rate; cancelling RADIUS settings call."
+        params = {'server': server,
+                  'port': port,
+                  'secret': secret,
+                  'radius_login_level': level,
+                  'refresh_rate': refresh}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Set RADIUS settings with arguments
+    def set_radius(self, server=None, port=1812, secret=None, level=None, refresh=None):
+        uri = 'http://' + self.address + '/rest/users/radius?'
+        server = server.strip()
+        try:
+            port = int(port)
+        except:
+            return "That is not a valid port input; cancelling RADIUS settings call."
+        try:
+            level = int(level)
+        except:
+            return "That is not a valid input for login level; cancelling RADIUS settings call."
+        if level == 0 or level == 1 or level == 7 or level == 31:
+            level = level
+        else:
+            print "That is not a valid input for login level; setting RADIUS login level to 0"
+            level = 0
+        try:
+            refresh = int(refresh)
+        except:
+            return "That is not a valid input for refresh rate; cancelling RADIUS settings call."
+        params = {'server': server,
+                  'port': port,
+                  'secret': secret,
+                  'radius_login_level': level,
+                  'refresh_rate': refresh}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code

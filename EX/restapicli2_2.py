@@ -87,9 +87,10 @@ if __name__ == '__main__':
                  23 - CCH Server Revision
                  24 - Web Log
                  25 - UAC
-                 26 - DNS settings
-                 27 - Telnet service status
-                 28 - Go back to Top Menu \n'''
+                 26 - RADIUS settings
+                 27 - DNS settings
+                 28 - Telnet service status
+                 29 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
         try:
             choice = int(choice)
@@ -196,14 +197,18 @@ if __name__ == '__main__':
             print access
             topmenu()
         elif choice == 26:
+            radius = packetmaster.get_radius()
+            print radius
+            topmenu()
+        elif choice == 27:
             dns = packetmaster.get_dns()
             print dns
             topmenu()
-        elif choice == 27:
+        elif choice == 28:
             telnet = packetmaster.get_telnet()
             print telnet
             topmenu()
-        elif choice == 28:
+        elif choice == 29:
             topmenu()
         else:
             print 'That is not a valid choice \n'
@@ -234,14 +239,15 @@ if __name__ == '__main__':
                 19 - Delete a rule save point
                 20 - Rule permanence on/off
                 21 - Delete Web Logs
-                22 - UAC on/off
-                23 - Enable or Disable HTTPS secure web interface
-                24 - Enable or Disable Telnet service
-                25 - Set DNS servers
-                26 - ID LED on/off
-                27 - Restart Web Server
-                28 - Reboot Packetmaster
-                29 - Go back to Top Menu \n'''
+                22 - Enable of Disable UAC
+                23 - Configure RADIUS settings
+                24 - Enable or Disable HTTPS secure web interface
+                25 - Enable or Disable Telnet service
+                26 - Set DNS servers
+                27 - ID LED on/off
+                28 - Restart Web Server
+                29 - Reboot Packetmaster
+                30 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -336,30 +342,34 @@ if __name__ == '__main__':
             print changeaccess
             topmenu()
         elif change == 23:
+            setradius = packetmaster.set_radius_guided()
+            print setradius
+            topmenu()
+        elif change == 24:
             secure = packetmaster.set_https_guided()
             print secure
             topmenu()
-        elif change == 24:
+        elif change == 25:
             settelnet = packetmaster.set_telnet_guided()
             print settelnet
             topmenu()
-        elif change == 25:
+        elif change == 26:
             setdns = packetmaster.set_dns_guided()
             print setdns
             topmenu()
-        elif change == 26:
+        elif change == 27:
             led = packetmaster.set_id_led_guided()
             print led
             topmenu()
-        elif change == 27:
+        elif change == 28:
             restartweb = packetmaster.restart_webserver()
             print restartweb
             topmenu()
-        elif change == 28:
+        elif change == 29:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 29:
+        elif change == 30:
             topmenu()
         else:
             print 'That is not a valid choice \n'
