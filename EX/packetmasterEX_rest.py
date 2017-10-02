@@ -7,20 +7,29 @@ from getpass import getpass
 #TO-DO Add code to handle case and verify input in all areas where needed
 #Create methods that accept arguments to post changes
 
-# users = '/users?' #add
-# raduser = '/users/radius?' #add
-# devicestor = '/device/rulestoragemode?' #Add post
-# devicehttps = '/device/https?' #Add post
 # appsact = '/apps/action?' #add
 # groups = '/groups?' #add
 # allgroup = '/groups/all?' #add
+
+#Add code to check and handle HTTPS for URIs
 class PacketmasterEX(object):
 
     def __init__(self, address, username=None, password=None):
         self.address = address
         self.username = username
         self.password = password
+        #self.https = False
 
+    #check whether web interface is using HTTP or HTTPS
+    #def check_https(self):
+        #try:
+            # uri = 'http://' + self.address + '/rest/device/imageversion'
+            # response = requests.get(uri, auth=(self.username, self.password))
+            # r = response.status_code
+            # if r == '200':
+                #self.https = False
+
+        #except:
     def get_port_count(self):
         uri = 'http://' + self.address + '/rest/ports/config?'
         ports = list()
@@ -256,8 +265,8 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Retrieve rule storage model
-    def storage_model(self):
+    #Retrieve rule storage mode
+    def storage_mode(self):
         uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
@@ -858,22 +867,21 @@ class PacketmasterEX(object):
     def export_savepoint_guided(self):
         uri = 'http://' + self.address + '/rest/savepoints/export?'
         rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
-        rspname = '[' + rspname + ']'
         pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
-        pspname = '[' + pspname + ']'
-        params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname} #Change to JSON encoding
+        params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
+        #params = json.dumps(params)
         try:
             response = requests.get(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
-            return json.dumps(data, indent=4)
             filename = raw_input("Enter a file name for the savepoint: ")
             try:
                 with open(filename, "w") as f:
-                    f.write(r) #Try json.dump(r, f)?
+                    f.write(r)
             except:
                 print "Invalid filename\n"
+            return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
             raise e
@@ -962,7 +970,7 @@ class PacketmasterEX(object):
     #Delete a port save point
     def delete_port_savepoint_guided(self):
         uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
-        name = raw_input("What is the name of the port save point you would like to delete?")
+        name = raw_input("What is the name of the port save point you would like to delete? ")
         params = {'name': name}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
@@ -977,7 +985,7 @@ class PacketmasterEX(object):
     #Delete a rule save point
     def delete_rule_savepoint_guided(self):
         uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
-        name = raw_input("What is the name of the rule save point you would like to delete?")
+        name = raw_input("What is the name of the rule save point you would like to delete? ")
         params = {'name': name}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
@@ -1149,6 +1157,56 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Set rule storage mode with guided options
+    def set_storage_mode_guided(self):
+        uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
+        mode = raw_input('''Select the rule storage mode:
+                        1 - Simple
+                        2 - IPv6
+                        Enter the number of your selection: ''')
+        try:
+            mode = int(mode)
+        except:
+            return "That is not a valid selection; canceling set rule storage mode."
+        if mode == 1:
+            params = {'mode' : 'simple'}
+        elif mode == 2:
+            params = {'mode': 'ipv6'}
+        else:
+            return "That is not a valid selection; canceling set rule storage mode."
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Set rule storage mode
+    def set_storage_mode(self, mode):
+        uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
+        try:
+            mode = mode.lower()
+        except:
+            return "That is not a valid setting; canceling set rule storage mode."
+        if mode == 'simple':
+            params = {'mode': 'simple'}
+        elif mode == 'ipv6':
+            params = {'mode': 'ipv6'}
+        else:
+            return "That is not a valid selection; canceling set rule storage mode."
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Turn mandatory user authentication on or off with guided options
     def set_uac_guided(self):
         uri = 'http://' + self.address + '/rest/users/uac?'
@@ -1197,7 +1255,7 @@ class PacketmasterEX(object):
         try:
             port = int(port)
         except:
-            return "That is not a valid port input; cancelling RADIUS settings call."
+            return "That is not a valid port input; canceling RADIUS settings call."
         print "Enter the RADIUS secret."
         secret = getpass()
         level = raw_input('''Enter the RADIUS login level.
@@ -1210,7 +1268,7 @@ class PacketmasterEX(object):
         try:
             level = int(level)
         except:
-            return "That is not a valid input for login level; cancelling RADIUS settings call."
+            return "That is not a valid input for login level; canceling RADIUS settings call."
         print level
         if level == 0 or level == 1 or level == 7 or level == 31:
             level = level
@@ -1221,7 +1279,7 @@ class PacketmasterEX(object):
         try:
             refresh = int(refresh)
         except:
-            return "That is not a valid input for refresh rate; cancelling RADIUS settings call."
+            return "That is not a valid input for refresh rate; canceling RADIUS settings call."
         params = {'server': server,
                   'port': port,
                   'secret': secret,
@@ -1244,11 +1302,11 @@ class PacketmasterEX(object):
         try:
             port = int(port)
         except:
-            return "That is not a valid port input; cancelling RADIUS settings call."
+            return "That is not a valid port input; canceling RADIUS settings call."
         try:
             level = int(level)
         except:
-            return "That is not a valid input for login level; cancelling RADIUS settings call."
+            return "That is not a valid input for login level; canceling RADIUS settings call."
         if level == 0 or level == 1 or level == 7 or level == 31:
             level = level
         else:
@@ -1257,7 +1315,7 @@ class PacketmasterEX(object):
         try:
             refresh = int(refresh)
         except:
-            return "That is not a valid input for refresh rate; cancelling RADIUS settings call."
+            return "That is not a valid input for refresh rate; canceling RADIUS settings call."
         params = {'server': server,
                   'port': port,
                   'secret': secret,
