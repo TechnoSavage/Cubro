@@ -7,7 +7,6 @@ from getpass import getpass
 #TO-DO Add code to handle case and verify input in all areas where needed
 #Create methods that accept arguments to post changes
 
-# appsact = '/apps/action?' #add
 # groups = '/groups?' #add
 # allgroup = '/groups/all?' #add
 
@@ -863,13 +862,12 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Export a save point from the Packetmaster
+    #Export a save point from the Packetmaster This still needs worked out; Packetmaster returns empty save points
     def export_savepoint_guided(self):
         uri = 'http://' + self.address + '/rest/savepoints/export?'
         rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
         pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
         params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
-        #params = json.dumps(params)
         try:
             response = requests.get(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
@@ -990,6 +988,46 @@ class PacketmasterEX(object):
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    # Call a custom app action with guided options
+    def call_app_action_guided(self):
+        uri = 'http://' + self.address + '/rest/apps/action?'
+        pid = raw_input('Enter the PID of the app instance: ')
+        try:
+            pid = int(pid)
+        except:
+            return "That is not a valid PID; canceling call app action."
+        name = raw_input('Enter the name of the custom app action: ')
+        params = {'pid': pid,
+                  'action_name': name}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    # Call a custom app action with arguments
+    def call_app_action(self, pid, name):
+        uri = 'http://' + self.address + '/rest/apps/action?'
+        try:
+            pid = int(pid)
+        except:
+            return "That is not a valid PID; canceling call app action."
+        params = {'pid': pid,
+                  'action_name': name}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
