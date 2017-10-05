@@ -73,24 +73,25 @@ if __name__ == '__main__':
                   9 - Port Counters
                  10 - SFP Status
                  11 - Show Rules
-                 12 - List Apps
-                 13 - List Running Apps
-                 14 - Print Save Points
-                 15 - Show Active Load-Balancing Hashes
-                 16 - Permanence Mode
-                 17 - Rule Storage Mode
-                 18 - Temerature and Fans
-                 19 - ID LED Status
-                 20 - OS and CPU Load Averages
-                 21 - TCAM Flows
-                 22 - Memory Usage
-                 23 - CCH Server Revision
-                 24 - Web Log
-                 25 - UAC
-                 26 - RADIUS settings
-                 27 - DNS settings
-                 28 - Telnet service status
-                 29 - Go back to Top Menu \n'''
+                 12 - Show Groups
+                 13 - List Apps
+                 14 - List Running Apps
+                 15 - Print Save Points
+                 16 - Show Active Load-Balancing Hashes
+                 17 - Permanence Mode
+                 18 - Rule Storage Mode
+                 19 - Temerature and Fans
+                 20 - ID LED Status
+                 21 - OS and CPU Load Averages
+                 22 - TCAM Flows
+                 23 - Memory Usage
+                 24 - CCH Server Revision
+                 25 - Web Log
+                 26 - UAC
+                 27 - RADIUS settings
+                 28 - DNS settings
+                 29 - Telnet service status
+                 30 - Go back to Top Menu \n'''
         choice = raw_input('Enter the number of the selection to check: ')
         try:
             choice = int(choice)
@@ -138,77 +139,81 @@ if __name__ == '__main__':
             topmenu()
         elif choice == 11:
             rules_active = packetmaster.rules_active()
-            print rulesrun
+            print rules_active
             topmenu()
         elif choice == 12:
+            groups_active = packetmaster.groups_active()
+            print groups_active
+            topmenu()
+        elif choice == 13:
             apps = packetmaster.device_apps()
             print apps
             topmenu()
-        elif choice == 13:
+        elif choice == 14:
             appsrun = packetmaster.apps_active()
             print appsrun
             topmenu()
-        elif choice == 14:
+        elif choice == 15:
             saves = packetmaster.save_points()
             print saves
             topmenu()
-        elif choice == 15:
+        elif choice == 16:
             hashes = packetmaster.hash_algorithms()
             print hashes
             topmenu()
-        elif choice == 16:
+        elif choice == 17:
             perm = packetmaster.rule_permanence()
             print perm
             topmenu()
-        elif choice == 17:
+        elif choice == 18:
             storage = packetmaster.storage_mode()
             print storage
             topmenu()
-        elif choice == 18:
+        elif choice == 19:
             env = packetmaster.env_info()
             print env
             topmenu()
-        elif choice == 19:
+        elif choice == 20:
             led = packetmaster.id_led()
             print led
             topmenu()
-        elif choice == 20:
+        elif choice == 21:
             load = packetmaster.load_info()
             print load
             topmenu()
-        elif choice == 21:
+        elif choice == 22:
             tcam = packetmaster.tcam()
             print tcam
             topmenu()
-        elif choice == 22:
+        elif choice == 23:
             memory = packetmaster.mem_free()
             print memory
             topmenu()
-        elif choice == 23:
+        elif choice == 24:
             server = packetmaster.server_revision()
             print server
             topmenu()
-        elif choice == 24:
+        elif choice == 25:
             log = packetmaster.web_log()
             print log
             topmenu()
-        elif choice == 25:
+        elif choice == 26:
             access = packetmaster.user_uac()
             print access
             topmenu()
-        elif choice == 26:
+        elif choice == 27:
             radius = packetmaster.get_radius()
             print radius
             topmenu()
-        elif choice == 27:
+        elif choice == 28:
             dns = packetmaster.get_dns()
             print dns
             topmenu()
-        elif choice == 28:
+        elif choice == 29:
             telnet = packetmaster.get_telnet()
             print telnet
             topmenu()
-        elif choice == 29:
+        elif choice == 30:
             topmenu()
         else:
             print 'That is not a valid choice \n'
@@ -225,31 +230,32 @@ if __name__ == '__main__':
                  5 - Delete Port Counters
                  6 - Reset Rule Counters
                  7 - Add Rule
-                 8 - Set Load Balancing Group Hash Algorithms
-                 9 - Activate a save point for ports
-                10 - Activate a save point for rules
-                11 - Set the rule save point to be loaded on boot
-                12 - Export a save point
-                13 - Modify a save point for port configuration
-                14 - Modify a save point for rules
-                15 - Create save point from current port configuration
-                16 - Create a quicksave point from current configuration
-                17 - Create a save point from current rules
-                18 - Delete a port save point
-                19 - Delete a rule save point
-                20 - Call a custom app action
-                21 - Rule permanence on/off
-                22 - Change Rule Storage Mode
-                23 - Delete Web Logs
-                24 - Enable of Disable UAC
-                25 - Configure RADIUS settings
-                26 - Enable or Disable HTTPS secure web interface
-                27 - Enable or Disable Telnet service
-                28 - Set DNS servers
-                29 - ID LED on/off
-                30 - Restart Web Server
-                31 - Reboot Packetmaster
-                32 - Go back to Top Menu \n'''
+                 8 - Delete all active groups and associated rules
+                 9 - Set Load Balancing Group Hash Algorithms
+                10 - Activate a save point for ports
+                11 - Activate a save point for rules
+                12 - Set the rule save point to be loaded on boot
+                13 - Export a save point
+                14 - Modify a save point for port configuration
+                15 - Modify a save point for rules
+                16 - Create save point from current port configuration
+                17 - Create a quicksave point from current configuration
+                18 - Create a save point from current rules
+                19 - Delete a port save point
+                20 - Delete a rule save point
+                21 - Call a custom app action
+                22 - Rule permanence on/off
+                23 - Change Rule Storage Mode
+                24 - Delete Web Logs
+                25 - Enable of Disable UAC
+                26 - Configure RADIUS settings
+                27 - Enable or Disable HTTPS secure web interface
+                28 - Enable or Disable Telnet service
+                29 - Set DNS servers
+                30 - ID LED on/off
+                31 - Restart Web Server
+                32 - Reboot Packetmaster
+                33 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -284,102 +290,106 @@ if __name__ == '__main__':
             print ruleadd
             topmenu()
         elif change == 8:
+            delete_groups = packetmaster.delete_groups_all()
+            print delete_groups
+            topmenu()
+        elif change == 9:
             hashes = packetmaster.set_hash_algorithms_guided()
             print hashes
             topmenu()
-        elif change == 9:
+        elif change == 10:
             portspactive = packetmaster.set_port_savepoint_guided()
             print portspactive
             topmenu()
-        elif change == 10:
+        elif change == 11:
             rulespactive = packetmaster.set_rule_savepoint_guided()
             print rulespactive
             topmenu()
-        elif change == 11:
+        elif change == 12:
             spset = packetmaster.set_boot_savepoint_guided()
             print spset
             topmenu()
-        elif change == 12:
+        elif change == 13:
             spexport = packetmaster.export_savepoint_guided()
             print spexport
             topmenu()
-        elif change == 13:
+        elif change == 14:
             portspmod = packetmaster.modify_port_savepoint_guided()
             print portspmod
             topmenu()
-        elif change == 14:
+        elif change == 15:
             rulepsmod = packetmaster.modify_rule_savepoint_guided()
             print rulepsmod
             topmenu()
-        elif change == 15:
+        elif change == 16:
             portspcreate = packetmaster.create_port_savepoint_guided()
             print portspcreate
             topmenu()
-        elif change == 16:
+        elif change == 17:
             quickcreate = packetmaster.create_quick_savepoint()
             print quickcreate
             topmenu()
-        elif change == 17:
+        elif change == 18:
             rulespcreate = packetmaster.create_rule_savepoint_guided()
             print rulespcreate
             topmenu()
-        elif change == 18:
+        elif change == 19:
             portspdelete = packetmaster.delete_port_savepoint_guided()
             print portspdelete
             topmenu()
-        elif change == 19:
+        elif change == 20:
             rulespdelete = packetmaster.delete_rule_savepoint_guided()
             print rulespdelete
             topmenu()
-        elif change == 20:
+        elif change == 21:
             action = packetmaster.call_app_action_guided()
             print action
             topmenu()
-        elif change == 21:
+        elif change == 22:
             ruleperm = packetmaster.set_rule_permanence_guided()
             print ruleperm
             topmenu()
-        elif change == 22:
+        elif change == 23:
             storagemode = packetmaster.set_storage_mode_guided()
             print storagemode
             topmenu()
-        elif change == 23:
+        elif change == 24:
             logdelete = packetmaster.del_web_log()
             print logdelete
             topmenu()
-        elif change == 24:
+        elif change == 25:
             changeaccess = packetmaster.set_uac_guided()
             print changeaccess
             topmenu()
-        elif change == 25:
+        elif change == 26:
             setradius = packetmaster.set_radius_guided()
             print setradius
             topmenu()
-        elif change == 26:
+        elif change == 27:
             secure = packetmaster.set_https_guided()
             print secure
             topmenu()
-        elif change == 27:
+        elif change == 28:
             settelnet = packetmaster.set_telnet_guided()
             print settelnet
             topmenu()
-        elif change == 28:
+        elif change == 29:
             setdns = packetmaster.set_dns_guided()
             print setdns
             topmenu()
-        elif change == 29:
+        elif change == 30:
             led = packetmaster.set_id_led_guided()
             print led
             topmenu()
-        elif change == 30:
+        elif change == 31:
             restartweb = packetmaster.restart_webserver()
             print restartweb
             topmenu()
-        elif change == 31:
+        elif change == 32:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 32:
+        elif change == 33:
             topmenu()
         else:
             print 'That is not a valid choice \n'

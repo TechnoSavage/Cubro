@@ -212,6 +212,19 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Retrieve active groups
+    def groups_active(self):
+        uri = 'http://' + self.address + '/rest/groups/all?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #List all available apps
     def device_apps(self):
         uri = 'http://' + self.address + '/rest/apps?'
@@ -656,7 +669,7 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Add a rule
+    #Add a rule with guided options
     def add_rule_guided(self):
         uri = 'http://' + self.address + '/rest/rules?'
         params = {}
@@ -809,6 +822,50 @@ class PacketmasterEX(object):
         params['actions'] = ruleaction
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Add rule by providing all parameters
+    def add_rule(self, params):
+        uri = 'http://' + self.address + '/rest/rules?'
+        if type(params) != 'dict':
+            return "That is not a valid format for rule; please provide a dictionary object with valid rule parameters."
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Add a group with guided options
+    def add_group_guided(self):
+        pass
+
+    #Add a group with arguments
+    def add_group(self, params):
+        pass
+
+    #Modify a group with guided options
+    def modify_group_guided(self):
+        pass
+
+    #Modify a group with arguments
+    def modify_group(self, params):
+        pass
+        
+    #Delete all active groups
+    def delete_groups_all(self):
+        uri = 'http://' + self.address + '/rest/groups/all?'
+        try:
+            response = requests.delete(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
