@@ -946,8 +946,9 @@ class PacketmasterEX(object):
                 bucket_list.append(bucket_params)
         else:
             return "That is not a valid bucket number; canceling add group."
-        params = { '(GID)': {'buckets': bucket_list},
+        params = {'buckets': bucket_list,
                   'group_id': name,
+                  'description': description,
                   'type': type_group}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
