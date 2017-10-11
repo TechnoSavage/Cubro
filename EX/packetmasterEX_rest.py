@@ -18,7 +18,8 @@ class PacketmasterEX(object):
         self.username = username
         self.password = password
         #self.https = False
-
+        self.hardware_generation()
+        self.get_port_count()
     #check whether web interface is using HTTP or HTTPS
     #def check_https(self):
         #try:
@@ -850,7 +851,7 @@ class PacketmasterEX(object):
         uri = 'http://' + self.address + '/rest/groups?'
         name = raw_input("Enter the group ID: ")
         try:
-            name = int(name)
+            input_check = int(name)
         except:
             return "That is not a valid group ID, canceling add group."
         description = raw_input("Enter the group description: ")
@@ -879,7 +880,7 @@ class PacketmasterEX(object):
             return "That is not a valid bucket number; canceling add group."
         if buckets >= 2 and buckets <= 16:
             for bucket in xrange(buckets):
-                print "Configure settings for bucket %s" % bucket
+                print "\nConfigure settings for bucket %s" % bucket
                 #Add check against number of ports on device
                 output = raw_input("Output on which port: ")
                 try:
@@ -911,9 +912,22 @@ class PacketmasterEX(object):
                         except:
                             return "That is not a valid input for VLAN ID, canceling add group."
                     else:
-                        strip_vlan = raw_input("Strip VLAN ID from output traffic?  Y or N [N]: ").lower()
+                        strip_vlan = raw_input('Strip VLAN ID from output traffic?  Y or N [N]: ').lower()
                         if strip_vlan == 'y' or strip_vlan == 'yes':
                             actions = 'strip_vlan,' + actions
+                if self.hardware == '4':
+                    pop_l2 = raw_input('Pop all L2 information from packet?  Y or N [N]: ').lower()
+                    if pop_l2 == 'y' or pop_l2 == 'yes':
+                        actions = 'pop_l2,' + actions
+                if self.hardware == '4':
+                    pop_mpls = raw_input('Pop MPLS tags? In most cases you should also push L2.  Y or N [N]: ').lower()
+                    if pop_mpls == 'y' or pop_mpls == 'yes':
+                        actions = 'pop_all_mpls,' + actions
+                if self.hardware == '4':
+                    push_l2 = raw_input('Push L2 information to output packets?  Y or N [N]: ').lower()
+                    if push_l2 == 'y' or push_l2 == 'yes':
+                        print "Be sure to modify destination MAC when prompted or an error will occur."
+                        actions = 'push_l2,' + actions
                 src_mac = raw_input('Modify source MAC address?  Enter new MAC address or leave blank for no: ').strip()
                 if src_mac != '':
                     ations = 'set_field:' + src_mac + '->eth_src,' + actions
@@ -927,6 +941,14 @@ class PacketmasterEX(object):
                         actions = 'set_field:' + dstip[0] + '->ip_dst,' + actions
                     except:
                         return "That is not a valid input for IP address, canceling add group."
+                if self.hardware == '4':
+                    src_udp = raw_input('Modify source UDP port?  Enter new port number or leave blank for no: ').strip()
+                    if src_udp != '':
+                        try:
+                            test_input = int(src_udp)
+                            actions = 'set_field:' + src_udp + '->udp_src,' + actions
+                        except:
+                            return "That is not a valid input for port number; canceling add group."
                 dst_udp = raw_input('Modify destination UDP port?  Enter new port number or leave blank for no: ').strip()
                 if dst_udp != '':
                     try:
@@ -934,7 +956,15 @@ class PacketmasterEX(object):
                         actions = 'set_field:' + dst_udp + '->udp_dst,' + actions
                     except:
                         return "That is not a valid input for port number; canceling add group."
-                dst_tcp = raw_input('Modify destination TCP port?  Enter new port number or leave blank for no: \n').strip()
+                if self.hardware == '4':
+                    src_tcp = raw_input('Modify source TCP port?  Enter new port number or leave blank for no: ').strip()
+                    if src_tcp != '':
+                        try:
+                            test_input = int(src_tcp)
+                            actions = 'set_field:' + src_tcp + '->tcp_src,' + actions
+                        except:
+                            return "That is not a valid input for port number; canceling add group."
+                dst_tcp = raw_input('Modify destination TCP port?  Enter new port number or leave blank for no: ').strip()
                 if dst_tcp != '':
                     try:
                         test_input = int(dst_tcp)
@@ -946,10 +976,13 @@ class PacketmasterEX(object):
                 bucket_list.append(bucket_params)
         else:
             return "That is not a valid bucket number; canceling add group."
-        params = {'buckets': bucket_list,
-                  'group_id': name,
-                  'description': description,
-                  'type': type_group}
+        params = { name:
+                 { 'buckets': bucket_list,
+                 'group_id': name,
+                 'type': type_group,
+                 'description': description
+                 }
+                 }
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
