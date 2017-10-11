@@ -889,11 +889,12 @@ class PacketmasterEX(object):
                 except:
                     return "That is not a valid port number; canceling add group"
                 actions = output
-                watch = raw_input("Set watch port to: ")
-                try:
-                    input_check = int(watch)
-                except:
-                    return "That is not a valid port number; canceling add group"
+                if self.hardware != '4':
+                    watch = raw_input("Set watch port to: ")
+                    try:
+                        input_check = int(watch)
+                    except:
+                        return "That is not a valid port number; canceling add group"
                 push_vlan = raw_input('Push VLAN ID to outout traffic? Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
                     try:
@@ -971,20 +972,22 @@ class PacketmasterEX(object):
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
                     except:
                         return "That is not a valid input for port number; canceling add group."
-                bucket_params = {'actions': actions,
-                                 'watch_port': watch}
+                if self.hardware != '4':
+                    bucket_params = {'actions': actions,
+                                     'watch_port': watch}
+                else:
+                    bucket_params = {'actions': actions}
                 bucket_list.append(bucket_params)
         else:
             return "That is not a valid bucket number; canceling add group."
-        params = { name:
-                 { 'buckets': bucket_list,
-                 'group_id': name,
-                 'type': type_group,
-                 'description': description
+        params = { 'buckets': bucket_list,
+                   'group_id': name,
+                   'type': type_group,
+                   'description': description
                  }
-                 }
+        params_json = json.dumps(params)
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, json=params, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
