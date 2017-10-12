@@ -6,16 +6,17 @@ from getpass import getpass
 from requests.exceptions import ConnectionError
 from packetmasterEX_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
+
 def set_ip():
     address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
     try:
         ip_address = re.findall('([0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', address)
         address = ip_address[0]
     except:
-        return "That is not a valid IPv4 address."
+        print "That is not a valid IPv4 address."
         set_ip()
     return address
-    
+
 if __name__ == '__main__':
     #Welcome statement
     print '''
