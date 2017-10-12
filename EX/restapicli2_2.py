@@ -8,14 +8,18 @@ from packetmasterEX_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
 
 def set_ip():
-    address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
-    try:
-        ip_address = re.findall('([0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', address)
-        address = ip_address[0]
-    except:
-        print "That is not a valid IPv4 address."
-        set_ip()
-    return address
+    fail_count = 0
+    while fail_count < 3:
+        address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
+        try:
+            ip_address = re.findall('([0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', address)
+            address = ip_address[0]
+            return address
+        except:
+            print "That is not a valid IPv4 address."
+            fail_count += 1
+    print "That is not a valid IPv4 address.  Exiting"
+    exit()
 
 if __name__ == '__main__':
     #Welcome statement
