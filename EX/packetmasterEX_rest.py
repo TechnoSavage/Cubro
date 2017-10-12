@@ -5,10 +5,8 @@ from requests.exceptions import ConnectionError
 from getpass import getpass
 
 #TO-DO Add code to handle case and verify input in all areas where needed
+#add_rule_guided requires many input checks
 #Add code to validate input for IPv6 as well as IPv4
-
-# groups = '/groups?' #add
-# allgroup = '/groups/all?' #add
 
 #Add code to check and handle HTTPS for URIs
 class PacketmasterEX(object):

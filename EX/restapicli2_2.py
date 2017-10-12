@@ -6,8 +6,16 @@ from getpass import getpass
 from requests.exceptions import ConnectionError
 from packetmasterEX_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
-
-
+def set_ip():
+    address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
+    try:
+        ip_address = re.findall('([0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', address)
+        address = ip_address[0]
+    except:
+        return "That is not a valid IPv4 address."
+        set_ip()
+    return address
+    
 if __name__ == '__main__':
     #Welcome statement
     print '''
@@ -16,8 +24,7 @@ if __name__ == '__main__':
         the Cubro REST API. \n'''
 
     #IP address to access REST data of device
-    address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
-    #Write a check against valid IPv4 address
+    address = set_ip()
     #Device credentials
     username = raw_input('Enter your username: ')
     password = getpass()
@@ -39,7 +46,7 @@ if __name__ == '__main__':
         except:
             topmenu()
         if option == 1:
-            address = raw_input('What is the IP address of the Packetmaster you want to access: ')
+            address = set_ip()
             packetmaster = PacketmasterEX(address, username, password)
             topmenu()
         elif option == 2:
