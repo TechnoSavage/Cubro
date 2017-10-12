@@ -813,7 +813,7 @@ class PacketmasterEX(object):
             error = 'That is not a valid selection; please try again \n'
             return error
         print '''\nAdd Custom Extra Match?
-        e.g. hard_timeout, idle_timeout, tcp_flags, QinQ
+        e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
         Improper syntax will cause Add Rule to fail \n'''
         extra = raw_input('Enter Extra Custom Match String: ')
@@ -853,7 +853,14 @@ class PacketmasterEX(object):
         try:
             input_check = int(name)
         except:
-            return "That is not a valid group ID, canceling add group."
+            return "That is not a valid group ID, canceling Add Group."
+        existing = []
+        all_groups = self.groups_active()
+        for item in all_groups['groups']:
+            if item == 'group_id':
+                existing.append(item[0])
+        if gid in existing:
+            return "A group with this group ID already exists; use Modify Group or select a different group ID. Canceling Add Group"
         description = raw_input("Enter the group description: ")
         group_type = raw_input(""" Select the group type:
                                 1 - All
@@ -863,7 +870,7 @@ class PacketmasterEX(object):
         try:
             group_type = int(group_type)
         except:
-            return "That is not a valid group type selection; canceling add group."
+            return "That is not a valid group type selection; canceling Add Group."
         if group_type == 1:
             type_group = 'all'
         elif group_type == 2:
@@ -871,13 +878,13 @@ class PacketmasterEX(object):
         elif group_type == 3:
             type_group = 'ff'
         else:
-            return "That is not a valid group type selection; canceling add group."
+            return "That is not a valid group type selection; canceling Add Group."
         bucket_list = []
         buckets = raw_input("How many buckets in this port group?  Must be at least 2 and no more than 16: ")
         try:
             buckets = int(buckets)
         except:
-            return "That is not a valid bucket number; canceling add group."
+            return "That is not a valid bucket number; canceling Add Group."
         if buckets >= 2 and buckets <= 16:
             for bucket in xrange(buckets):
                 print "\nConfigure settings for bucket %s" % bucket
@@ -887,14 +894,14 @@ class PacketmasterEX(object):
                     input_check = int(output)
                     output = 'output:' + output
                 except:
-                    return "That is not a valid port number; canceling add group"
+                    return "That is not a valid port number; canceling Add Group"
                 actions = output
                 if self.hardware != '4':
                     watch = raw_input("Set watch port to: ")
                     try:
                         input_check = int(watch)
                     except:
-                        return "That is not a valid port number; canceling add group"
+                        return "That is not a valid port number; canceling Add Group"
                 push_vlan = raw_input('Push VLAN ID to outout traffic? Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
                     try:
@@ -902,7 +909,7 @@ class PacketmasterEX(object):
                         vlan = 'push_vlan:0x8100,set_field:' + vlan + '->vlan_vid,'
                         actions = vlan + actions
                     except:
-                        return "That is not a valid VLAN ID, canceling add group."
+                        return "That is not a valid VLAN ID, canceling Add Group."
                 else:
                     mod_vlan = raw_input('Modify VLAN ID of output traffic? Enter VLAN ID or leave blank for no: ').strip()
                     if mod_vlan != '':
@@ -911,7 +918,7 @@ class PacketmasterEX(object):
                             vlan = 'set_field:' + vlan + '->vlan_vid,'
                             actions = vlan + actions
                         except:
-                            return "That is not a valid input for VLAN ID, canceling add group."
+                            return "That is not a valid input for VLAN ID, canceling Add Group."
                     else:
                         strip_vlan = raw_input('Strip VLAN ID from output traffic?  Y or N [N]: ').lower()
                         if strip_vlan == 'y' or strip_vlan == 'yes':
@@ -941,7 +948,7 @@ class PacketmasterEX(object):
                         dstip = re.findall('([0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', dst_ip)
                         actions = 'set_field:' + dstip[0] + '->ip_dst,' + actions
                     except:
-                        return "That is not a valid input for IP address, canceling add group."
+                        return "That is not a valid input for IP address, canceling Add Group."
                 if self.hardware == '4':
                     src_udp = raw_input('Modify source UDP port?  Enter new port number or leave blank for no: ').strip()
                     if src_udp != '':
@@ -949,14 +956,14 @@ class PacketmasterEX(object):
                             test_input = int(src_udp)
                             actions = 'set_field:' + src_udp + '->udp_src,' + actions
                         except:
-                            return "That is not a valid input for port number; canceling add group."
+                            return "That is not a valid input for port number; canceling Add Group."
                 dst_udp = raw_input('Modify destination UDP port?  Enter new port number or leave blank for no: ').strip()
                 if dst_udp != '':
                     try:
                         test_input = int(dst_udp)
                         actions = 'set_field:' + dst_udp + '->udp_dst,' + actions
                     except:
-                        return "That is not a valid input for port number; canceling add group."
+                        return "That is not a valid input for port number; canceling Add Group."
                 if self.hardware == '4':
                     src_tcp = raw_input('Modify source TCP port?  Enter new port number or leave blank for no: ').strip()
                     if src_tcp != '':
@@ -964,14 +971,14 @@ class PacketmasterEX(object):
                             test_input = int(src_tcp)
                             actions = 'set_field:' + src_tcp + '->tcp_src,' + actions
                         except:
-                            return "That is not a valid input for port number; canceling add group."
+                            return "That is not a valid input for port number; canceling Add Group."
                 dst_tcp = raw_input('Modify destination TCP port?  Enter new port number or leave blank for no: ').strip()
                 if dst_tcp != '':
                     try:
                         test_input = int(dst_tcp)
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
                     except:
-                        return "That is not a valid input for port number; canceling add group."
+                        return "That is not a valid input for port number; canceling Add Group."
                 if self.hardware != '4':
                     bucket_params = {'actions': actions,
                                      'watch_port': watch}
@@ -979,7 +986,7 @@ class PacketmasterEX(object):
                     bucket_params = {'actions': actions}
                 bucket_list.append(bucket_params)
         else:
-            return "That is not a valid bucket number; canceling add group."
+            return "That is not a valid bucket number; canceling Add Group."
         params = { 'buckets': bucket_list,
                    'group_id': name,
                    'type': type_group,
@@ -997,10 +1004,25 @@ class PacketmasterEX(object):
             raise e
 
     #Add a group with arguments
-    def add_group(self, params):
+    def add_group(self, gid, json_app):
         uri = 'http://' + self.address + '/rest/groups?'
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            input_check = int(gid)
+        except:
+            return "That is not a valid group ID, canceling Add Group."
+        existing = []
+        all_groups = self.groups_active()
+        for item in all_groups['groups']:
+            if item == 'group_id':
+                existing.append(item[0])
+        if gid in existing:
+            return "A group with this group ID already exists; use Modify Group or select a different group ID. Canceling Add Group"
+        try:
+            input_check = json.loads(json_app)
+        except:
+            return "That is not a valid JSON object for Add Group.  Canceling Add Group."
+        try:
+            response = requests.post(uri, json=json_app, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -1011,11 +1033,171 @@ class PacketmasterEX(object):
 
     #Modify a group with guided options
     def modify_group_guided(self):
-        pass
+        uri = 'http://' + self.address + '/rest/groups?'
+        name = raw_input("Enter the group ID of the group you would like to modify: ")
+        try:
+            input_check = int(name)
+        except:
+            return "That is not a valid group ID, canceling Modify Group."
+        existing = []
+        all_groups = self.groups_active()
+        for item in all_groups['groups']:
+            if item == 'group_id':
+                existing.append(item[0])
+        if name not in existing:
+            return "A group with this group ID does not exist; use Add Group. Canceling Modify Group"
+        description = raw_input("Enter the new group description or leave blank to retain original: ")
+        bucket_list = []
+        buckets = raw_input("How many buckets in this port group?  Must be at least 2 and no more than 16: ")
+        try:
+            buckets = int(buckets)
+        except:
+            return "That is not a valid bucket number; canceling Modify Group."
+        if buckets >= 2 and buckets <= 16:
+            for bucket in xrange(buckets):
+                print "\nConfigure settings for bucket %s" % bucket
+                #Add check against number of ports on device
+                output = raw_input("Output on which port: ")
+                try:
+                    input_check = int(output)
+                    output = 'output:' + output
+                except:
+                    return "That is not a valid port number; canceling Modify Group"
+                actions = output
+                if self.hardware != '4':
+                    watch = raw_input("Set watch port to: ")
+                    try:
+                        input_check = int(watch)
+                    except:
+                        return "That is not a valid port number; canceling Modify Group"
+                push_vlan = raw_input('Push VLAN ID to outout traffic? Enter VLAN ID or leave blank for no: ').strip()
+                if push_vlan != '':
+                    try:
+                        vlan = str(int(push_vlan) + 4096)
+                        vlan = 'push_vlan:0x8100,set_field:' + vlan + '->vlan_vid,'
+                        actions = vlan + actions
+                    except:
+                        return "That is not a valid VLAN ID, canceling Modify Group."
+                else:
+                    mod_vlan = raw_input('Modify VLAN ID of output traffic? Enter VLAN ID or leave blank for no: ').strip()
+                    if mod_vlan != '':
+                        try:
+                            vlan = str(int(mod_vlan) + 4096)
+                            vlan = 'set_field:' + vlan + '->vlan_vid,'
+                            actions = vlan + actions
+                        except:
+                            return "That is not a valid input for VLAN ID, canceling Modify Group."
+                    else:
+                        strip_vlan = raw_input('Strip VLAN ID from output traffic?  Y or N [N]: ').lower()
+                        if strip_vlan == 'y' or strip_vlan == 'yes':
+                            actions = 'strip_vlan,' + actions
+                if self.hardware == '4':
+                    pop_l2 = raw_input('Pop all L2 information from packet?  Y or N [N]: ').lower()
+                    if pop_l2 == 'y' or pop_l2 == 'yes':
+                        actions = 'pop_l2,' + actions
+                if self.hardware == '4':
+                    pop_mpls = raw_input('Pop MPLS tags? In most cases you should also push L2.  Y or N [N]: ').lower()
+                    if pop_mpls == 'y' or pop_mpls == 'yes':
+                        actions = 'pop_all_mpls,' + actions
+                if self.hardware == '4':
+                    push_l2 = raw_input('Push L2 information to output packets?  Y or N [N]: ').lower()
+                    if push_l2 == 'y' or push_l2 == 'yes':
+                        print "Be sure to modify destination MAC when prompted or an error will occur."
+                        actions = 'push_l2,' + actions
+                src_mac = raw_input('Modify source MAC address?  Enter new MAC address or leave blank for no: ').strip()
+                if src_mac != '':
+                    ations = 'set_field:' + src_mac + '->eth_src,' + actions
+                dst_mac = raw_input('Modify destination MAC address?  Enter new MAC address or leave blank for no: ').strip()
+                if dst_mac != '':
+                    ations = 'set_field:' + dst_mac + '->eth_dst,' + actions
+                dst_ip = raw_input('Modify destination IP address?  Enter new IP address or leave blank for no: ').strip()
+                if dst_ip != '':
+                    try:
+                        dstip = re.findall('([0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', dst_ip)
+                        actions = 'set_field:' + dstip[0] + '->ip_dst,' + actions
+                    except:
+                        return "That is not a valid input for IP address, canceling Modify Group."
+                if self.hardware == '4':
+                    src_udp = raw_input('Modify source UDP port?  Enter new port number or leave blank for no: ').strip()
+                    if src_udp != '':
+                        try:
+                            test_input = int(src_udp)
+                            actions = 'set_field:' + src_udp + '->udp_src,' + actions
+                        except:
+                            return "That is not a valid input for port number; canceling Modify Group."
+                dst_udp = raw_input('Modify destination UDP port?  Enter new port number or leave blank for no: ').strip()
+                if dst_udp != '':
+                    try:
+                        test_input = int(dst_udp)
+                        actions = 'set_field:' + dst_udp + '->udp_dst,' + actions
+                    except:
+                        return "That is not a valid input for port number; canceling Modify Group."
+                if self.hardware == '4':
+                    src_tcp = raw_input('Modify source TCP port?  Enter new port number or leave blank for no: ').strip()
+                    if src_tcp != '':
+                        try:
+                            test_input = int(src_tcp)
+                            actions = 'set_field:' + src_tcp + '->tcp_src,' + actions
+                        except:
+                            return "That is not a valid input for port number; canceling Modify Group."
+                dst_tcp = raw_input('Modify destination TCP port?  Enter new port number or leave blank for no: ').strip()
+                if dst_tcp != '':
+                    try:
+                        test_input = int(dst_tcp)
+                        actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
+                    except:
+                        return "That is not a valid input for port number; canceling Modify Group."
+                if self.hardware != '4':
+                    bucket_params = {'actions': actions,
+                                     'watch_port': watch}
+                else:
+                    bucket_params = {'actions': actions}
+                bucket_list.append(bucket_params)
+        else:
+            return "That is not a valid bucket number; canceling Modify Group."
+        params = { 'buckets': bucket_list,
+                   'group_id': name,
+                   'type': type_group,
+                   'description': description
+                 }
+        params_json = json.dumps(params)
+        try:
+            response = requests.put(uri, json=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Modify a group with arguments
-    def modify_group(self, params):
-        pass
+    def modify_group(self, gid, json_app):
+        uri = 'http://' + self.address + '/rest/groups?'
+        try:
+            input_check = int(gid)
+        except:
+            return "That is not a valid group ID, canceling Modify Group."
+        existing = []
+        all_groups = self.groups_active()
+        for item in all_groups['groups']:
+            if item == 'group_id':
+                existing.append(item[0])
+        if gid not in existing:
+            return "A group with this group ID does not exist; use Add Group. Canceling Modify Group"
+        try:
+            input_check = json.loads(json_app)
+        except:
+            return "That is not a valid JSON object for Modify Group.  Canceling Modify Group."
+        try:
+            response = requests.put(uri, json=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Delete all active groups
     def delete_groups_all(self):
