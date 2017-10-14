@@ -393,6 +393,19 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Retrieve all users
+    def get_users(self):
+        uri = 'http://' + self.address + '/rest/users?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Retrieve User Authentication settings
     def user_uac(self):
         uri = 'http://' + self.address + '/rest/users/uac?'
@@ -894,10 +907,12 @@ class PacketmasterEX(object):
             return "That is not a valid group ID, canceling Add Group."
         existing = []
         all_groups = self.groups_active()
-        for item in all_groups['groups']:
-            if item == 'group_id':
-                existing.append(item[0])
-        if gid in existing:
+        json_groups = json.loads(all_groups)
+        count = 0
+        for group in json_groups['groups']:
+            existing.append(json_groups['groups'][count]['group_id'])
+            count +=1
+        if name in existing:
             return "A group with this group ID already exists; use Modify Group or select a different group ID. Canceling Add Group"
         description = raw_input("Enter the group description: ")
         group_type = raw_input(""" Select the group type:
@@ -1050,9 +1065,11 @@ class PacketmasterEX(object):
             return "That is not a valid group ID, canceling Add Group."
         existing = []
         all_groups = self.groups_active()
-        for item in all_groups['groups']:
-            if item == 'group_id':
-                existing.append(item[0])
+        json_groups = json.loads(all_groups)
+        count = 0
+        for group in json_groups['groups']:
+            existing.append(json_groups['groups'][count]['group_id'])
+            count +=1
         if gid in existing:
             return "A group with this group ID already exists; use Modify Group or select a different group ID. Canceling Add Group"
         try:
@@ -1079,9 +1096,11 @@ class PacketmasterEX(object):
             return "That is not a valid group ID, canceling Modify Group."
         existing = []
         all_groups = self.groups_active()
-        for item in all_groups['groups']:
-            if item == 'group_id':
-                existing.append(item[0])
+        json_groups = json.loads(all_groups)
+        count = 0
+        for group in json_groups['groups']:
+            existing.append(json_groups['groups'][count]['group_id'])
+            count +=1
         if name not in existing:
             return "A group with this group ID does not exist; use Add Group. Canceling Modify Group"
         description = raw_input("Enter the new group description or leave blank to retain original: ")
@@ -1670,6 +1689,49 @@ class PacketmasterEX(object):
             return "That is not a valid selection; canceling set rule storage mode."
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Delete a user with guided options
+    def delete_user_guided(self):
+        uri = 'http://' + self.address + '/rest/users?'
+        username = raw_input('What is the user name to delete: ')
+        user_list = []
+        active_users = self.get_users()
+        json_users = json.loads(active_users)
+        for user in json_users:
+            user_list.append(json_users[user]['username'])
+        if username not in user_list:
+            return "That username does not exist"
+        params = {'name': username}
+        try:
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Delete a user
+    def delete_user(self, username):
+        uri = 'http://' + self.address + '/rest/users?'
+        user_list = []
+        active_users = self.get_users()
+        json_users = json.loads(active_users)
+        for user in json_users:
+            user_list.append(json_users[item]['username'])
+        if username not in user_list:
+            return "That username does not exist"
+        params = {'name': username}
+        try:
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
             r = response.content
             data = json.loads(r)
