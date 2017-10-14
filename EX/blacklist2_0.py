@@ -44,7 +44,8 @@ if __name__ == '__main__':
         blacklist = requests.get('https://isc.sans.edu/block.txt?').text
         text = blacklist.rstrip()
         for l in text:
-            match = re.findall('(\S[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', text)
+            #match = re.findall('(\S[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', text)
+            match = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', text)
     except:
         print 'Site is unavailable \n'
     createblacklist(match, address, username, password)

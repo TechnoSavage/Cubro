@@ -12,7 +12,7 @@ def set_ip():
     while fail_count < 3:
         address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
         try:
-            ip_address = re.findall('([0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', address)
+            ip_address = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', address)
             address = ip_address[0]
             return address
         except:
