@@ -1697,6 +1697,85 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Add a user with guided option
+    def add_user_guided(self):
+        uri = 'http://' + self.address + '/rest/users?'
+        username = raw_input('Enter a username: ').strip()
+        if username == '':
+            return "That is not a valid username; canceling add user."
+        user_list = []
+        active_users = self.get_users()
+        json_users = json.loads(active_users)
+        for user in json_users:
+            user_list.append(json_users[user]['username'])
+        if username in user_list:
+            return "That username is already in use; use Modify User; canceling Add User."
+        access_level = raw_input("""Choose an access level for the user:
+                                1 - Read only
+                                7 - Write
+                               31 - Super User
+                               Enter the numeric value for the access level: """).strip()
+        try:
+            access_level = int(access_level)
+        else:
+            return "That is not a valid user access level; canceling Add User."
+        if access_level != 1 or access_level != 7 or access_level != 31:
+            return "That is not a valid user access level; canceling Add User."
+        passwd = raw_input("Enter a password for the user: ")
+        description = raw_input("Add a description for this user: ")
+        rad = raw_input("Use RADIUS authentication?  Y or N [N]: ").lower()
+        if rad == 'y' or rad == 'yes':
+            rad = True
+        else:
+            rad = False
+        params = {'username': username,
+                  'accesslevel': access_level,
+                  'password': passwd,
+                  'description': description,
+                  'radius': rad}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Add a user
+    def add_user(self, username, access_level, passwd, description='', rad=False):
+        uri = 'http://' + self.address + '/rest/users?'
+        user_list = []
+        active_users = self.get_users()
+        json_users = json.loads(active_users)
+        for user in json_users:
+            user_list.append(json_users[user]['username'])
+        if username in user_list:
+            return "That username is already in use; use Modify User; canceling Add User."
+        try:
+            access_level = int(access_level)
+        else:
+            return "That is not a valid user access level; canceling Add User."
+        if access_level != 1 or access_level != 7 or access_level != 31:
+            return "That is not a valid user access level; canceling Add User."
+        if type(rad) not bool:
+            return "That is not a valid input for RADIUS authentication (bool); canceling Add User."
+        params = {'username': username,
+                  'accesslevel': access_level,
+                  'password': passwd,
+                  'description': description,
+                  'radius': rad}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Delete a user with guided options
     def delete_user_guided(self):
         uri = 'http://' + self.address + '/rest/users?'
