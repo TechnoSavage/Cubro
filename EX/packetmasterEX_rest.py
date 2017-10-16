@@ -1717,9 +1717,9 @@ class PacketmasterEX(object):
                                Enter the numeric value for the access level: """).strip()
         try:
             access_level = int(access_level)
-        else:
+        except:
             return "That is not a valid user access level; canceling Add User."
-        if access_level != 1 or access_level != 7 or access_level != 31:
+        if access_level not in (1, 7, 31):
             return "That is not a valid user access level; canceling Add User."
         passwd = raw_input("Enter a password for the user: ")
         description = raw_input("Add a description for this user: ")
@@ -1755,12 +1755,14 @@ class PacketmasterEX(object):
             return "That username is already in use; use Modify User; canceling Add User."
         try:
             access_level = int(access_level)
+        except:
+            return "That is not a valid user access level; canceling Add User."
+        if access_level not in (1, 7, 31):
+            return "That is not a valid user access level; canceling Add User."
+        if rad in (True, 'true', 'True', 'Y', 'Yes', 'y', 'yes'):
+            rad = True
         else:
-            return "That is not a valid user access level; canceling Add User."
-        if access_level != 1 or access_level != 7 or access_level != 31:
-            return "That is not a valid user access level; canceling Add User."
-        if type(rad) not bool:
-            return "That is not a valid input for RADIUS authentication (bool); canceling Add User."
+            rad = False
         params = {'username': username,
                   'accesslevel': access_level,
                   'password': passwd,
@@ -1768,6 +1770,92 @@ class PacketmasterEX(object):
                   'radius': rad}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Modify a user with guided options
+    def mod_user_guided(self):
+        uri = 'http://' + self.address + '/rest/users?'
+        cur_name = raw_input('What is the username you would like to modify: ')
+        user_list = []
+        active_users = self.get_users()
+        json_users = json.loads(active_users)
+        for user in json_users:
+            user_list.append(json_users[user]['username'])
+        if cur_name not in user_list:
+            return "That username does not exist; please use Add User.  Canceling Modify User."
+        new_name = raw_input('Enter a new username: ')
+        if new_name in user_list:
+            return "The newly entered user name is already in use; canceling Modify User."
+        description = raw_input("Enter a new description; this will overwrite the old description: ")
+        access_level = raw_input("""Choose an access level for the user:
+                                1 - Read only
+                                7 - Write
+                               31 - Super User
+                               Enter the numeric value for the access level: """).strip()
+        try:
+            access_level = int(access_level)
+        except:
+            return "That is not a valid user access level; canceling Modify User."
+        if access_level not in (1, 7, 31):
+            return "That is not a valid user access level; canceling Modify User."
+        passwd = raw_input("Enter a new password for the user: ")
+        rad = raw_input("Use RADIUS authentication?  Y or N [N]: ").lower()
+        if rad in ('y', 'yes'):
+            rad = True
+        else:
+            rad = False
+        params = {'username': cur_name,
+                  'new_username': new_name,
+                  'accesslevel': access_level,
+                  'password': passwd,
+                  'description': description,
+                  'radius': rad}
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Modify a user
+    def mod_user(self, cur_name, new_name, access_level, passwd, description='', rad=False ):
+        uri = 'http://' + self.address + '/rest/users?'
+        user_list = []
+        active_users = self.get_users()
+        json_users = json.loads(active_users)
+        for user in json_users:
+            user_list.append(json_users[user]['username'])
+        if cur_name not in user_list:
+            return "That username does not exist; please use Add User.  Canceling Modify User."
+        if new_name in user_list:
+            return "The newly entered user name is already in use; canceling Modify User."
+        try:
+            access_level = int(access_level)
+        except:
+            return "That is not a valid user access level; canceling Modify User."
+        if access_level not in (1, 7, 31):
+            return "That is not a valid user access level; canceling Modify User."
+        if rad in (True, 'true', 'True', 'Y', 'Yes', 'y', 'yes'):
+            rad = True
+        else:
+            rad = False
+        params = {'username': cur_name,
+                  'new_username': new_name,
+                  'accesslevel': access_level,
+                  'password': passwd,
+                  'description': description,
+                  'radius': rad}
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
             r = response.content
             data = json.loads(r)
@@ -1805,7 +1893,7 @@ class PacketmasterEX(object):
         active_users = self.get_users()
         json_users = json.loads(active_users)
         for user in json_users:
-            user_list.append(json_users[item]['username'])
+            user_list.append(json_users[user]['username'])
         if username not in user_list:
             return "That username does not exist"
         params = {'name': username}

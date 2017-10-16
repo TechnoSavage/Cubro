@@ -267,16 +267,17 @@ if __name__ == '__main__':
                 25 - Change Rule Storage Mode
                 26 - Delete Web Logs
                 27 - Add User
-                28 - Delete User
-                29 - Enable of Disable UAC
-                30 - Configure RADIUS settings
-                31 - Enable or Disable HTTPS secure web interface
-                32 - Enable or Disable Telnet service
-                33 - Set DNS servers
-                34 - ID LED on/off
-                35 - Restart Web Server
-                36 - Reboot Packetmaster
-                37 - Go back to Top Menu \n'''
+                28 - Modify User
+                29 - Delete User
+                30 - Enable of Disable UAC
+                31 - Configure RADIUS settings
+                32 - Enable or Disable HTTPS secure web interface
+                33 - Enable or Disable Telnet service
+                34 - Set DNS servers
+                35 - ID LED on/off
+                36 - Restart Web Server
+                37 - Reboot Packetmaster
+                38 - Go back to Top Menu \n'''
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
@@ -391,42 +392,46 @@ if __name__ == '__main__':
             print adduser
             topmenu()
         elif change == 28:
+            moduser = packetmaster.mod_user_guided()
+            print moduser
+            topmenu()
+        elif change == 29:
             deluser = packetmaster.delete_user_guided()
             print deluser
             topmenu()
-        elif change == 29:
+        elif change == 30:
             changeaccess = packetmaster.set_uac_guided()
             print changeaccess
             topmenu()
-        elif change == 30:
+        elif change == 31:
             setradius = packetmaster.set_radius_guided()
             print setradius
             topmenu()
-        elif change == 31:
+        elif change == 32:
             secure = packetmaster.set_https_guided()
             print secure
             topmenu()
-        elif change == 32:
+        elif change == 33:
             settelnet = packetmaster.set_telnet_guided()
             print settelnet
             topmenu()
-        elif change == 33:
+        elif change == 34:
             setdns = packetmaster.set_dns_guided()
             print setdns
             topmenu()
-        elif change == 34:
+        elif change == 35:
             led = packetmaster.set_id_led_guided()
             print led
             topmenu()
-        elif change == 35:
+        elif change == 36:
             restartweb = packetmaster.restart_webserver()
             print restartweb
             topmenu()
-        elif change == 36:
+        elif change == 37:
             restart = packetmaster.reboot()
             print restart
             topmenu()
-        elif change == 37:
+        elif change == 38:
             topmenu()
         else:
             print 'That is not a valid choice \n'
