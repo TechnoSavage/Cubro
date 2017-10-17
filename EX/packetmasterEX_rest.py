@@ -897,6 +897,35 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Modify a rule with guided options
+    def mod_rule_guided(self):
+        pass
+
+    #Modify a rule with arguments
+    def mod_rule(self):
+        pass
+
+    #Delete a rule with guided options
+    def del_rule_guided(self):
+        pass
+
+    #Delete a rule with arguments
+    def del_rule(self):
+        pass
+
+    #Delete all rules
+    def del_rule_all(self):
+        uri = 'http://' + self.address + '/rest/rules/all?'
+        try:
+            response = requests.delete(uri, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Add a group with guided options
     def add_group_guided(self):
         uri = 'http://' + self.address + '/rest/groups?'
@@ -1447,6 +1476,32 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Start an app with guided parameters
+    def start_app_guided(self):
+        pass
+
+    #Start an app
+    def start_app(self, name, user_description, params): #Not yet finished
+        pass
+        # uri = 'http://' + self.address + '/rest/apps?'
+        # try:
+        #     response = requests.post(uri, data=params, auth=(self.username, self.password))
+        #     code = response.status_code
+        #     r = response.content
+        #     data = json.loads(r)
+        #     return json.dumps(data, indent=4)
+        # except ConnectionError as e:
+        #     r = 'No Response'
+        #     raise e
+
+    #Modify an app with guided parameters
+    def mod_app_guided(self):
+        pass
+
+    #Modify an app
+    def mod_app(self):
+        pass
+
     # Call a custom app action with guided options
     def call_app_action_guided(self):
         uri = 'http://' + self.address + '/rest/apps/action?'
@@ -1479,7 +1534,44 @@ class PacketmasterEX(object):
                   'action_name': name}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
+            #code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Stop a running app with guided options
+    def kill_app_guided(self):
+        uri = 'http://' + self.address + '/rest/apps?'
+        pid = raw_input('What is the process ID of the app to kill: ')
+        try:
+            pid = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Kill App."
+        params = {'pid': pid}
+        try:
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            #code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Stop a running app with arguments
+    def kill_app(self, pid):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            pid = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Kill App."
+        params = {'pid': pid}
+        try:
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            #code = response.status_code
             r = response.content
             data = json.loads(r)
             return json.dumps(data, indent=4)
