@@ -693,7 +693,14 @@ class PacketmasterEX(object):
             params['description'] = ruledescrip
         priority = raw_input('Enter the priority level of the rule; 0 - 65535 higher number = higher priority [32768]: ')
         if priority != '':
-            params['priority'] = int(priority)
+            try:
+                priority = int(priority)
+                if priority >= 0 and priority <= 65535:
+                    params['priority'] = int(priority)
+                else:
+                    return "That is not a valid input for priority; canceling Add Rule."
+            except:
+                 return "That is not a valid input for priority; canceling Add Rule."
         else:
             params['priority'] = 32768
         portin = raw_input('Enter the port number or numbers for incoming traffic; multiple ports separated by a comma: ')
@@ -711,9 +718,9 @@ class PacketmasterEX(object):
             params['match[vlan]'] = 'match'
             matchid = raw_input('Enter the VLAN ID to filter on: ')
             params['match[vlan_id]'] = matchid
-            vpri = raw_input('Enter the VLAN priority (Enter 0-7) [0]: ')
+            vpri = raw_input('Enter a VLAN priority? Enter 0-7 orleave blank for none: ')
             if vpri == '':
-                params['match[vlan_priority]'] = '0'
+                pass
             else:
                 vpri != ''
                 try:
@@ -723,25 +730,23 @@ class PacketmasterEX(object):
                         print "That is not a valid selection; VLAN priority defaulting to '0'"
                         params['match[vlan_priority]'] = '0'
                 except:
-                    print "That is not a valid selection; VLAN priority defaulting to '0'"
-                    params['match[vlan_priority]'] = '0'
+                    print "That is not a valid selection; canceling Add Rule."
         else:
-            error = 'That is not a valid selection; please try again \n'
-            return error
+            return "That is not a valid selection; canceling Add Rule \n"
         macsrc = raw_input('Filter by source MAC address?  Leave blank for no or enter MAC address: ')
         if macsrc != '':
-            params['dl_src'] = macsrc
+            params['match[dl_src]'] = macsrc
         macdst = raw_input('Filter by destination MAC address?  Leave blank for no or enter MAC address: ')
         if macdst != '':
-            params['dl_dst'] = macdst
+            params['match[dl_dst]'] = macdst
         print '''\nFilter on protocol?
                 1 - No Protocol Filtering
-                2 - ip
-                3 - tcp
-                4 - udp
-                5 - sctp
-                6 - icmp
-                7 - arp
+                2 - IP
+                3 - TCP
+                4 - UDP
+                5 - SCTP
+                6 - ICMP
+                7 - ARP
                 8 - Enter Ethertype\n'''
         proto = raw_input('Enter the number of your selection [1]: ')
         if proto == '' or int(proto) == 1:
@@ -754,14 +759,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
         elif int(proto) == 3:
             params['match[protocol]'] = 'tcp'
             nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
@@ -770,14 +775,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
             tcpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
             if tcpsrc != '':
                 params['match[tcp_src]'] = tcpsrc
@@ -792,14 +797,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
             udpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
             if udpsrc != '':
                 params['match[udp_src]'] = udpsrc
@@ -814,14 +819,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
             sctpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
             if sctpsrc != '':
                 params['match[sctp_src]'] = sctpsrc
@@ -836,18 +841,18 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
+                    return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling add rule."
-            icmpt = raw_input('Flter on ICMP type?  Leave blank for no or enter ICMP type number: ')
+                    return "That is not a valid IP address, canceling Add Rule."
+            icmpt = raw_input('Filter on ICMP type?  Leave blank for no or enter ICMP type number: ')
             if icmpt != '':
                 params['match[icmp_type]'] = icmpt
-            icmpc = raw_input('Flter on ICMP code?  Leave blank for no or enter ICMP code number: ')
+            icmpc = raw_input('Filter on ICMP code?  Leave blank for no or enter ICMP code number: ')
             if icmpc != '':
                 params['match[icmp_code]'] = icmpc
         elif int(proto) == 7:
@@ -861,8 +866,7 @@ class PacketmasterEX(object):
             if nwproto != '':
                 params['match[nw_proto]'] = nwproto
         else:
-            error = 'That is not a valid selection; please try again \n'
-            return error
+            return "That is not a valid selection; canceling Add Rule \n"
         print '''\nAdd Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
@@ -885,7 +889,7 @@ class PacketmasterEX(object):
     #Add rule by providing all parameters
     def add_rule(self, params):
         uri = 'http://' + self.address + '/rest/rules?'
-        if type(params) != 'dict':
+        if type(params) is not dict:
             return "That is not a valid format for rule; please provide a dictionary object with valid rule parameters."
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -907,11 +911,208 @@ class PacketmasterEX(object):
 
     #Delete a rule with guided options
     def del_rule_guided(self):
-        pass
+        uri = 'http://' + self.address + '/rest/rules?'
+        priority = raw_input("What is the priority of the rule to delete: ")
+        try:
+            priority = int(priority)
+        except:
+            print "That is not a valid input for rule priority; canceling Delete Rule."
+        if priority < 0 or priority > 65535:
+            print "That is not a valid input for rule priority; canceling Delete Rule."
+        in_port = raw_input("What is (are) the input port(s)for the rule separated by commas: ")
+        params = {'priority': priority,
+                  'match[in_port]': in_port}
+        print '''\nIs the rule matching a VLAN tag?
+                1 - No, matching all tagged and untagged traffic
+                2 - No, matching only untagged traffic
+                3 - Yes, matching a VLAN tag \n'''
+        trafmatch = raw_input('Enter the number of your selection [1]: ')
+        if trafmatch == '' or int(trafmatch) == 1:
+            pass
+        elif int(trafmatch) == 2:
+            params['match[vlan]'] = 'neg_match'
+        elif int(trafmatch) == 3:
+            params['match[vlan]'] = 'match'
+            matchid = raw_input('Enter the VLAN ID the rule is filtering: ')
+            params['match[vlan_id]'] = matchid
+            vpri = raw_input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
+            if vpri == '':
+                pass
+            else:
+                vpri != ''
+                try:
+                    if int(vpri) >= 0 or int(vpri) <= 7:
+                        params['match[vlan_priority]'] = vpri
+                    else:
+                        print "That is not a valid selection; VLAN priority defaulting to '0'"
+                        params['match[vlan_priority]'] = '0'
+                except:
+                    return "That is not a valid selection; canceling Delete Rule."
+        else:
+            return "That is not a valid selection; canceling Delete Rule \n"
+        macsrc = raw_input('Filtering by source MAC address?  Leave blank for no or enter MAC address: ')
+        if macsrc != '':
+            params['match[dl_src]'] = macsrc
+        macdst = raw_input('Filtering by destination MAC address?  Leave blank for no or enter MAC address: ')
+        if macdst != '':
+            params['match[dl_dst]'] = macdst
+        print '''\nFiltering on a protocol?
+                1 - No Protocol Filtering
+                2 - IP
+                3 - TCP
+                4 - UDP
+                5 - SCTP
+                6 - ICMP
+                7 - ARP
+                8 - Ethertype\n'''
+        proto = raw_input('Enter the number of your selection [1]: ')
+        if proto == '' or int(proto) == 1:
+            params['match[protocol]'] = ''
+        elif int(proto) == 2:
+            params['match[protocol]'] = 'ip'
+            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            if nwsrc != '':
+                try:
+                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
+                    params['match[nw_src]'] = nwsrc[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+            if nwdst != '':
+                try:
+                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
+                    params['match[nw_dst]'] = nwdst[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+        elif int(proto) == 3:
+            params['match[protocol]'] = 'tcp'
+            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            if nwsrc != '':
+                try:
+                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
+                    params['match[nw_src]'] = nwsrc[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+            if nwdst != '':
+                try:
+                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
+                    params['match[nw_dst]'] = nwdst[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            tcpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+            if tcpsrc != '':
+                params['match[tcp_src]'] = tcpsrc
+            tcpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            if tcpdst != '':
+                params['match[tcp_dst]'] = tcpdst
+        elif int(proto) == 4:
+            params['match[protocol]'] = 'udp'
+            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            if nwsrc != '':
+                try:
+                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
+                    params['match[nw_src]'] = nwsrc[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+            if nwdst != '':
+                try:
+                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
+                    params['match[nw_dst]'] = nwdst[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            udpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+            if udpsrc != '':
+                params['match[udp_src]'] = udpsrc
+            udpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            if udpdst != '':
+                params['match[udp_dst]'] = udpdst
+        elif int(proto) == 5:
+            params['match[protocol]'] = 'sctp'
+            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            if nwsrc != '':
+                try:
+                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
+                    params['match[nw_src]'] = nwsrc[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+            if nwdst != '':
+                try:
+                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
+                    params['match[nw_dst]'] = nwdst[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            sctpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+            if sctpsrc != '':
+                params['match[sctp_src]'] = sctpsrc
+            sctpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            if sctpdst != '':
+                params['match[sctp_dst]'] = sctpdst
+        elif int(proto) == 6:
+            params['match[protocol]'] = 'icmp'
+            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            if nwsrc != '':
+                try:
+                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
+                    params['match[nw_src]'] = nwsrc[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+            if nwdst != '':
+                try:
+                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
+                    params['match[nw_dst]'] = nwdst[0]
+                except:
+                    return "That is not a valid IP address, canceling Delete Rule."
+            icmpt = raw_input('Filtering on ICMP type?  Leave blank for no or enter ICMP type number: ')
+            if icmpt != '':
+                params['match[icmp_type]'] = icmpt
+            icmpc = raw_input('Filtering on ICMP code?  Leave blank for no or enter ICMP code number: ')
+            if icmpc != '':
+                params['match[icmp_code]'] = icmpc
+        elif int(proto) == 7:
+            params['match[protocol]'] = 'arp'
+        elif int(proto) == 8:
+            params['match[protocol]'] = 'custom'
+            ether = raw_input('Enter Ethertype e.g. 0x800: ')
+            if ether != '':
+                params['match[dl_type]'] = ether
+            nwproto = raw_input('Enter protocol number (protocol number in IPv4, header type in IPv6, opcode in ARP) or leave blank for none: ')
+            if nwproto != '':
+                params['match[nw_proto]'] = nwproto
+        else:
+            return "That is not a valid selection; canceling Delete Rule \n"
+        print '''\nUsing Custom Extra Match?
+        e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
+        Leave blank for none
+        Improper syntax will cause Delete Rule to fail \n'''
+        extra = raw_input('Enter Extra Custom Match String: ')
+        if extra != '':
+            params['match[extra]'] = extra
+        try:
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Delete a rule with arguments
-    def del_rule(self):
-        pass
+    def del_rule(self, params):
+        uri = 'http://' + self.address + '/rest/rules?'
+        try:
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Delete all rules
     def del_rule_all(self):
