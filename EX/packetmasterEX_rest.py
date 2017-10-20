@@ -1909,7 +1909,9 @@ class PacketmasterEX(object):
             server2 = raw_input("Enter NTP backup IP or Host Name: ")
             run = self.start_app_ntp(server1, server2, description)
         elif app == 2:
-            interval = raw_input("Enter the check interval in milliseconds: ")
+            interval = raw_input("Enter the check interval in milliseconds [5000]: ")
+            if interval == '':
+                interval = '5000'
             in_port = raw_input("Physical source port of incoming ARP request (optional): ")
             out_port = raw_input("Physical port for sending ARP response: ")
             match_mac = raw_input("Enter source MAC address of incoming ARP request (optional): ")
@@ -1917,7 +1919,7 @@ class PacketmasterEX(object):
             dst_mac = raw_input("Destination MAC address of outgoing ARP response: ")
             src_ip = raw_input("Source IP address of outgoing ARP response: ")
             dst_ip = raw_input("Destination IP of outgoing ARP response: ")
-            run = self.start_app_arpresponder(interval, out_port, src_mac, dst_mac, src_ip, dst_ip, in_port, match_mac, description)
+            run = self.start_app_arpresponder(out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
         elif app == 3:
             name = 'SNMP'
         elif app == 4:
@@ -1949,7 +1951,7 @@ class PacketmasterEX(object):
             raise e
 
     #Start ArpResponder App
-    def start_app_arpresponder(self, interval, outport, src_mac, dst_mac, src_ip, dst_ip, inport=None, match_srcmac=None, user_description=''):
+    def start_app_arpresponder(self, outport, src_mac, dst_mac, src_ip, dst_ip, interval='5000', inport=None, match_srcmac=None, user_description=''):
         uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(interval)
@@ -2605,31 +2607,20 @@ class PacketmasterEX(object):
 
     #Turn HTTPS secure web interface on or off with guided options
     def set_https_guided(self):
-        uri = 'http://' + self.address + '/rest/device/https?'
         enabled = raw_input('Type "true" to enable HTTPS on web interface; type "false" to turn it off [false]: ').lower()
         if enabled == 'true':
-            enabled = True
             print ("Please enter the SSL password")
             ssl = getpass()
         else:
             enabled = False
             ssl = 'none'
-        params = {'https_enabled': enabled,
-                  'ssl_password': ssl}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = "No Response"
-            raise e
+        run = self.set_https(enabled, ssl)
+        return run
 
     #Turn HTTPS secure web interface on or off with arguments
     def set_https(self, enabled=False, ssl=None):
         uri = 'http://' + self.address + '/rest/device/https?'
-        if enabled.lower() == 'true':
+        if enabled.lower() == 'true' or enabled == True:
             enabled = True
         else:
             enabled = False
@@ -2647,27 +2638,14 @@ class PacketmasterEX(object):
 
     #Turn Telnet service on or off with guided options
     def set_telnet_guided(self):
-        uri = 'http://' + self.address + '/rest/device/telnet?'
         enabled = raw_input('Type "true" to enable Telnet; type "false" to turn it off [false]: ').lower()
-        if enabled == 'true':
-            enabled = True
-        else:
-            enabled = False
-        params = {'activated': enabled}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = "No Response"
-            raise e
+        run = self.set_telnet(enabled)
+        return run
 
     #Turn Telnet service on or off with arguments
     def set_telnet(self, enabled=False):
         uri = 'http://' + self.address + '/rest/device/telnet?'
-        if enabled.lower() == 'true':
+        if enabled.lower() == 'true' or enabled == True:
             enabled = True
         else:
             enabled = False
@@ -2677,7 +2655,7 @@ class PacketmasterEX(object):
             code = response.status_code
             r = response.content
             data = json.loads(r)
-            return json.dumps(data, indent=4)
+            return (json.dumps(data, indent=4), "Device must be rebooted for change to take effect")
         except ConnectionError as e:
             r = "No Response"
             raise e
@@ -2698,14 +2676,14 @@ class PacketmasterEX(object):
     #Set DNS server settings with guided options
     def set_dns_guided(self):
         print 'You may set up to three DNS servers.'
-        dns1 = raw_input('Enter the IP address of the first DNS server: ').strip()
+        dns1 = raw_input('Enter the IP address of the first DNS server or leave blank for none [none]: ').strip()
         dns2 = raw_input('Enter the IP address of the second DNS server or leave blank for none [none]: ').strip()
         dns3 = raw_input('Enter the IP address of the third DNS server or leave blank for none [none]: ').strip()
         run = self.set_dns(dns1, dns2, dns3)
         return run
 
     #Set DNS server settings
-    def set_dns(self, dns1, dns2='', dns3=''):
+    def set_dns(self, dns1='', dns2='', dns3=''):
         uri = 'http://' + self.address + '/rest/device/nameresolution?'
         params = {}
         if dns1 != '':
@@ -2725,7 +2703,7 @@ class PacketmasterEX(object):
                 r = 'No Response'
                 raise e
         else:
-            return 'No valid DNS server addresses given'
+            return 'No valid DNS server addresses given; DNS entries cleared.'
 
     #Turn the ID LED on or off with guided options
     def set_id_led_guided(self):
