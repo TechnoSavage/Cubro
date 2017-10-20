@@ -554,7 +554,6 @@ class PacketmasterEX(object):
 
     #Change the configuration of a port
     def set_port_config_guided(self):
-        #Add additional parameters, add function to change multiple ports without exiting
         #Add provision to handle devices which require reboot for speed change e.g. EX2 (10G is XG)
         #Add shutdown true/false parameter for EX2 (more?)
         uri = 'http://' + self.address + '/rest/ports/config?'
@@ -1892,21 +1891,101 @@ class PacketmasterEX(object):
 
     #Start an app with guided parameters
     def start_app_guided(self):
-        pass
+        app = raw_input("""Select the App instance to start:
+                            1 - NTP
+                            2 - Arp Responder
+                            3 - SNMP
+                            4 - Heartbeat Bypass (control Bypass Switch)
+                            5 - Syslog
+                            6 - Heartbeat
+                           Enter the number of the App selection: """)
+        try:
+            app = int(app)
+        except:
+            return "That is not a valid input for App selection; canceling Start App."
+        description = raw_input("Custom description for the new App instance: ")
+        if app == 1:
+            server1 = raw_input("Enter NTP target IP or Host Name: ")
+            server2 = raw_input("Enter NTP backup IP or Host Name: ")
+            run = self.start_app_ntp(server1, server2, description)
+        elif app == 2:
+            interval = raw_input("Enter the check interval in milliseconds: ")
+            in_port = raw_input("Physical source port of incoming ARP request (optional): ")
+            out_port = raw_input("Physical port for sending ARP response: ")
+            match_mac = raw_input("Enter source MAC address of incoming ARP request (optional): ")
+            src_mac = raw_input("Source MAC address of outgoing ARP response: ")
+            dst_mac = raw_input("Destination MAC address of outgoing ARP response: ")
+            src_ip = raw_input("Source IP address of outgoing ARP response: ")
+            dst_ip = raw_input("Destination IP of outgoing ARP response: ")
+            run = self.start_app_arpresponder(interval, out_port, src_mac, dst_mac, src_ip, dst_ip, in_port, match_mac, description)
+        elif app == 3:
+            name = 'SNMP'
+        elif app == 4:
+            name = 'HeartbeatBypass'
+        elif app == 5:
+            name = 'Syslog'
+        elif app == 6:
+            name = 'Heartbeat'
+        else:
+            return "That is not a valid input for App selection; canceling Start App."
+        return run
 
-    #Start an app
-    def start_app(self, name, user_description, params): #Not yet finished
-        pass
-        # uri = 'http://' + self.address + '/rest/apps?'
-        # try:
-        #     response = requests.post(uri, data=params, auth=(self.username, self.password))
-        #     code = response.status_code
-        #     r = response.content
-        #     data = json.loads(r)
-        #     return json.dumps(data, indent=4)
-        # except ConnectionError as e:
-        #     r = 'No Response'
-        #     raise e
+    #Start NTP App
+    def start_app_ntp(self, server1, server2=None, user_description=''):
+        uri = 'http://' + self.address + '/rest/apps?'
+        params = {'name': 'NTP',
+                  'description': 'Syncs time with remote NTP servers.',
+                  'server1': server1,
+                  'server2': server2,
+                  'userDescription': user_description}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Start ArpResponder App
+    def start_app_arpresponder(self, interval, outport, src_mac, dst_mac, src_ip, dst_ip, inport=None, match_srcmac=None, user_description=''):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not an valid input for interval (number in milliseconds); canceling start ArpResponder."
+        try:
+            input_check = int(outport)
+        except:
+            return "That is not an valid input for output port; canceling start ArpResponder."
+        params = {'name': 'ArpResponder',
+                  'description': 'Responds to an arbotrary packet with an ARP response',
+                  'interval': interval,
+                  'outPort': outport,
+                  'macSrc': src_mac,
+                  'macDst': dst_mac,
+                  'ipSrc': src_ip,
+                  'ipDst': dst_ip}
+        if inport:
+            try:
+                input_check = int(inport)
+            except:
+                return "That is not a valid input for input port; canceling ArpResponder."
+            params['inPort'] = inport
+        if match_srcmac:
+            params['matchMacSrc'] = match_srcmac
+        if user_description:
+            params['userDescription'] = user_description
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Modify an app with guided parameters
     def mod_app_guided(self):
@@ -1958,22 +2037,9 @@ class PacketmasterEX(object):
 
     #Stop a running app with guided options
     def kill_app_guided(self):
-        uri = 'http://' + self.address + '/rest/apps?'
         pid = raw_input('What is the process ID of the app to kill: ')
-        try:
-            pid = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Kill App."
-        params = {'pid': pid}
-        try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            #code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.kill_app(pid)
+        return run
 
     #Stop a running app with arguments
     def kill_app(self, pid):
@@ -2631,33 +2697,15 @@ class PacketmasterEX(object):
 
     #Set DNS server settings with guided options
     def set_dns_guided(self):
-        uri = 'http://' + self.address + '/rest/device/nameresolution?'
-        params = {}
         print 'You may set up to three DNS servers.'
-        dns1 = raw_input('Enter the IP address of the first DNS server or leave blank for none [none]: ').strip()
-        if dns1 != '':
-            params['dns1'] = dns1
+        dns1 = raw_input('Enter the IP address of the first DNS server: ').strip()
         dns2 = raw_input('Enter the IP address of the second DNS server or leave blank for none [none]: ').strip()
-        if dns2 != '':
-            params['dns2'] = dns2
         dns3 = raw_input('Enter the IP address of the third DNS server or leave blank for none [none]: ').strip()
-        if dns3 != '':
-            params['dns3'] = dns3
-        if len(params) > 0:
-            try:
-                response = requests.post(uri, data=params, auth=(self.username, self.password))
-                code = response.status_code
-                r = response.content
-                data = json.loads(r)
-                return json.dumps(data, indent=4)
-            except ConnectionError as e:
-                r = 'No Response'
-                raise e
-        else:
-            return 'No valid DNS server addresses given'
+        run = self.set_dns(dns1, dns2, dns3)
+        return run
 
     #Set DNS server settings
-    def set_dns(self, dns1=None, dns2=None, dns3=None):
+    def set_dns(self, dns1, dns2='', dns3=''):
         uri = 'http://' + self.address + '/rest/device/nameresolution?'
         params = {}
         if dns1 != '':
@@ -2681,28 +2729,15 @@ class PacketmasterEX(object):
 
     #Turn the ID LED on or off with guided options
     def set_id_led_guided(self):
-        uri = 'http://' + self.address + '/rest/device/idled?'
         led = raw_input('type "true" to turn the ID LED on; type "false" to turn it off [false]: ').lower()
-        if led == 'true':
-            led = True
-        else:
-            led = False
-        params = {'activated': led}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.set_id_led(led)
+        return run
 
     #Turn the ID LED on or off with arguments
     def set_id_led(self, led):
         uri = 'http://' + self.address + '/rest/device/idled?'
         led = led.lower()
-        if led == 'true':
+        if led == 'true' or led == True:
             led = True
         else:
             led = False
