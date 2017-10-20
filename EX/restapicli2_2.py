@@ -274,7 +274,7 @@ if __name__ == '__main__':
                 32 - Add User
                 33 - Modify User
                 34 - Delete User
-                35 - Enable of Disable UAC
+                35 - Enable or Disable UAC
                 36 - Configure RADIUS settings
                 37 - Enable or Disable HTTPS secure web interface
                 38 - Enable or Disable Telnet service

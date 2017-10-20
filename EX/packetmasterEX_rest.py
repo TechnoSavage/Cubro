@@ -2440,25 +2440,9 @@ class PacketmasterEX(object):
 
     #Delete a user with guided options
     def delete_user_guided(self):
-        uri = 'http://' + self.address + '/rest/users?'
         username = raw_input('What is the user name to delete: ')
-        user_list = []
-        active_users = self.get_users()
-        json_users = json.loads(active_users)
-        for user in json_users:
-            user_list.append(json_users[user]['username'])
-        if username not in user_list:
-            return "That username does not exist"
-        params = {'name': username}
-        try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.delete_user(username)
+        return run
 
     #Delete a user
     def delete_user(self, username):
@@ -2483,32 +2467,18 @@ class PacketmasterEX(object):
 
     #Turn mandatory user authentication on or off with guided options
     def set_uac_guided(self):
-        uri = 'http://' + self.address + '/rest/users/uac?'
         access = raw_input('type "true" to turn on UAC; type "false" to turn it off [false]: ').lower()
-        if access == 'true':
-            access = True
-        else:
-            access = False
-        params = {'state': access }
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.set_uac(access)
+        return run
 
     #Turn mandatory user authentication on or off with arguments
     def set_uac(self, uac):
         uri = 'http://' + self.address + '/rest/users/uac?'
-        access = uac.lower()
-        if access == 'true':
-            access = True
+        if uac.lower() == 'true' or uac == True:
+            uac = True
         else:
-            access = False
-        params = {'state': access }
+            uac = False
+        params = {'state': uac }
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
@@ -2521,17 +2491,10 @@ class PacketmasterEX(object):
 
     #Set RADIUS settings with guided options
     def set_radius_guided(self):
-        uri = 'http://' + self.address + '/rest/users/radius?'
         server = raw_input('Enter the IP address of the RADIUS server: ').strip()
-        port = raw_input('Enter the UDP port of the RADIUS server [1812]: ')
-        if port == '':
-            port = 1812
-        try:
-            port = int(port)
-        except:
-            return "That is not a valid port input; canceling RADIUS settings call."
         print "Enter the RADIUS secret."
         secret = getpass()
+        refresh = raw_input("Enter the refresh rate of the RADIUS session in seconds: ")
         level = raw_input('''Enter the RADIUS login level.
         Determines the user access level that a user has logging in via RADIUS but without a local user account.
                              0 - no access
@@ -2539,57 +2502,30 @@ class PacketmasterEX(object):
                              7 - write access
                             31 - super user access
                             [0]: ''')
-        try:
-            level = int(level)
-        except:
-            return "That is not a valid input for login level; canceling RADIUS settings call."
-        print level
-        if level == 0 or level == 1 or level == 7 or level == 31:
-            level = level
-        else:
-            print "That is not a valid input for login level; setting RADIUS login level to 0"
-            level = 0
-        refresh = raw_input("Enter the refresh rate of the RADIUS session in seconds: ")
+        port = raw_input('Enter the UDP port of the RADIUS server [1812]: ')
+        if port == '':
+            port = 1812
+        run = self.set_radius(server, secret, refresh, level, port)
+        return run
+
+    #Set RADIUS settings with arguments
+    def set_radius(self, server, secret, refresh, level, port=1812):
+        uri = 'http://' + self.address + '/rest/users/radius?'
+        server = server.strip()
         try:
             refresh = int(refresh)
         except:
-            return "That is not a valid input for refresh rate; canceling RADIUS settings call."
-        params = {'server': server,
-                  'port': port,
-                  'secret': secret,
-                  'radius_login_level': level,
-                  'refresh_rate': refresh}
+            return "That is not a valid input for refresh rate; canceling Set Radius."
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
-
-    #Set RADIUS settings with arguments
-    def set_radius(self, server=None, port=1812, secret=None, level=None, refresh=None):
-        uri = 'http://' + self.address + '/rest/users/radius?'
-        server = server.strip()
+            level = int(level)
+        except:
+            return "That is not a valid input for login level; canceling Set Radius."
+        if level not in (0, 1, 7, 31):
+            return "That is not a valid input for RADIUS login level; canceling Set Radius."
         try:
             port = int(port)
         except:
             return "That is not a valid port input; canceling RADIUS settings call."
-        try:
-            level = int(level)
-        except:
-            return "That is not a valid input for login level; canceling RADIUS settings call."
-        if level == 0 or level == 1 or level == 7 or level == 31:
-            level = level
-        else:
-            print "That is not a valid input for login level; setting RADIUS login level to 0"
-            level = 0
-        try:
-            refresh = int(refresh)
-        except:
-            return "That is not a valid input for refresh rate; canceling RADIUS settings call."
         params = {'server': server,
                   'port': port,
                   'secret': secret,
