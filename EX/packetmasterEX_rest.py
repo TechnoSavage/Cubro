@@ -2185,32 +2185,18 @@ class PacketmasterEX(object):
 
     #Change rule mode permanence with guided options
     def set_rule_permanence_guided(self):
-        uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
         perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off [false]: ').lower()
-        if perm == 'true':
-            perm = True
-        else:
-            perm = False
-        params = {'state': perm}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.set_rule_permanence(perm)
+        return run
 
     #Change rule mode permanence with arguments
     def set_rule_permanence(self, permanence):
         uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
-        perm = permanence.lower()
-        if perm == 'true':
-            perm = True
+        if permanence in ('true', 'True', True):
+            permanence = True
         else:
-            perm == False
-        params = {'state': perm }
+            permanence == False
+        params = {'state': permanence}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
@@ -2223,7 +2209,6 @@ class PacketmasterEX(object):
 
     #Set rule storage mode with guided options
     def set_storage_mode_guided(self):
-        uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
         mode = raw_input('''Select the rule storage mode:
                         1 - Simple
                         2 - IPv6
@@ -2233,20 +2218,13 @@ class PacketmasterEX(object):
         except:
             return "That is not a valid selection; canceling set rule storage mode."
         if mode == 1:
-            params = {'mode' : 'simple'}
+            mode = 'simple'
         elif mode == 2:
-            params = {'mode': 'ipv6'}
+            mode = 'ipv6'
         else:
             return "That is not a valid selection; canceling set rule storage mode."
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.set_storage_mode(mode)
+        return run
 
     #Set rule storage mode
     def set_storage_mode(self, mode):
@@ -2273,54 +2251,24 @@ class PacketmasterEX(object):
 
     #Add a user with guided option
     def add_user_guided(self):
-        uri = 'http://' + self.address + '/rest/users?'
         username = raw_input('Enter a username: ').strip()
-        if username == '':
-            return "That is not a valid username; canceling add user."
-        user_list = []
-        active_users = self.get_users()
-        json_users = json.loads(active_users)
-        for user in json_users:
-            user_list.append(json_users[user]['username'])
-        if username in user_list:
-            return "That username is already in use; use Modify User; canceling Add User."
         access_level = raw_input("""Choose an access level for the user:
                                 1 - Read only
                                 7 - Write
                                31 - Super User
                                Enter the numeric value for the access level: """).strip()
-        try:
-            access_level = int(access_level)
-        except:
-            return "That is not a valid user access level; canceling Add User."
-        if access_level not in (1, 7, 31):
-            return "That is not a valid user access level; canceling Add User."
         passwd = raw_input("Enter a password for the user: ")
         description = raw_input("Add a description for this user: ")
         rad = raw_input("Use RADIUS authentication?  Y or N [N]: ").lower()
-        if rad == 'y' or rad == 'yes':
-            rad = True
-        else:
-            rad = False
-        params = {'username': username,
-                  'accesslevel': access_level,
-                  'password': passwd,
-                  'description': description,
-                  'radius': rad}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.add_user(username, access_level, passwd, description, rad)
+        return run
 
     #Add a user
     def add_user(self, username, access_level, passwd, description='', rad=False):
         uri = 'http://' + self.address + '/rest/users?'
         user_list = []
+        if username == '':
+            return "That is not a valid username; canceling Add User."
         active_users = self.get_users()
         json_users = json.loads(active_users)
         for user in json_users:
@@ -2354,51 +2302,18 @@ class PacketmasterEX(object):
 
     #Modify a user with guided options
     def mod_user_guided(self):
-        uri = 'http://' + self.address + '/rest/users?'
         cur_name = raw_input('What is the username you would like to modify: ')
-        user_list = []
-        active_users = self.get_users()
-        json_users = json.loads(active_users)
-        for user in json_users:
-            user_list.append(json_users[user]['username'])
-        if cur_name not in user_list:
-            return "That username does not exist; please use Add User.  Canceling Modify User."
         new_name = raw_input('Enter a new username: ')
-        if new_name in user_list:
-            return "The newly entered user name is already in use; canceling Modify User."
         description = raw_input("Enter a new description; this will overwrite the old description: ")
         access_level = raw_input("""Choose an access level for the user:
                                 1 - Read only
                                 7 - Write
                                31 - Super User
                                Enter the numeric value for the access level: """).strip()
-        try:
-            access_level = int(access_level)
-        except:
-            return "That is not a valid user access level; canceling Modify User."
-        if access_level not in (1, 7, 31):
-            return "That is not a valid user access level; canceling Modify User."
         passwd = raw_input("Enter a new password for the user: ")
         rad = raw_input("Use RADIUS authentication?  Y or N [N]: ").lower()
-        if rad in ('y', 'yes'):
-            rad = True
-        else:
-            rad = False
-        params = {'username': cur_name,
-                  'new_username': new_name,
-                  'accesslevel': access_level,
-                  'password': passwd,
-                  'description': description,
-                  'radius': rad}
-        try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.mod_user(cur_name, new_name, access_level, passwd, description, rad)
+        return run
 
     #Modify a user
     def mod_user(self, cur_name, new_name, access_level, passwd, description='', rad=False ):
@@ -2410,6 +2325,8 @@ class PacketmasterEX(object):
             user_list.append(json_users[user]['username'])
         if cur_name not in user_list:
             return "That username does not exist; please use Add User.  Canceling Modify User."
+        if new_name == '':
+            return "That is not a valid username; canceling Modify User."
         if new_name in user_list:
             return "The newly entered user name is already in use; canceling Modify User."
         try:
