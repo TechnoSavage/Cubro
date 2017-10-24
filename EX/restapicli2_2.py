@@ -244,7 +244,7 @@ if __name__ == '__main__':
                  2 - Change Device Name + Notes
                  3 - Change Port Configuration
                  4 - Shut Down or Activate Port
-                 5 - Delete Port Counters
+                 5 - Reset Port Counters
                  6 - Reset Rule Counters
                  7 - Add Rule
                  8 - Modify Rule
@@ -305,7 +305,7 @@ if __name__ == '__main__':
             print onoff
             topmenu()
         elif change == 5:
-            countersdelete = packetmaster.delete_counters()
+            countersdelete = packetmaster.reset_port_counters()
             print countersdelete
             topmenu()
         elif change == 6:

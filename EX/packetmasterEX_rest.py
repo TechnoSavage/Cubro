@@ -615,7 +615,7 @@ class PacketmasterEX(object):
             raise e
 
     #Reset Port Counters
-    def delete_counters(self):
+    def reset_port_counters(self):
         uri = 'http://' + self.address + '/rest/ports/counters?'
         try:
             requests.delete(uri, auth=(self.username, self.password))
@@ -638,7 +638,6 @@ class PacketmasterEX(object):
 
     #Add a rule with guided options
     def add_rule_guided(self):
-        uri = 'http://' + self.address + '/rest/rules?'
         params = {}
         rulename = raw_input('Enter a name for the rule [none]: ')
         if rulename != '':
@@ -831,15 +830,8 @@ class PacketmasterEX(object):
             params['match[extra]'] = extra
         ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - improper syntax will cause Add Rule to fail: ')
         params['actions'] = ruleaction
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.add_rule(params)
+        return run
 
     #Add rule by providing all parameters
     def add_rule(self, params):
@@ -858,7 +850,6 @@ class PacketmasterEX(object):
 
     #Modify a rule with guided options
     def mod_rule_guided(self):
-        uri = 'http://' + self.address + '/rest/rules?'
         name = raw_input('Enter a new name for the rule: ')
         cookie = raw_input('Enter the cookie of the rule to modify: ')
         description = raw_input('Enter a new description for the rule: ')
@@ -904,9 +895,9 @@ class PacketmasterEX(object):
                         print "That is not a valid selection; VLAN priority defaulting to '0'"
                         params['match[vlan_priority]'] = '0'
                 except:
-                    return "That is not a valid selection; canceling Delete Rule."
+                    return "That is not a valid selection; canceling Modify Rule."
         else:
-            return "That is not a valid selection; canceling Delete Rule \n"
+            return "That is not a valid selection; canceling Modify Rule \n"
         macsrc = raw_input('Filtering by source MAC address?  Leave blank for no or enter MAC address: ')
         if macsrc != '':
             params['match[dl_src]'] = macsrc
@@ -933,14 +924,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
         elif int(proto) == 3:
             params['match[protocol]'] = 'tcp'
             nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
@@ -949,14 +940,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             tcpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
             if tcpsrc != '':
                 params['match[tcp_src]'] = tcpsrc
@@ -971,14 +962,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             udpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
             if udpsrc != '':
                 params['match[udp_src]'] = udpsrc
@@ -993,14 +984,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             sctpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
             if sctpsrc != '':
                 params['match[sctp_src]'] = sctpsrc
@@ -1015,14 +1006,14 @@ class PacketmasterEX(object):
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
                 except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                    return "That is not a valid IP address, canceling Modify Rule."
             icmpt = raw_input('Filtering on ICMP type?  Leave blank for no or enter ICMP type number: ')
             if icmpt != '':
                 params['match[icmp_type]'] = icmpt
@@ -1040,7 +1031,7 @@ class PacketmasterEX(object):
             if nwproto != '':
                 params['match[nw_proto]'] = nwproto
         else:
-            return "That is not a valid selection; canceling Delete Rule \n"
+            return "That is not a valid selection; canceling Modify Rule \n"
         print '''\nUsing Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
@@ -1050,15 +1041,8 @@ class PacketmasterEX(object):
             params['match[extra]'] = extra
         ruleaction = raw_input('Enter the new output actions separated by commas; order matters - improper syntax will cause Modify Rule to fail: ')
         params['actions'] = ruleaction
-        try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.mod_rule(params)
+        return run
 
     #Modify a rule with arguments
     def mod_rule(self, params):
@@ -1077,7 +1061,6 @@ class PacketmasterEX(object):
 
     #Delete a rule with guided options
     def del_rule_guided(self):
-        uri = 'http://' + self.address + '/rest/rules?'
         priority = raw_input("What is the priority of the rule to delete: ")
         try:
             priority = int(priority)
@@ -1257,15 +1240,8 @@ class PacketmasterEX(object):
         extra = raw_input('Enter Extra Custom Match String: ')
         if extra != '':
             params['match[extra]'] = extra
-        try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.del_rule(params)
+        return run
 
     #Delete a rule with arguments
     def del_rule(self, params):
@@ -1297,7 +1273,6 @@ class PacketmasterEX(object):
 
     #Add a group with guided options
     def add_group_guided(self):
-        uri = 'http://' + self.address + '/rest/groups?'
         name = raw_input("Enter the group ID: ")
         try:
             input_check = int(name)
@@ -1443,16 +1418,8 @@ class PacketmasterEX(object):
                    'type': type_group,
                    'description': description
                  }
-        params_json = json.dumps(params)
-        try:
-            response = requests.post(uri, json=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.add_group(name, params)
+        return run
 
     #Add a group with arguments
     def add_group(self, gid, json_app):
@@ -1486,7 +1453,6 @@ class PacketmasterEX(object):
 
     #Modify a group with guided options
     def modify_group_guided(self):
-        uri = 'http://' + self.address + '/rest/groups?'
         name = raw_input("Enter the group ID of the group you would like to modify: ")
         try:
             input_check = int(name)
@@ -1615,16 +1581,8 @@ class PacketmasterEX(object):
                    'type': type_group,
                    'description': description
                  }
-        params_json = json.dumps(params)
-        try:
-            response = requests.put(uri, json=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.modify_group(name, params)
+        return run
 
     #Modify a group with arguments
     def modify_group(self, gid, json_app):
@@ -1654,6 +1612,14 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Delete a group with guided options
+    def delete_group_guided(self):
+        pass
+
+    #Delete a group
+    def delete_group(self, gid, json_app):
+        pass
+        
     #Delete all active groups
     def delete_groups_all(self):
         uri = 'http://' + self.address + '/rest/groups/all?'
