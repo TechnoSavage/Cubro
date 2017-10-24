@@ -460,21 +460,11 @@ class PacketmasterEX(object):
 
     #Change the management IP configuration with guided options
     def set_ip_config_guided(self):
-        uri = 'http://' + self.address + '/rest/device/ipconfig?'
-        newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ').strip()
-        newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ').strip()
-        newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ').strip()
-        #Implement checks to validate IP input
-        params = {'ip': newip, 'mask': newmask, 'gw': newgate}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ')
+        newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ')
+        newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ')
+        run = self.set_ip_config(newip, newmask, newgate)
+        return run
 
     #Change the management IP configuration with arguments
     def set_ip_config(self, address, netmask, gateway):
@@ -496,18 +486,9 @@ class PacketmasterEX(object):
 
     #Change the device name
     def set_name_guided(self):
-        uri = 'http://' + self.address + '/rest/device/name?'
         newname = raw_input('Enter device name: ')
-        params = {'name': newname}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.set_name(newname)
+        return run
 
     def set_name(self, name):
         uri = 'http://' + self.address + '/rest/device/name?'
@@ -523,20 +504,10 @@ class PacketmasterEX(object):
             raise e
 
     def set_label_guided(self):
-        uri = 'http://' + self.address + '/rest/device/customident?'
         newname = raw_input('Enter device name: ')
         newnotes = raw_input('Enter device notes: ')
-        params = {'name': newname,
-                  'notes': newnotes}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.set_label(newname, newnotes)
+        return run
 
     def set_label(self, name, notes):
         uri = 'http://' + self.address + '/rest/device/customident?'
@@ -556,69 +527,48 @@ class PacketmasterEX(object):
     def set_port_config_guided(self):
         #Add provision to handle devices which require reboot for speed change e.g. EX2 (10G is XG)
         #Add shutdown true/false parameter for EX2 (more?)
-        uri = 'http://' + self.address + '/rest/ports/config?'
-        interface = raw_input('Enter the interface name of the port you want to change: ').strip()
-        port_no = re.findall('[1-9][0-9/]*', interface)
-        if len(port_no) == 1:
-            interface = 'eth-0-' + port_no[0]
-        else:
-            error = 'that is not a valid port number; please try again'
-            return error
+        interface = raw_input('Enter the interface name of the port you want to change: ')
         speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ').strip()
         if speed.lower() == 'auto':
             speed = 'auto'
         else:
             speed = speed.upper() #More checks needed here
-        duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto": ').strip()
-        if duplex.lower() =='auto' or duplex.lower() == 'full' or duplex.lower() == 'half':
-            duplex = duplex.lower()
-        else:
-            print "That is not a valid duplex; defaulting to auto"
-            duplex = 'auto'
-        forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no: ').strip()
-        forcetx = forcetx.lower()
-        check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no: ').strip()
-        check = check.lower()
-        recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no: ').strip()
-        recalc = recalc.lower
-        params = {
-            'if_name': interface,
-            'speed': speed,
-            'duplex': duplex,
-            'unidirectional': forcetx,
-            'crc_check': check,
-            'crc_recalculation': recalc }
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto" [auto]: ')
+        forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
+        check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
+        recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
+        run = self.set_port_config(interface, speed, duplex, forcetx, check, recalc)
+        return run
 
-    def set_port_config(self, interface, speed='auto', duplex='auto', forcetx='true', check='false', recalc='false'):
+    def set_port_config(self, interface, speed='auto', duplex='auto', forcetx='', check='', recalc=''):
         uri = 'http://' + self.address + '/rest/ports/config?'
         if_name = str(interface).strip()
         port_no = re.findall('[1-9][0-9/]*', if_name)
         if len(port_no) == 1:
             interface = 'eth-0-' + port_no[0]
         else:
-            error = 'that is not a valid port number; please try again'
-            return error
+            return "That is not a valid port number; canceling Set Port Config."
         if speed.lower() == 'auto':
             speed = 'auto'
         else:
             speed = speed.upper()
-        if duplex.lower() =='auto' or duplex.lower() == 'full' or duplex.lower() == 'half':
+        if duplex.lower() in ('auto', 'full', 'half'):
             duplex = duplex.lower()
         else:
             print "That is not a valid duplex; defaulting to auto"
             duplex = 'auto'
-        forcetx = forcetx.lower()
-        check = check.lower()
-        recalc = recalc.lower()
+        if forcetx.lower() in ('true', 't', 'yes', 'y'):
+            forcetx = True
+        else:
+            forcetx = False
+        if check.lower() in ('true', 't', 'yes', 'y'):
+            check = True
+        else:
+            check = False
+        if recalc.lower() in ('true', 't', 'yes', 'y'):
+            recalc = True
+        else:
+            recalc = False
         params = {
             'if_name': interface,
             'speed': speed,
@@ -636,14 +586,20 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Activate or deactivate a port
+    #Activate or deactivate a port with guided options
     def port_on_off_guided(self):
+        if_name = raw_input('Enter the interface name of the port you want to change: ')
+        shutdown = raw_input('Enter "true" to shut port down; Enter "false" to activate port [false]: ')
+        run = self.port_on_off(if_name, shutdown)
+        return run
+
+    #Activate or deactivate a port with arguments
+    def port_on_off(self, if_name, shutdown):
         uri = 'http://' + self.address + '/rest/ports/config?'
-        interface = raw_input('Enter the interface name of the port you want to change: ').strip()
-        port_no = re.find('[1-9][0-9/]*', interface)
-        interface = 'eth-0-' + port_no
-        updown = raw_input('Enter "true" to shut port down; Enter "false" to activate port [false]: ').lower()
-        if updown == 'true':
+        if_name = str(if_name).strip()
+        port_no = re.findall('[1-9][0-9/]*', if_name)
+        interface = 'eth-0-' + port_no[0]
+        if shutdown.lower() in ('true', 't', 'yes', 'y'):
             updown = True
         else:
             updown = False
@@ -1999,24 +1955,10 @@ class PacketmasterEX(object):
 
     # Call a custom app action with guided options
     def call_app_action_guided(self):
-        uri = 'http://' + self.address + '/rest/apps/action?'
         pid = raw_input('Enter the PID of the app instance: ')
-        try:
-            pid = int(pid)
-        except:
-            return "That is not a valid PID; canceling call app action."
         name = raw_input('Enter the name of the custom app action: ')
-        params = {'pid': pid,
-                  'action_name': name}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        run = self.call_app_action(pid, name)
+        return run
 
     # Call a custom app action with arguments
     def call_app_action(self, pid, name):
@@ -2024,7 +1966,7 @@ class PacketmasterEX(object):
         try:
             pid = int(pid)
         except:
-            return "That is not a valid PID; canceling call app action."
+            return "That is not a valid PID; canceling Call App Action."
         params = {'pid': pid,
                   'action_name': name}
         try:
@@ -2063,105 +2005,49 @@ class PacketmasterEX(object):
 
     #Change group hash algorithms with guided options
     def set_hash_algorithms_guided(self):
-        uri = 'http://' + self.address + '/rest/device/grouphash?'
-        macsa = raw_input('Type "true" to use MAC source address; type "false" to ignore [true]: ').lower()
-        if macsa == 'false':
-            macsa = False
-        else:
-            macsa = True
-        macda = raw_input('Type "true" to use MAC destination address; type "false" to ignore [true]: ').lower()
-        if macda == 'false':
-            macda = False
-        else:
-            macda = True
-        ether = raw_input('Type "true" to use ether type; type "false" to ignore [true]: ').lower()
-        if ether == 'false':
-            ether = False
-        else:
-            ether = True
-        ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ').lower()
-        if ipsa == 'false':
-            ipsa = False
-        else:
-            ipsa = True
-        ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ').lower()
-        if ipda == 'false':
-            ipda = False
-        else:
-            ipda = True
-        proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ').lower()
-        if proto == 'false':
-            proto = False
-        else:
-            proto = True
-        src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ').lower()
-        if src == 'false':
-            src = False
-        else:
-            src = True
-        dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ').lower()
-        if dst == 'false':
-            dst = False
-        else:
-            dst = True
-        params = {'macsa': macsa,
-                  'macda': macda,
-                  'ether_type': ether,
-                  'ipsa': ipsa,
-                  'ipda': ipda,
-                  'ip_protocol': proto,
-                  'src_port': src,
-                  'dst_port': dst}
-        try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        macsa = raw_input('Type "true" to use MAC source address; type "false" to ignore [true]: ')
+        macda = raw_input('Type "true" to use MAC destination address; type "false" to ignore [true]: ')
+        ether = raw_input('Type "true" to use ether type; type "false" to ignore [true]: ')
+        ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ')
+        ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ')
+        proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
+        src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
+        dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
+        run = self.set_hash_algorithms(macsa, macda, ether, ipsa, ipda, proto, src, dst)
+        return run
 
     #Change group hash algorithms with arguments
     def set_hash_algorithms(self, macsa, madca, ether, ipsa, ipda, proto, src, dst):
         uri = 'http://' + self.address + '/rest/device/grouphash?'
-        macsa = macsa.lower()
-        if macsa == 'false':
+        if macsa.lower() in ('false', 'f', 'no', 'n'):
             macsa = False
         else:
             macsa = True
-        macda = macda.lower()
-        if macda == 'false':
+        if macda.lower() in ('false', 'f', 'no', 'n'):
             macda = False
         else:
             macda = True
-        ether = ether.lower()
-        if ether == 'false':
+        if ether.lower() in ('false', 'f', 'no', 'n'):
             ether = False
         else:
             ether = True
-        ipsa = ipsa.lower()
-        if ipsa == 'false':
+        if ipsa.lower() in ('false', 'f', 'no', 'n'):
             ipsa = False
         else:
             ipsa = True
-        ipda = ipda.lower()
-        if ipda == 'false':
+        if ipda.lower() in ('false', 'f', 'no', 'n'):
             ipda = False
         else:
             ipda = True
-        proto = proto.lower()
-        if proto == 'false':
+        if proto.lower() in ('false', 'f', 'no', 'n'):
             proto = False
         else:
             proto = True
-        src = src.lower()
-        if src == 'false':
+        if src.lower() in ('false', 'f', 'no', 'n'):
             src = False
         else:
             src = True
-        dst = dst.lower()
-        if dst == 'false':
+        if dst.lower() in ('false', 'f', 'no', 'n'):
             dst = False
         else:
             dst = True
