@@ -1322,7 +1322,7 @@ class PacketmasterEX(object):
                 except:
                     return "That is not a valid port number; canceling Add Group"
                 actions = output
-                if self.hardware != '4':
+                if self.hardware != '4' or group_type == 3:
                     watch = raw_input("Set watch port to: ")
                     try:
                         input_check = int(watch)
@@ -1405,7 +1405,7 @@ class PacketmasterEX(object):
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
                     except:
                         return "That is not a valid input for port number; canceling Add Group."
-                if self.hardware != '4':
+                if self.hardware != '4' or group_type == 3:
                     bucket_params = {'actions': actions,
                                      'watch_port': watch}
                 else:
@@ -1437,10 +1437,8 @@ class PacketmasterEX(object):
             count +=1
         if gid in existing:
             return "A group with this group ID already exists; use Modify Group or select a different group ID. Canceling Add Group"
-        try:
-            input_check = json.loads(json_app)
-        except:
-            return "That is not a valid JSON object for Add Group.  Canceling Add Group."
+        if type(json_app) is not dict:
+            return "That is not a valid dictionary input for Add Group; canceling Add Group."
         try:
             response = requests.post(uri, json=json_app, auth=(self.username, self.password))
             # print response.status_code
@@ -1464,6 +1462,8 @@ class PacketmasterEX(object):
         count = 0
         for group in json_groups['groups']:
             existing.append(json_groups['groups'][count]['group_id'])
+            if json_groups['groups'][count]['group_id'] == name:
+                group_type = json_groups['groups'][count]['type']
             count +=1
         if name not in existing:
             return "A group with this group ID does not exist; use Add Group. Canceling Modify Group"
@@ -1485,7 +1485,7 @@ class PacketmasterEX(object):
                 except:
                     return "That is not a valid port number; canceling Modify Group"
                 actions = output
-                if self.hardware != '4':
+                if self.hardware != '4' or group_type == 'ff':
                     watch = raw_input("Set watch port to: ")
                     try:
                         input_check = int(watch)
@@ -1568,7 +1568,7 @@ class PacketmasterEX(object):
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
                     except:
                         return "That is not a valid input for port number; canceling Modify Group."
-                if self.hardware != '4':
+                if self.hardware != '4' or group_type == 'ff':
                     bucket_params = {'actions': actions,
                                      'watch_port': watch}
                 else:
@@ -1578,7 +1578,7 @@ class PacketmasterEX(object):
             return "That is not a valid bucket number; canceling Modify Group."
         params = { 'buckets': bucket_list,
                    'group_id': name,
-                   'type': type_group,
+                   'type': group_type,
                    'description': description
                  }
         run = self.modify_group(name, params)
@@ -1593,17 +1593,17 @@ class PacketmasterEX(object):
             return "That is not a valid group ID, canceling Modify Group."
         existing = []
         all_groups = self.groups_active()
-        for item in all_groups['groups']:
-            if item == 'group_id':
-                existing.append(item[0])
+        json_groups = json.loads(all_groups)
+        count = 0
+        for group in json_groups['groups']:
+            existing.append(json_groups['groups'][count]['group_id'])
+            count +=1
         if gid not in existing:
-            return "A group with this group ID does not exist; use Add Group. Canceling Modify Group"
+            return "A group with this group ID does not exist; use Add Group.  Canceling Modify Group"
+        if type(json_app) is not dict:
+            return "That is not a valid dictionary input for Modify Group; canceling Modify Group."
         try:
-            input_check = json.loads(json_app)
-        except:
-            return "That is not a valid JSON object for Modify Group.  Canceling Modify Group."
-        try:
-            response = requests.put(uri, json=params, auth=(self.username, self.password))
+            response = requests.put(uri, json=json_app, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
@@ -1619,7 +1619,7 @@ class PacketmasterEX(object):
     #Delete a group
     def delete_group(self, gid, json_app):
         pass
-        
+
     #Delete all active groups
     def delete_groups_all(self):
         uri = 'http://' + self.address + '/rest/groups/all?'
