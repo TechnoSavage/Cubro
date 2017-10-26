@@ -1633,10 +1633,16 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Make a port save point active
+    #Make a port save point active with guided options
     def set_port_savepoint_guided(self):
-        uri = 'http://' + self.address + '/rest/savepoints/activeportsavepoint?'
         savename = raw_input('What is the name of the port save point to make active?: ')
+        run = self.set_port_savepoint(savename)
+        return run
+
+    #Make a port save point active
+    def set_port_savepoint(self, savename):
+        uri = 'http://' + self.address + '/rest/savepoints/activeportsavepoint?'
+        #Add check against system savepoints
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
@@ -1647,11 +1653,17 @@ class PacketmasterEX(object):
         except ConnectionError as e:
             r = 'No Response'
             raise e
+
+    #Make a rule save point active with guided options
+    def set_rule_savepoint_guided(self):
+        savename = raw_input('What is the name of the rule save point to make active?: ')
+        run = self.set_rule_savepoint(savename)
+        return run
 
     #Make a rule save point active
-    def set_rule_savepoint_guided(self):
+    def set_rule_savepoint(self, savename):
         uri = 'http://' + self.address + '/rest/savepoints/activerulesavepoint?'
-        savename = raw_input('What is the name of the rule save point to make active?: ')
+        #Add check against system savepoints
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
@@ -1662,11 +1674,17 @@ class PacketmasterEX(object):
         except ConnectionError as e:
             r = 'No Response'
             raise e
+
+    #Set a save point as the default boot configuration with guided options
+    def set_boot_savepoint_guided(self):
+        savename = raw_input('What is the name of the save point to make the default at boot configuration?: ')
+        run = self.set_boot_savepoint(savename)
+        return run
 
     #Set a save point as the default boot configuration
-    def set_boot_savepoint_guided(self):
+    def set_boot_savepoint(self, savename):
         uri = 'http://' + self.address + '/rest/savepoints/defaultrulesavepoint?'
-        savename = raw_input('What is the name of the save point to make the default at boot configuration?: ')
+        #Add check against system savepoints
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
@@ -1678,11 +1696,17 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Export a save point from the Packetmaster This still needs worked out; Packetmaster returns empty save points
+    #Export a save point from the Packetmaster with guided options.
     def export_savepoint_guided(self):
-        uri = 'http://' + self.address + '/rest/savepoints/export?'
         rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
         pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
+        run = self.export_savepoint(rspname, pspname)
+        return run
+
+    #Export a save point from the Packetmaster.  This still needs worked out; Packetmaster returns empty save points
+    def export_savepoint(self, rspname, pspname):
+        uri = 'http://' + self.address + '/rest/savepoints/export?'
+        #Add checks to see if names exist
         params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
         try:
             response = requests.get(uri, data=params, auth=(self.username, self.password))
@@ -1700,14 +1724,33 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Modify a port save point
+    #Modify a port save point with guided options
     def modify_port_savepoint_guided(self):
-        uri = 'http://' + self.address + '/rest/savepoints/modportsavepoint?'
         oldname = raw_input("What is the name of the save point you would like to modify?")
         newname = raw_input("What would you like to rename this save point to?")
         desc = raw_input("What is the description of the save point?")
-        saveports = raw_input('Hit enter to save the current active ports to this save point; type "false" to not save them (This overwrites port configuration of the save point): ')
-        params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saveports': saveports}
+        override = raw_input('Hit enter to save the current active ports to this save point; type "false" to not save them (This overwrites port configuration of the save point): ')
+        if override.lower() in ('false', 'f', 'n', 'no'):
+            override = False
+        else:
+            override = True
+        run = self.modify_port_savepoint(oldname, newname, desc, override)
+        return run
+
+    #Modify a port savepoint
+    def modify_port_savepoint(self, oldname, newname, description, override=True):
+        uri = 'http://' + self.address + '/rest/savepoints/modportsavepoint?'
+        if override == False:
+            override = False
+        elif:
+            try:
+                if override.lower() in ('false', 'f', 'n', 'no'):
+                    override = False
+            except:
+                pass
+        else:
+            override = True
+        params = {'oldname': oldname, 'newname': newname, 'description': desc, 'override': override}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
