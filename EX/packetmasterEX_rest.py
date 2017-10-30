@@ -1614,11 +1614,40 @@ class PacketmasterEX(object):
 
     #Delete a group with guided options
     def delete_group_guided(self):
-        pass
+        name = raw_input("Enter the group ID of the group to be deleted: ")
+        try:
+            input_check = int(name)
+        except:
+            return "That is not a valid group ID, canceling Delete Group."
+        run = self.delete_group(name)
+        return run
 
     #Delete a group
-    def delete_group(self, gid, json_app):
-        pass
+    def delete_group(self, gid):
+        uri = 'http://' + self.address + '/rest/groups?'
+        try:
+            input_check = int(gid)
+        except:
+            return "That is not a valid group ID, canceling Delete Group."
+        existing = []
+        all_groups = self.groups_active()
+        json_groups = json.loads(all_groups)
+        count = 0
+        for group in json_groups['groups']:
+            existing.append(json_groups['groups'][count]['group_id'])
+            count +=1
+        if gid not in existing:
+            return "A group with this group ID does not exist; canceling Delete Group"
+        params = {'group_id': gid}
+        try:
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            # print response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Delete all active groups
     def delete_groups_all(self):
@@ -1742,12 +1771,8 @@ class PacketmasterEX(object):
         uri = 'http://' + self.address + '/rest/savepoints/modportsavepoint?'
         if override == False:
             override = False
-        elif:
-            try:
-                if override.lower() in ('false', 'f', 'n', 'no'):
-                    override = False
-            except:
-                pass
+        elif override.lower() in ('false', 'f', 'n', 'no'):
+            override = False
         else:
             override = True
         params = {'oldname': oldname, 'newname': newname, 'description': desc, 'override': override}
