@@ -2016,6 +2016,22 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Start SNMP app instance
+    def start_app_snmp(self):
+        pass
+
+    #Start app instance for bypass switch control
+    def start_app_heartbeatbypass(self):
+        pass
+
+    #Start syslog app instance
+    def start_app_syslog(self):
+        pass
+
+    #Start heartbeat app instance
+    def start_app_heartbeat(self):
+        pass
+
     #Modify an app with guided parameters
     def mod_app_guided(self):
         pass
@@ -2024,14 +2040,14 @@ class PacketmasterEX(object):
     def mod_app(self):
         pass
 
-    # Call a custom app action with guided options
+    #Call a custom app action with guided options
     def call_app_action_guided(self):
         pid = raw_input('Enter the PID of the app instance: ')
         name = raw_input('Enter the name of the custom app action: ')
         run = self.call_app_action(pid, name)
         return run
 
-    # Call a custom app action with arguments
+    #Call a custom app action with arguments
     def call_app_action(self, pid, name):
         uri = 'http://' + self.address + '/rest/apps/action?'
         try:
