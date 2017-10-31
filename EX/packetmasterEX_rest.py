@@ -1775,7 +1775,7 @@ class PacketmasterEX(object):
             override = False
         else:
             override = True
-        params = {'oldname': oldname, 'newname': newname, 'description': desc, 'override': override}
+        params = {'old_name': oldname, 'new_name': newname, 'description': desc, 'override': override}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
@@ -1786,14 +1786,29 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Modify a rule save point
+    #Modify a rule save point with guided options
     def modify_rule_savepoint_guided(self):
-        uri = 'http://' + self.address + '/rest/savepoints/modrulesavepoint?'
         oldname = raw_input("What is the name of the save point you would like to modify?")
         newname = raw_input("What would you like to rename this save point to?")
         desc = raw_input("What is the description of the save point?")
-        saverules = raw_input('Hit enter to save the current active rules to this save point; type "false" to not save them (This overwrites rule configuration of the save point): ')
-        params = {'oldname': oldname, 'newname': newname, 'description': desc, 'saverules': saverules}
+        override = raw_input('Hit enter to save the current active rules to this save point; type "false" to not save them (This overwrites rule configuration of the save point): ')
+        if override.lower() in ('false', 'f', 'n', 'no'):
+            override = False
+        else:
+            override = True
+        run = self.modify_rule_savepoint(oldname, newname, desc, override)
+        return run
+
+    #Modify a rule save point with arguments
+    def modify_rule_savepoint(self, oldname, newname, description, override=True):
+        uri = 'http://' + self.address + '/rest/savepoints/modrulesavepoint?'
+        if override == False:
+            override = False
+        elif override.lower() in ('false', 'f', 'n', 'no'):
+            override = False
+        else:
+            override = True
+        params = {'old_name': oldname, 'new_name': newname, 'description': description, 'override': saverules}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
@@ -1804,12 +1819,17 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Create a port save point from current configuration
+    #Create a port save point from current configuration using guided options
     def create_port_savepoint_guided(self):
-        uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
         name = raw_input("What would you like to name the port save point?")
         desc = raw_input("Enter a description for the port save point")
-        params = {'name': name, 'description': desc}
+        run = self.create_port_savepoint(name, desc)
+        return run
+
+    #Create a port save point from current configuration using arguments
+    def create_port_savepoint(self, name, description):
+        uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
+        params = {'name': name, 'description': description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
@@ -1833,12 +1853,17 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Create a rule save point from current configuration
+    #Create a rule save point from current configuration with guided options
     def create_rule_savepoint_guided(self):
-        uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
         name = raw_input("What would you like to name the rule save point?")
         desc = raw_input("Enter a description for the rule save point")
-        params = {'name': name, 'description': desc}
+        run = self.create_rule_savepoint(name, desc)
+        return run
+
+    #Create a rule save point from current configuration using arguments
+    def create_rule_savepoint(self, name, description):
+        uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
+        params = {'name': name, 'description': description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
@@ -1849,10 +1874,16 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Delete a port save point
+    #Delete a port save point with guided options
     def delete_port_savepoint_guided(self):
-        uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
         name = raw_input("What is the name of the port save point you would like to delete? ")
+        run = self.delete_port_savepoint(name)
+        return run
+
+    #Delete a port save point with arguments
+    def delete_port_savepoint(self, name):
+        uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
+        #Add check to see if port savepoint exists
         params = {'name': name}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
@@ -1864,10 +1895,16 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Delete a rule save point
+    #Delete a rule save point with guided options
     def delete_rule_savepoint_guided(self):
-        uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
         name = raw_input("What is the name of the rule save point you would like to delete? ")
+        run = self.delete_rule_savepoint(name)
+        return run
+
+    #Delete a rule save point with arguments
+    def delete_rule_savepoint(self, name):
+        uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
+        #Add check to see if rule savepoint exists
         params = {'name': name}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
