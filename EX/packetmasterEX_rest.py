@@ -1948,7 +1948,32 @@ class PacketmasterEX(object):
             dst_ip = raw_input("Destination IP of outgoing ARP response: ")
             run = self.start_app_arpresponder(out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
         elif app == 3:
-            name = 'SNMP'
+            interval = raw_input("Enter the check interval in milliseconds [5000]: ")
+            if interval == '':
+                interval = '5000'
+            snmp_port = raw_input("Enter the SNMP port [161]: ")
+            if snmp_port == '':
+                snmp_port = '161'
+            community = raw_input("Enter the SNMP community [public]: ")
+            if community == '':
+                community = 'public'
+            trap_enable = raw_input("Enter SNMP traps?  Enter 'true' to enable or 'false' to keep disabled [true]: ")
+            if trap_enable.lower() in ('false', 'f', 'n', 'no'):
+                trap_enable = False
+            else:
+                trap_enable = True
+            if trap_enable:
+                trap1 = raw_input('Enter IP address of SNMP trap: ')
+                trap1_port = raw_input('Enter port number for SNMP trap [162]: ')
+                if trap1_port == '':
+                    trap1_port = '162'
+                trap2 = raw_input('Enter IP address for additional SNMP trap or leave blank for none: ')
+                trap2_port = raw_input('Enter port number for additional SNMP trap [162]: ')
+                if trap2_port == '':
+                    trap2_port = '162'
+                run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable, trap1, trap1_port, trap2, trap2_port)
+            else:
+                run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable)
         elif app == 4:
             name = 'HeartbeatBypass'
         elif app == 5:
@@ -2017,8 +2042,68 @@ class PacketmasterEX(object):
             raise e
 
     #Start SNMP app instance
-    def start_app_snmp(self):
-        pass
+    def start_app_snmp(self, interval='5000', snmp_port='161', community='public', user_description='',trap_enable=True, trap1='1.1.1.1', trap1_port='162', trap2='', trap2_port='162'):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not valid input for Check Interval; canceling SNMP."
+        try:
+            input_check = int(snmp_port)
+        except:
+            return "That is not valid input for SNMP Port; canceling SNMP."
+        if trap_enable == True or type(trap_enable) is str and trap_enable.lower() in ('true', 't', 'yes', 'y'):
+            trap_enable = True
+            try:
+                ip1 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap1)
+                trap1 = ip1[0]
+            except:
+                return "That is not a valid IP address for Trap 1; canceling SNMP."
+            try:
+                input_check = int(trap1_port)
+            except:
+                return "That is not valid input for Trap Port 1; canceling SNMP."
+            if trap2 != '':
+                try:
+                    ip2 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap2)
+                    trap2 = ip2[0]
+                except:
+                    return "That is not a valid IP address for Trap 2; canceling SNMP."
+            try:
+                input_check = int(trap2_port)
+            except:
+                return "That is not valid input for Trap Port 2; canceling SNMP."
+            params = {'name': 'SNMP',
+                      'description': 'Runs an SNMP Server.  The server uses [url=',
+                      'interval': interval,
+                      'snmpCommunity': community,
+                      'snmpPort': snmp_port,
+                      'trapEnabled': trap_enable,
+                      'trapPort': trap1_port,
+                      'trapPort2': trap2_port,
+                      'trapReceiver': trap1,
+                      'trapReceiver2': trap2,
+                      'userDescription': user_description}
+        elif trap_enable == False or trap_enable.lower() in ('fasle', 'f', 'no', 'n'):
+            trap_enable = False
+            params = {'name': 'SNMP',
+                      'description': 'Runs an SNMP Server.  The server uses [url=',
+                      'interval': interval,
+                      'snmpCommunity': community,
+                      'snmpPort': snmp_port,
+                      'trapEnabled': trap_enable,
+                      'userDescription': user_description}
+        else:
+            return "That is not a valid input for Enable Trap; canceling SNMP."
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Start app instance for bypass switch control
     def start_app_heartbeatbypass(self):
