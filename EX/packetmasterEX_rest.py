@@ -1975,7 +1975,64 @@ class PacketmasterEX(object):
             else:
                 run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable)
         elif app == 4:
-            name = 'HeartbeatBypass'
+            conn_type = raw_input('''Control Bypass Switch using:
+                                    1 - IP Address
+                                    2 - RS232 Console Cable
+                                    Enter selection [1]: ''')
+            if conn_type in ('', '1'):
+                conn_type = 'IP'
+                bypass_ip = raw_input("IP address of bypass ")
+            elif int(conn_type) == 2:
+                conn_type = 'RS232'
+            else:
+                return "That is not a valid input for Connection Type; canceling HeartbeatBypass."
+            bypass_port1 = raw_input("Port number of first port connected to the Bypass Switch: ")
+            bypass_port2 = raw_input("Port number of the second port connected to the Bypass Switch: ")
+            hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
+            hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
+            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            if interval == '':
+                interval = '2000'
+            proto = raw_input('''Protocol to use for heartbeat packets:
+                                 1 - UDP
+                                 2 - ICMP
+                                 Enter selection [1]: ''')
+            if proto in ('', '1'):
+                proto = 'UDP'
+                src_port = raw_input("Enter source port for UDP heartbeat packets [5555]: ")
+                if src_port == '':
+                    src_port = '5555'
+                dst_port = raw_input("Enter destination port for UDP heartbeat packets [5556]: ")
+                if dst_port == '':
+                    dst_port = '5556'
+            elif int(proto) == 2:
+                proto = 'ICMP'
+            else:
+                return "That is not a valid input for Protocol; canceling HeartbeatBypass."
+            src_mac = raw_input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+            if src_mac == '':
+                src_mac = '00:00:00:00:00:01'
+            dst_mac = raw_input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+            if dst_mac == '':
+                dst_mac = '00:00:00:00:00:02'
+            src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+            if src_ip == '':
+                src_ip = '0.0.0.1'
+            dst_ip = raw_input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+            if dst_ip == '':
+                dst_ip = '0.0.0.2'
+            if conn_type == 'IP' and proto == 'UDP':
+                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
+                return run
+            elif conn_type == 'IP' and proto == 'ICMP':
+                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
+                return run
+            elif conn_type == 'RS232' and proto == 'UDP':
+                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                return run
+            elif conn_type == 'RS232' and proto == 'ICMP':
+                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                return run
         elif app == 5:
             name = 'Syslog'
         elif app == 6:
@@ -2106,8 +2163,89 @@ class PacketmasterEX(object):
             raise e
 
     #Start app instance for bypass switch control
-    def start_app_heartbeatbypass(self):
-        pass
+    def start_app_heartbeatbypass(self, bypass_port1, bypass_port2, hb_in, hb_out, conn_type='ip', interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556', bypass_ip='1.1.1.1'):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(bypass_port1)
+        except:
+            return "That is not a valid port number for Bypass Port 1; canceling HeartbeatBypass."
+        try:
+            input_check = int(bypass_port2)
+        except:
+            return "That is not a valid port number for Bypass Port 2; canceling HeartbeatBypass."
+        try:
+            input_check = int(hb_in)
+        except:
+            return "That is not a valid port number for Heartbeat In Port; canceling HeartbeatBypass."
+        try:
+            input_check = int(hb_out)
+        except:
+            return "That is not a valid port number for Heartbeat Out Port; canceling HeartbeatBypass."
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not a valid input for Check Interval; canceling HeartbeatBypass."
+        if proto.upper() in ('UDP', 'ICMP'):
+            proto = proto.upper()
+        else:
+            return "That is not a valid input for Protocol; must be UDP or ICMP.  Canceling HeartbeatBypass."
+        #MAC address regex check
+        try:
+            src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
+            src_ip = src_ip_check[0]
+        except:
+            return "That is not a valid input for Source IP; canceling HeartbeatBypass."
+        try:
+            dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
+            dst_ip = dst_ip_check[0]
+        except:
+            return "That is not a valid input for Destiantion IP; canceling HeartbeatBypass."
+        params = {'bypassPort1': bypass_port1,
+                  'bypassPort2': bypass_port2,
+                  'connectionType': conn_type,
+                  'description': 'This app is used to control a Cubro Bypass Switch device.',
+                  'inport': hb_in,
+                  'interval': interval,
+                  'ipDst': dst_ip,
+                  'ipSrc': src_ip,
+                  'macDst': dst_mac,
+                  'macSrc': src_mac,
+                  'name': 'HeartbeatBypass',
+                  'outport': hb_out,
+                  'protocol': proto,
+                  'userDescription': user_description}
+        if conn_type.upper() in ('IP', 'RS232'):
+            params['connectionType'] = conn_type.upper()
+            if conn_type == 'RS232' and self.hardware_generation =='4':
+                return "Controlling a Bypass Switch with RS232 is not supported on Gen 4 hardware; please use IP instead."
+            if conn_type == 'IP':
+                try:
+                    ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
+                    params['bypassIP'] = ip_check[0]
+                except:
+                    return "That is not a valid input for Bypass Switch IP; canceling HeartbeatBypass."
+        else:
+            return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling HeartbeatBypass."
+        if proto == 'UDP':
+            try:
+                input_check = int(src_port)
+            except:
+                return "That is not a valid input for Source Port; canceling HeartbeatBypass."
+            params['portSrc'] = src_port
+            try:
+                input_check = int(dst_port)
+            except:
+                return "That is not a valid input for Destination Port; canceling HeartbeatBypass."
+            params['portDst'] = dst_port
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Start syslog app instance
     def start_app_syslog(self):
