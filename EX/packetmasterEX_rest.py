@@ -2033,10 +2033,59 @@ class PacketmasterEX(object):
             elif conn_type == 'RS232' and proto == 'ICMP':
                 run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
                 return run
+            else:
+                return "Something went wrong."
         elif app == 5:
-            name = 'Syslog'
+            server_ip = raw_input("IP address of the syslog server: ")
+            port = raw_input("Server port [514]: ")
+            if port == '':
+                port = '514'
+            run = self.start_app_syslog(server_ip, port, description)
+            return run
         elif app == 6:
-            name = 'Heartbeat'
+            hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
+            act_comm = raw_input("Command to run when heartbeat packets are detected: ")
+            hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
+            deact_comm = raw_input("Command to run when heartbeat packets are not detected: ")
+            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            if interval == '':
+                interval = '2000'
+            proto = raw_input('''Protocol to use for heartbeat packets:
+                                 1 - UDP
+                                 2 - ICMP
+                                 Enter selection [1]: ''')
+            if proto in ('', '1'):
+                proto = 'UDP'
+                src_port = raw_input("Enter source port for UDP heartbeat packets [5555]: ")
+                if src_port == '':
+                    src_port = '5555'
+                dst_port = raw_input("Enter destination port for UDP heartbeat packets [5556]: ")
+                if dst_port == '':
+                    dst_port = '5556'
+            elif int(proto) == 2:
+                proto = 'ICMP'
+            else:
+                return "That is not a valid input for Protocol; canceling Heartbeat."
+            src_mac = raw_input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+            if src_mac == '':
+                src_mac = '00:00:00:00:00:01'
+            dst_mac = raw_input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+            if dst_mac == '':
+                dst_mac = '00:00:00:00:00:02'
+            src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+            if src_ip == '':
+                src_ip = '0.0.0.1'
+            dst_ip = raw_input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+            if dst_ip == '':
+                dst_ip = '0.0.0.2'
+            if proto == 'UDP':
+                run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                return run
+            elif proto == 'ICMP':
+                run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                return run
+            else:
+                return "Something went wrong."
         else:
             return "That is not a valid input for App selection; canceling Start App."
         return run
@@ -2199,7 +2248,7 @@ class PacketmasterEX(object):
             dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
             dst_ip = dst_ip_check[0]
         except:
-            return "That is not a valid input for Destiantion IP; canceling HeartbeatBypass."
+            return "That is not a valid input for Destination IP; canceling HeartbeatBypass."
         params = {'bypassPort1': bypass_port1,
                   'bypassPort2': bypass_port2,
                   'connectionType': conn_type,
@@ -2248,12 +2297,94 @@ class PacketmasterEX(object):
             raise e
 
     #Start syslog app instance
-    def start_app_syslog(self):
-        pass
+    def start_app_syslog(self, ip, port='514', user_description=''):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', ip)
+            server = ip_check[0]
+        except:
+            return "That is not a valid server IP address; canceling Syslog."
+        try:
+            input_check = int(port)
+        except:
+            return "That is not a valid input for port number; canceling syslog."
+        params = {'description': 'Logs syslog data to a remote server',
+                  'name': 'Syslog',
+                  'port': port,
+                  'server': server,
+                  'userDescription': user_description}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Start heartbeat app instance
-    def start_app_heartbeat(self):
-        pass
+    def start_app_heartbeat(self, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(hb_in)
+        except:
+            return "That is not a valid port number for Heartbeat In Port; canceling Heartbeat."
+        try:
+            input_check = int(hb_out)
+        except:
+            return "That is not a valid port number for Heartbeat Out Port; canceling Heartbeat."
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not a valid input for Check Interval; canceling Heartbeat."
+        if proto.upper() in ('UDP', 'ICMP'):
+            proto = proto.upper()
+        else:
+            return "That is not a valid input for Protocol; must be UDP or ICMP.  Canceling Heartbeat."
+        #MAC address regex check
+        try:
+            src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
+            src_ip = src_ip_check[0]
+        except:
+            return "That is not a valid input for Source IP; canceling Heartbeat."
+        try:
+            dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
+            dst_ip = dst_ip_check[0]
+        except:
+            return "That is not a valid input for Destination IP; canceling Heartbeat."
+        try:
+            input_check = int(src_port)
+        except:
+            return "That is not a valid input for Source Port; canceling Heartbeat."
+        try:
+            input_check = int(dst_port)
+        except:
+            return "That is not a valid input for Destination Port; canceling Heartbeat."
+        params = {'activateCommand': act_comm,
+                  'deactivateCommand': deact_comm,
+                  'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
+                  'inport': hb_in,
+                  'interval': interval,
+                  'ipDst': dst_ip,
+                  'ipSrc': src_ip,
+                  'macDst': dst_mac,
+                  'macSrc': src_mac,
+                  'name': 'Heartbeat',
+                  'outport': hb_out,
+                  'protocol': proto,
+                  'portSrc': src_port,
+                  'portDst': dst_port,
+                  'userDescription': user_description}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Modify an app with guided parameters
     def mod_app_guided(self):
