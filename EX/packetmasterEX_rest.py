@@ -1981,7 +1981,7 @@ class PacketmasterEX(object):
                                     Enter selection [1]: ''')
             if conn_type in ('', '1'):
                 conn_type = 'IP'
-                bypass_ip = raw_input("IP address of bypass ")
+                bypass_ip = raw_input("IP address of Bypass Switch: ")
             elif int(conn_type) == 2:
                 conn_type = 'RS232'
             else:
@@ -2023,16 +2023,12 @@ class PacketmasterEX(object):
                 dst_ip = '0.0.0.2'
             if conn_type == 'IP' and proto == 'UDP':
                 run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
-                return run
             elif conn_type == 'IP' and proto == 'ICMP':
                 run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
-                return run
             elif conn_type == 'RS232' and proto == 'UDP':
                 run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
-                return run
             elif conn_type == 'RS232' and proto == 'ICMP':
                 run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
-                return run
             else:
                 return "Something went wrong."
         elif app == 5:
@@ -2041,7 +2037,6 @@ class PacketmasterEX(object):
             if port == '':
                 port = '514'
             run = self.start_app_syslog(server_ip, port, description)
-            return run
         elif app == 6:
             hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
             act_comm = raw_input("Command to run when heartbeat packets are detected: ")
@@ -2080,10 +2075,8 @@ class PacketmasterEX(object):
                 dst_ip = '0.0.0.2'
             if proto == 'UDP':
                 run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
-                return run
             elif proto == 'ICMP':
                 run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
-                return run
             else:
                 return "Something went wrong."
         else:
@@ -2190,7 +2183,7 @@ class PacketmasterEX(object):
                       'trapReceiver': trap1,
                       'trapReceiver2': trap2,
                       'userDescription': user_description}
-        elif trap_enable == False or trap_enable.lower() in ('fasle', 'f', 'no', 'n'):
+        elif trap_enable == False or trap_enable.lower() in ('false', 'f', 'no', 'n'):
             trap_enable = False
             params = {'name': 'SNMP',
                       'description': 'Runs an SNMP Server.  The server uses [url=',
@@ -2307,7 +2300,7 @@ class PacketmasterEX(object):
         try:
             input_check = int(port)
         except:
-            return "That is not a valid input for port number; canceling syslog."
+            return "That is not a valid input for port number; canceling Syslog."
         params = {'description': 'Logs syslog data to a remote server',
                   'name': 'Syslog',
                   'port': port,
@@ -2388,11 +2381,500 @@ class PacketmasterEX(object):
 
     #Modify an app with guided parameters
     def mod_app_guided(self):
-        pass
+        pid = raw_input("What is the PID of the app instance: ")
+        try:
+            app = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling modify app."
+        active = self.apps_active()
+        active = json.loads(active)
+        for app in active:
+            if pid == app:
+                instance = active[pid]['name']
+                break
+            else:
+                instance = None
+        if not instance:
+            return "That PID doesn't exist; use Start App to start an app instance."
+        description = raw_input("New description for the modified App instance: ")
+        if instance == 'NTP':
+            server1 = raw_input("Enter NTP target IP or Host Name: ")
+            server2 = raw_input("Enter NTP backup IP or Host Name: ")
+            run = self.mod_app_ntp(pid, server1, server2, description)
+        elif instance == 'ArpResponder':
+            interval = raw_input("Enter the check interval in milliseconds [5000]: ")
+            if interval == '':
+                interval = '5000'
+            in_port = raw_input("Physical source port of incoming ARP request (optional): ")
+            out_port = raw_input("Physical port for sending ARP response: ")
+            match_mac = raw_input("Enter source MAC address of incoming ARP request (optional): ")
+            src_mac = raw_input("Source MAC address of outgoing ARP response: ")
+            dst_mac = raw_input("Destination MAC address of outgoing ARP response: ")
+            src_ip = raw_input("Source IP address of outgoing ARP response: ")
+            dst_ip = raw_input("Destination IP of outgoing ARP response: ")
+            run = self.mod_app_arpresponder(pid, out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
+        elif instance == 'SNMP':
+            interval = raw_input("Enter the check interval in milliseconds [5000]: ")
+            if interval == '':
+                interval = '5000'
+            snmp_port = raw_input("Enter the SNMP port [161]: ")
+            if snmp_port == '':
+                snmp_port = '161'
+            community = raw_input("Enter the SNMP community [public]: ")
+            if community == '':
+                community = 'public'
+            trap_enable = raw_input("Enter SNMP traps?  Enter 'true' to enable or 'false' to keep disabled [true]: ")
+            if trap_enable.lower() in ('false', 'f', 'n', 'no'):
+                trap_enable = False
+            else:
+                trap_enable = True
+            if trap_enable:
+                trap1 = raw_input('Enter IP address of SNMP trap: ')
+                trap1_port = raw_input('Enter port number for SNMP trap [162]: ')
+                if trap1_port == '':
+                    trap1_port = '162'
+                trap2 = raw_input('Enter IP address for additional SNMP trap or leave blank for none: ')
+                trap2_port = raw_input('Enter port number for additional SNMP trap [162]: ')
+                if trap2_port == '':
+                    trap2_port = '162'
+                run = self.mod_app_snmp(pid, interval, snmp_port, community, description, trap_enable, trap1, trap1_port, trap2, trap2_port)
+            else:
+                run = self.mod_app_snmp(pid, interval, snmp_port, community, description, trap_enable)
+        elif instance == 'HeartbeatBypass':
+            conn_type = raw_input('''Control Bypass Switch using:
+                                    1 - IP Address
+                                    2 - RS232 Console Cable
+                                    Enter selection [1]: ''')
+            if conn_type in ('', '1'):
+                conn_type = 'IP'
+                bypass_ip = raw_input("IP address of Bypass Switch: ")
+            elif int(conn_type) == 2:
+                conn_type = 'RS232'
+            else:
+                return "That is not a valid input for Connection Type; canceling Modify HeartbeatBypass."
+            bypass_port1 = raw_input("Port number of first port connected to the Bypass Switch: ")
+            bypass_port2 = raw_input("Port number of the second port connected to the Bypass Switch: ")
+            hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
+            hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
+            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            if interval == '':
+                interval = '2000'
+            proto = raw_input('''Protocol to use for heartbeat packets:
+                                 1 - UDP
+                                 2 - ICMP
+                                 Enter selection [1]: ''')
+            if proto in ('', '1'):
+                proto = 'UDP'
+                src_port = raw_input("Enter source port for UDP heartbeat packets [5555]: ")
+                if src_port == '':
+                    src_port = '5555'
+                dst_port = raw_input("Enter destination port for UDP heartbeat packets [5556]: ")
+                if dst_port == '':
+                    dst_port = '5556'
+            elif int(proto) == 2:
+                proto = 'ICMP'
+            else:
+                return "That is not a valid input for Protocol; canceling modify HeartbeatBypass."
+            src_mac = raw_input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+            if src_mac == '':
+                src_mac = '00:00:00:00:00:01'
+            dst_mac = raw_input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+            if dst_mac == '':
+                dst_mac = '00:00:00:00:00:02'
+            src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+            if src_ip == '':
+                src_ip = '0.0.0.1'
+            dst_ip = raw_input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+            if dst_ip == '':
+                dst_ip = '0.0.0.2'
+            if conn_type == 'IP' and proto == 'UDP':
+                run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
+            elif conn_type == 'IP' and proto == 'ICMP':
+                run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
+            elif conn_type == 'RS232' and proto == 'UDP':
+                run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+            elif conn_type == 'RS232' and proto == 'ICMP':
+                run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+            else:
+                return "Something went wrong."
+        elif instance == 'Syslog':
+            server_ip = raw_input("IP address of the syslog server: ")
+            port = raw_input("Server port [514]: ")
+            if port == '':
+                port = '514'
+            run = self.mod_app_syslog(pid, server_ip, port, description)
+        elif instance == 'Heartbeat':
+            hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
+            act_comm = raw_input("Command to run when heartbeat packets are detected: ")
+            hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
+            deact_comm = raw_input("Command to run when heartbeat packets are not detected: ")
+            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            if interval == '':
+                interval = '2000'
+            proto = raw_input('''Protocol to use for heartbeat packets:
+                                 1 - UDP
+                                 2 - ICMP
+                                 Enter selection [1]: ''')
+            if proto in ('', '1'):
+                proto = 'UDP'
+                src_port = raw_input("Enter source port for UDP heartbeat packets [5555]: ")
+                if src_port == '':
+                    src_port = '5555'
+                dst_port = raw_input("Enter destination port for UDP heartbeat packets [5556]: ")
+                if dst_port == '':
+                    dst_port = '5556'
+            elif int(proto) == 2:
+                proto = 'ICMP'
+            else:
+                return "That is not a valid input for Protocol; canceling Modify Heartbeat."
+            src_mac = raw_input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+            if src_mac == '':
+                src_mac = '00:00:00:00:00:01'
+            dst_mac = raw_input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+            if dst_mac == '':
+                dst_mac = '00:00:00:00:00:02'
+            src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+            if src_ip == '':
+                src_ip = '0.0.0.1'
+            dst_ip = raw_input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+            if dst_ip == '':
+                dst_ip = '0.0.0.2'
+            if proto == 'UDP':
+                run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+            elif proto == 'ICMP':
+                run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+            else:
+                return "Something went wrong."
+        else:
+            return "That is not a valid input for PID; canceling Modify App."
+        return run
 
-    #Modify an app
-    def mod_app(self):
-        pass
+    #Modify NTP App
+    def mod_app_ntp(self, pid, server1, server2=None, user_description=''):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Modify NTP."
+        params = {'name': 'NTP',
+                  'description': 'Syncs time with remote NTP servers.',
+                  'pid': pid,
+                  'server1': server1,
+                  'server2': server2,
+                  'userDescription': user_description}
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Modify ArpResponder App
+    def mod_app_arpresponder(self, pid, outport, src_mac, dst_mac, src_ip, dst_ip, interval='5000', inport=None, match_srcmac=None, user_description=''):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Modify ArpResponder."
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not an valid input for interval (number in milliseconds); canceling Modify ArpResponder."
+        try:
+            input_check = int(outport)
+        except:
+            return "That is not an valid input for output port; canceling Modify ArpResponder."
+        params = {'name': 'ArpResponder',
+                  'description': 'Responds to an arbotrary packet with an ARP response',
+                  'pid': pid,
+                  'interval': interval,
+                  'outPort': outport,
+                  'macSrc': src_mac,
+                  'macDst': dst_mac,
+                  'ipSrc': src_ip,
+                  'ipDst': dst_ip}
+        if inport:
+            try:
+                input_check = int(inport)
+            except:
+                return "That is not a valid input for input port; canceling ArpResponder."
+            params['inPort'] = inport
+        if match_srcmac:
+            params['matchMacSrc'] = match_srcmac
+        if user_description:
+            params['userDescription'] = user_description
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Modify SNMP app instance
+    def mod_app_snmp(self, pid, interval='5000', snmp_port='161', community='public', user_description='',trap_enable=True, trap1='1.1.1.1', trap1_port='162', trap2='', trap2_port='162'):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Modify SNMP."
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not valid input for Check Interval; canceling Modify SNMP."
+        try:
+            input_check = int(snmp_port)
+        except:
+            return "That is not valid input for SNMP Port; canceling Modify SNMP."
+        if trap_enable == True or type(trap_enable) is str and trap_enable.lower() in ('true', 't', 'yes', 'y'):
+            trap_enable = True
+            try:
+                ip1 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap1)
+                trap1 = ip1[0]
+            except:
+                return "That is not a valid IP address for Trap 1; canceling Modify SNMP."
+            try:
+                input_check = int(trap1_port)
+            except:
+                return "That is not valid input for Trap Port 1; canceling Modify SNMP."
+            if trap2 != '':
+                try:
+                    ip2 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap2)
+                    trap2 = ip2[0]
+                except:
+                    return "That is not a valid IP address for Trap 2; canceling Modify SNMP."
+            try:
+                input_check = int(trap2_port)
+            except:
+                return "That is not valid input for Trap Port 2; canceling Modify SNMP."
+            params = {'name': 'SNMP',
+                      'description': 'Runs an SNMP Server.  The server uses [url=',
+                      'pid': pid,
+                      'interval': interval,
+                      'snmpCommunity': community,
+                      'snmpPort': snmp_port,
+                      'trapEnabled': trap_enable,
+                      'trapPort': trap1_port,
+                      'trapPort2': trap2_port,
+                      'trapReceiver': trap1,
+                      'trapReceiver2': trap2,
+                      'userDescription': user_description}
+        elif trap_enable == False or trap_enable.lower() in ('false', 'f', 'no', 'n'):
+            trap_enable = False
+            params = {'name': 'SNMP',
+                      'description': 'Runs an SNMP Server.  The server uses [url=',
+                      'pid': pid,
+                      'interval': interval,
+                      'snmpCommunity': community,
+                      'snmpPort': snmp_port,
+                      'trapEnabled': trap_enable,
+                      'userDescription': user_description}
+        else:
+            return "That is not a valid input for Enable Trap; canceling SNMP."
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Modify app instance for bypass switch control
+    def mod_app_heartbeatbypass(self, pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type='ip', interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556', bypass_ip='1.1.1.1'):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Modify HeartbeatBypass."
+        try:
+            input_check = int(bypass_port1)
+        except:
+            return "That is not a valid port number for Bypass Port 1; canceling Modify HeartbeatBypass."
+        try:
+            input_check = int(bypass_port2)
+        except:
+            return "That is not a valid port number for Bypass Port 2; canceling Modify HeartbeatBypass."
+        try:
+            input_check = int(hb_in)
+        except:
+            return "That is not a valid port number for Heartbeat In Port; canceling Modify HeartbeatBypass."
+        try:
+            input_check = int(hb_out)
+        except:
+            return "That is not a valid port number for Heartbeat Out Port; canceling Modify HeartbeatBypass."
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not a valid input for Check Interval; canceling Modify HeartbeatBypass."
+        if proto.upper() in ('UDP', 'ICMP'):
+            proto = proto.upper()
+        else:
+            return "That is not a valid input for Protocol; must be UDP or ICMP.  Canceling Modify HeartbeatBypass."
+        #MAC address regex check
+        try:
+            src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
+            src_ip = src_ip_check[0]
+        except:
+            return "That is not a valid input for Source IP; canceling Modify HeartbeatBypass."
+        try:
+            dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
+            dst_ip = dst_ip_check[0]
+        except:
+            return "That is not a valid input for Destination IP; canceling Modify HeartbeatBypass."
+        params = {'bypassPort1': bypass_port1,
+                  'bypassPort2': bypass_port2,
+                  'connectionType': conn_type,
+                  'description': 'This app is used to control a Cubro Bypass Switch device.',
+                  'inport': hb_in,
+                  'interval': interval,
+                  'ipDst': dst_ip,
+                  'ipSrc': src_ip,
+                  'macDst': dst_mac,
+                  'macSrc': src_mac,
+                  'name': 'HeartbeatBypass',
+                  'outport': hb_out,
+                  'pid': pid,
+                  'protocol': proto,
+                  'userDescription': user_description}
+        if conn_type.upper() in ('IP', 'RS232'):
+            params['connectionType'] = conn_type.upper()
+            if conn_type == 'RS232' and self.hardware_generation =='4':
+                return "Controlling a Bypass Switch with RS232 is not supported on Gen 4 hardware; please use IP instead."
+            if conn_type == 'IP':
+                try:
+                    ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
+                    params['bypassIP'] = ip_check[0]
+                except:
+                    return "That is not a valid input for Bypass Switch IP; canceling Modify HeartbeatBypass."
+        else:
+            return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling Modify HeartbeatBypass."
+        if proto == 'UDP':
+            try:
+                input_check = int(src_port)
+            except:
+                return "That is not a valid input for Source Port; canceling Modify HeartbeatBypass."
+            params['portSrc'] = src_port
+            try:
+                input_check = int(dst_port)
+            except:
+                return "That is not a valid input for Destination Port; canceling Modify HeartbeatBypass."
+            params['portDst'] = dst_port
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Modify syslog app instance
+    def mod_app_syslog(self, pid, ip, port='514', user_description=''):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Modify Syslog."
+        try:
+            ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', ip)
+            server = ip_check[0]
+        except:
+            return "That is not a valid server IP address; canceling Modify Syslog."
+        try:
+            input_check = int(port)
+        except:
+            return "That is not a valid input for port number; canceling Modify Syslog."
+        params = {'description': 'Logs syslog data to a remote server',
+                  'name': 'Syslog',
+                  'pid': pid,
+                  'port': port,
+                  'server': server,
+                  'userDescription': user_description}
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
+    #Modify heartbeat app instance
+    def mod_app_heartbeat(self, pid, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
+        uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Modify Heartbeat."
+        try:
+            input_check = int(hb_in)
+        except:
+            return "That is not a valid port number for Heartbeat In Port; canceling Modify Heartbeat."
+        try:
+            input_check = int(hb_out)
+        except:
+            return "That is not a valid port number for Heartbeat Out Port; canceling Modify Heartbeat."
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not a valid input for Check Interval; canceling Modify Heartbeat."
+        if proto.upper() in ('UDP', 'ICMP'):
+            proto = proto.upper()
+        else:
+            return "That is not a valid input for Protocol; must be UDP or ICMP.  Canceling Modify Heartbeat."
+        #MAC address regex check
+        try:
+            src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
+            src_ip = src_ip_check[0]
+        except:
+            return "That is not a valid input for Source IP; canceling Modify Heartbeat."
+        try:
+            dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
+            dst_ip = dst_ip_check[0]
+        except:
+            return "That is not a valid input for Destination IP; canceling Modify Heartbeat."
+        try:
+            input_check = int(src_port)
+        except:
+            return "That is not a valid input for Source Port; canceling Modify Heartbeat."
+        try:
+            input_check = int(dst_port)
+        except:
+            return "That is not a valid input for Destination Port; canceling Modify Heartbeat."
+        params = {'activateCommand': act_comm,
+                  'deactivateCommand': deact_comm,
+                  'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
+                  'inport': hb_in,
+                  'interval': interval,
+                  'ipDst': dst_ip,
+                  'ipSrc': src_ip,
+                  'macDst': dst_mac,
+                  'macSrc': src_mac,
+                  'name': 'Heartbeat',
+                  'outport': hb_out,
+                  'pid': pid,
+                  'protocol': proto,
+                  'portSrc': src_port,
+                  'portDst': dst_port,
+                  'userDescription': user_description}
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
 
     #Call a custom app action with guided options
     def call_app_action_guided(self):
