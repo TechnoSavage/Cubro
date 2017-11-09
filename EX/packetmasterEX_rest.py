@@ -1729,11 +1729,12 @@ class PacketmasterEX(object):
     def export_savepoint_guided(self):
         rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
         pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
-        run = self.export_savepoint(rspname, pspname)
+        filename = raw_input("Enter a file name for the savepoint: ")
+        run = self.export_savepoint(rspname, pspname, filename)
         return run
 
     #Export a save point from the Packetmaster.  This still needs worked out; Packetmaster returns empty save points
-    def export_savepoint(self, rspname, pspname):
+    def export_savepoint(self, rspname, pspname, filename):
         uri = 'http://' + self.address + '/rest/savepoints/export?'
         #Add checks to see if names exist
         params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
@@ -1742,7 +1743,6 @@ class PacketmasterEX(object):
             # print response.status_code
             r = response.content
             data = json.loads(r)
-            filename = raw_input("Enter a file name for the savepoint: ")
             try:
                 with open(filename, "w") as f:
                     f.write(r)
