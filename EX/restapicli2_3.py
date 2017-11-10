@@ -26,9 +26,13 @@ def set_ip():
 if __name__ == '__main__':
     #Welcome statement
     print '''
-        Welcome to my interactive Cubro Packetmaster REST API demo.
-        All Packetmaster interaction in this program is accomplished via
-        the Cubro REST API. \n'''
+                ________  ______  ____  ____     _____  ______ _____ _______   ____   ____   __
+               / ____/ / / / __ )/ __ \/ __ \   / __  \/ ____//  __//_  ___/  / __ \ / __ \ / /
+              / /   / / / / /_/ / /_/ / / / /  / /_/  / __/  / /__   / /     / /_/ // /_/ // /
+             / /___/ /_/ / /_/ / _, _/ /_/ /  / _,  _/ /___  \__  \ / /     / __  //  ___// /
+             \____/\____/_____/_/ |_|\____/  /_/ \_\/_____//______//_/     /_/ /_//_/    /_/
+           ###################################################################################
+        \n'''
 
     #IP address to access REST data of device
     address = set_ip()
@@ -62,7 +66,7 @@ if __name__ == '__main__':
             packetmaster = PacketmasterEX(address, username, password)
             topmenu()
         elif option == 3:
-            configmenu()
+            manage()
         elif option == 4:
             print 'Goodbye'
             exit()
@@ -75,20 +79,30 @@ if __name__ == '__main__':
         choice = raw_input('''
                   1 - Hardware Configuration Menu
                   2 - Rule and Port Group Configuration Menu
-                  3 - App Menu
-                  4 - Savepoint Menu
+                  3 - App Configuration Menu
+                  4 - Savepoint Configuration Menu
                   5 - User Management Menu
-                 13 - List Apps
-                 14 - List Running Apps
-                 15 - Print Save Points
-                 26 - Users
-                 27 - UAC
-                 28 - RADIUS settings
-                 31 - Back \n
+                  6 - Back \n
                  Enter the number of the selection to check: ''')
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
+            manage()
+        if choice == 1:
+            hardwareconfig()
+        elif choice == 2:
+            ruleconfig()
+        elif choice == 3:
+            appconfig()
+        elif choice == 4:
+            saveconfig()
+        elif choice == 5:
+            userconfig()
+        elif choice == 6:
+            topmenu()
+        else:
+            print "That is not a valid selection."
             manage()
 
     def hardwareconfig():
@@ -184,7 +198,25 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except:
-            telnet()
+            print "That is not a valid selection."
+            web()
+        if choice == 1:
+            run = packetmaster.web_log()
+            print run
+            web()
+        elif choice == 2:
+            run = packetmaster.del_web_log()
+            print run
+            web()
+        elif choice == 3:
+            run = packetmaster.restart_webserver()
+            print run
+            web()
+        elif choice == 4:
+            hardwareconfig()
+        else:
+            print "That is not a valid selection."
+            web()
 
     def telnet():
         print 'Telnet service menu for device at', address,'acting as User', username
@@ -196,6 +228,20 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
+            telnet()
+        if choice == 1:
+            run = packetmaster.get_telnet()
+            print run
+            telnet()
+        elif choice == 2:
+            run = packetmaster.set_telnet_guided()
+            print run
+            telnet()
+        elif choice == 3:
+            hardwareconfig()
+        else:
+            print "That is not a valid selection."
             telnet()
 
     def ruleconfig():
@@ -222,4 +268,55 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
             ruleconfig()
+
+    def appconfig():
+        print 'App configuration menu for device at', address,'acting as User', username
+        choice = raw_input('''
+                 1 -
+                 2 -
+                 3 -
+                 4 -
+                 5 -
+                17 - Back \n
+                 Enter selection number: ''')
+        try:
+            choice = int(choice)
+        except:
+            print "That is not a valid selection."
+            appconfig()
+
+    def saveconfig():
+        print 'Save Point configuration menu for device at', address,'acting as User', username
+        choice = raw_input('''
+                 1 -
+                 2 -
+                 3 -
+                 4 -
+                 5 -
+                17 - Back \n
+                 Enter selection number: ''')
+        try:
+            choice = int(choice)
+        except:
+            print "That is not a valid selection."
+            saveconfig()
+
+    def userconfig():
+        print 'User configuration menu for device at', address,'acting as User', username
+        choice = raw_input('''
+                 1 -
+                 2 -
+                 3 -
+                 4 -
+                 5 -
+                17 - Back \n
+                 Enter selection number: ''')
+        try:
+            choice = int(choice)
+        except:
+            print "That is not a valid selection."
+            userconfig()
+
+topmenu()
