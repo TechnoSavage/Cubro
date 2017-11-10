@@ -131,6 +131,72 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
+            hardwareconfig()
+        if choice == 1:
+            run = packetmaster.device_model()
+            print run
+            hardwareconfig()
+        elif choice == 2:
+            run = packetmaster.serial_number()
+            print run
+            hardwareconfig()
+        elif choice == 3:
+            run = packetmaster.hardware_generation()
+            print run
+            hardwareconfig()
+        elif choice == 4:
+            run = packetmaster.firmware_version()
+            print run
+            hardwareconfig()
+        elif choice == 5:
+            run = packetmaster.env_info()
+            print run
+            hardwareconfig()
+        elif choice == 6:
+            run = packetmaster.id_led()
+            print run
+            hardwareconfig()
+        elif choice == 7:
+            run = packetmaster.set_id_led_guided()
+            print run
+            hardwareconfig()
+        elif choice == 8:
+            run = packetmaster.load_info()
+            print run
+            hardwareconfig()
+        elif choice == 9:
+            run = packetmaster.tcam()
+            print run
+            hardwareconfig()
+        elif choice == 10:
+            run = packetmaster.mem_free()
+            print run
+            hardwareconfig()
+        elif choice == 11:
+            run = packetmaster.server_revision()
+            print run
+            hardwareconfig()
+        elif choice == 12:
+            notesmenu()
+        elif choice == 13:
+            ipconfig()
+        elif choice == 14:
+            dns()
+        elif choice == 15:
+            portconfig()
+        elif choice == 16:
+            telnet()
+        elif choice == 17:
+            web()
+        elif choice == 18:
+            run = packetmaster.reboot()
+            print run
+            hardwareconfig()
+        elif choice == 19:
+            manage()
+        else:
+            print "That is not a valid selection."
             hardwareconfig()
 
     def notesmenu():
@@ -144,7 +210,25 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
             notesmenu()
+        if choice == 1:
+            run = packetmaster.device_label()
+            print run
+            notesmenu()
+        elif choice == 2:
+            run = packetmaster.set_name_guided()
+            print run
+            notesmenu()
+        elif choice == 3:
+            run = packetmaster.set_label_guided()
+            print run
+            notesmenu()
+        elif choice == 4:
+            hardwareconfig()
+        else:
+            print "That is not a valid selection."
+            notes()
 
     def ipconfig():
         print 'Device label and notes menu for device at', address,'acting as User', username
@@ -156,6 +240,20 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
+            ipconfig()
+        if choice == 1:
+            run = packetmaster.ip_config()
+            print run
+            ipconfig()
+        elif choice == 2:
+            run = packetmaster.set_ip_config_guided()
+            print run
+            ipconfig()
+        elif choice == 3:
+            hardwareconfig()
+        else:
+            print "That is not a valid selection."
             ipconfig()
 
     def dns():
@@ -168,6 +266,20 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
+            dns()
+        if choice == 1:
+            run = packetmaster.get_dns()
+            print run
+            dns()
+        elif choice == 2:
+            run = packetmaster.set_dns_guided()
+            print run
+            dns()
+        elif choice == 3:
+            hardwareconfig()
+        else:
+            print "That is not a valid selection."
             dns()
 
     def portconfig():
@@ -185,6 +297,40 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
+            portconfig()
+        if choice == 1:
+            run = packetmaster.port_config()
+            print run
+            portconfig()
+        elif choice == 2:
+            run = packetmaster.port_info()
+            print run
+            portconfig()
+        elif choice == 3:
+            run = packetmaster.port_statistics()
+            print run
+            portconfig()
+        elif choice == 4:
+            run = packetmaster.sfp_info()
+            print run
+            portconfig()
+        elif choice == 5:
+            run = packetmaster.set_port_config_guided()
+            print run
+            portconfig()
+        elif choice == 6:
+            run = packetmaster.port_on_off_guided()
+            print run
+            portconfig()
+        elif choice == 7:
+            run = packetmaster.reset_port_counters()
+            print run
+            portconfig()
+        elif choice == 8:
+            hardwareconfig()
+        else:
+            print "That is not a valid selection."
             portconfig()
 
     def web():
@@ -247,7 +393,7 @@ if __name__ == '__main__':
     def ruleconfig():
         print 'Rule and Port Group configuration menu for device at', address,'acting as User', username
         choice = raw_input('''
-                 1 - Show Rules
+                 1 - Show Rules and Rule Counters
                  2 - Add Rule
                  3 - Modify Rule
                  4 - Delete Rule
@@ -260,14 +406,88 @@ if __name__ == '__main__':
                 11 - Delete all active groups and associated rules
                 12 - Show Active Load-Balancing Hashes
                 13 - Set Load Balancing Group Hash Algorithms
-                14 - Permanence Mode
-                15 - Rule Storage Mode
-                16 - Reset Rule Counters
-                17 - Back \n
+                14 - Show Rule Permanence Mode
+                15 - Set Rule Permanence Mode
+                16 - Show Rule Storage Mode
+                17 - Set Rule Storage Mode
+                18 - Back \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
         except:
+            print "That is not a valid selection."
+            ruleconfig()
+        if choice == 1:
+            run = packetmaster.rules_active()
+            print run
+            ruleconfig()
+        elif choice == 2:
+            run = packetmaster.add_rule_guided()
+            print run
+            ruleconfig()
+        elif choice == 3:
+            run = packetmaster.mod_rule_guided()
+            print run
+            ruleconfig()
+        elif choice == 4:
+            run = packetmaster.del_rule_guided()
+            print run
+            ruleconfig()
+        elif choice == 5:
+            run = packetmaster.del_rule_all()
+            print run
+            ruleconfig()
+        elif choice == 6:
+            run = packetmaster.reset_rule_counters()
+            print run
+            ruleconfig()
+        elif choice == 7:
+            run = packetmaster.groups_active()
+            print run
+            ruleconfig()
+        elif choice == 8:
+            run = packetmaster.add_group_guided()
+            print run
+            ruleconfig()
+        elif choice == 9:
+            run = packetmaster.modify_group_guided()
+            print run
+            ruleconfig()
+        elif choice == 10:
+            run = packetmaster.delete_group_guided()
+            print run
+            ruleconfig()
+        elif choice == 11:
+            run = packetmaster.delete_groups_all()
+            print run
+            ruleconfig()
+        elif choice == 12:
+            run = packetmaster.hash_algorithms()
+            print run
+            ruleconfig()
+        elif choice == 13:
+            run = packetmaster.set_hash_algorithms_guided()
+            print run
+            ruleconfig()
+        elif choice == 14:
+            run = packetmaster.rule_permanence()
+            print run
+            ruleconfig()
+        elif choice == 15:
+            run = packetmaster.set_rule_permanence_guided()
+            print run
+            ruleconfig()
+        elif choice == 16:
+            run = packetmaster.storage_mode()
+            print run
+            ruleconfig()
+        elif choice == 17:
+            run = packetmaster.set_storage_mode_guided()
+            print run
+            ruleconfig()
+        elif choice == 18:
+            manage()
+        else:
             print "That is not a valid selection."
             ruleconfig()
 
