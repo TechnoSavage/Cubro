@@ -339,7 +339,8 @@ if __name__ == '__main__':
                  1 - Web logs
                  2 - Delete web Logs
                  3 - Restart webserver
-                 4 - Back \n
+                 4 - Enable or Disable HTTPS secure web interface
+                 5 - Back \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -359,6 +360,10 @@ if __name__ == '__main__':
             print run
             web()
         elif choice == 4:
+            run = packetmaster.set_https_guided()
+            print run
+            web()
+        elif choice == 5:
             hardwareconfig()
         else:
             print "That is not a valid selection."
@@ -494,49 +499,178 @@ if __name__ == '__main__':
     def appconfig():
         print 'App configuration menu for device at', address,'acting as User', username
         choice = raw_input('''
-                 1 -
-                 2 -
-                 3 -
-                 4 -
-                 5 -
-                17 - Back \n
+                 1 - List Apps
+                 2 - List Running Apps
+                 3 - Start an App instance
+                 4 - Modify an App instance
+                 5 - Kill an App instance
+                 6 - Call a custom App action
+                 7 - Back \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
         except:
             print "That is not a valid selection."
             appconfig()
+        if choice == 1:
+            run = packetmaster.device_apps()
+            print run
+            appconfig()
+        elif choice == 2:
+            run = packetmaster.apps_active()
+            print run
+            appconfig()
+        elif choice == 3:
+            run = packetmaster.start_app_guided()
+            print run
+            appconfig()
+        elif choice == 4:
+            run = packetmaster.mod_app_guided()
+            print run
+            appconfig()
+        elif choice == 5:
+            run = packetmaster.kill_app_guided()
+            print run
+            appconfig()
+        elif choice == 6:
+            run = packetmaster.call_app_action_guided()
+            print run
+            appconfig()
+        elif choice == 7:
+            manage()
+        else:
+            print "That is not a valid selection."
+            appconfig()
 
     def saveconfig():
         print 'Save Point configuration menu for device at', address,'acting as User', username
         choice = raw_input('''
-                 1 -
-                 2 -
-                 3 -
-                 4 -
-                 5 -
-                17 - Back \n
+                 1 - List Save Points
+                 2 - Activate a save point for ports
+                 3 - Activate a save point for rules
+                 4 - Set the rule save point to be loaded on boot
+                 5 - Export a save point
+                 6 - Modify a save point for port configuration
+                 7 - Modify a save point for rules
+                 8 - Create save point from current port configuration
+                 9 - Create a quicksave point from current configuration
+                10 - Create a save point from current rules
+                11 - Delete a port save point
+                12 - Delete a rule save point
+                13 - Back \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
         except:
             print "That is not a valid selection."
             saveconfig()
+        if choice == 1:
+            run = packetmaster.save_points()
+            print run
+            saveconfig()
+        elif choice == 2:
+            run = packetmaster.set_port_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 3:
+            run = packetmaster.set_rule_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 4:
+            run = packetmaster.set_boot_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 5:
+            run = packetmaster.export_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 6:
+            run = packetmaster.modify_port_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 7:
+            run = packetmaster.modify_rule_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 8:
+            run = packetmaster.create_port_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 9:
+            run = packetmaster.create_quick_savepoint()
+            print run
+            saveconfig()
+        elif choice == 10:
+            run = packetmaster.create_rule_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 11:
+            run = packetmaster.delete_port_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 12:
+            run = packetmaster.delete_rule_savepoint_guided()
+            print run
+            saveconfig()
+        elif choice == 13:
+            manage()
+        else:
+            print "That is not a valid selection."
+            saveconfig()
 
     def userconfig():
         print 'User configuration menu for device at', address,'acting as User', username
         choice = raw_input('''
-                 1 -
-                 2 -
-                 3 -
-                 4 -
-                 5 -
-                17 - Back \n
+                 1 - List Users
+                 2 - Add User
+                 3 - Modify User
+                 4 - Delete User
+                 5 - UAC Status
+                 6 - Enable or Disable UAC
+                 7 - Show RADIUS Settings
+                 8 - Configure RADIUS settings
+                 9 - Back \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
         except:
             print "That is not a valid selection."
             userconfig()
-
+        if choice == 1:
+            run = packetmaster.get_users()
+            print run
+            userconfig()
+        elif choice == 2:
+            run = packetmaster.add_user_guided()
+            print run
+            userconfig()
+        elif choice == 3:
+            run = packetmaster.mod_user_guided()
+            print run
+            userconfig()
+        elif choice == 4:
+            run = packetmaster.delete_user_guided()
+            print run
+            userconfig()
+        elif choice == 5:
+            run = packetmaster.user_uac()
+            print run
+            userconfig()
+        elif choice == 6:
+            run = packetmaster.set_uac_guided()
+            print run
+            userconfig()
+        elif choice == 7:
+            run = packetmaster.get_radius()
+            print run
+            userconfig()
+        elif choice == 8:
+            run = packetmaster.set_radius_guided()
+            print run
+            userconfig()
+        elif choice == 9:
+            manage()
+        else:
+            print "That is not a valid selection."
+            userconfig()
 topmenu()
