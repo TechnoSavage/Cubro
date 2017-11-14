@@ -8,28 +8,50 @@ from getpass import getpass
 #add_rule_guided requires many input checks
 #Add code to validate input for IPv6 as well as IPv4
 
-#Add code to check and handle HTTPS for URIs
 class PacketmasterEX(object):
 
     def __init__(self, address, username=None, password=None):
         self.address = address
         self.username = username
         self.password = password
-        #self.https = False
-        self.hardware_generation()
-        self.get_port_count()
-    #check whether web interface is using HTTP or HTTPS
-    #def check_https(self):
-        #try:
-            # uri = 'http://' + self.address + '/rest/device/imageversion'
-            # response = requests.get(uri, auth=(self.username, self.password))
-            # r = response.status_code
-            # if r == '200':
-                #self.https = False
+        self.https = False
+        conn_test = self.conn_test()
+        print conn_test
 
-        #except:
+    def conn_test(self):
+        try:
+            gen_test = self.hardware_generation()
+            data = json.loads(gen_test)
+            for item in data:
+                if item == 'error':
+                    print data['error']
+                    return "Connection test failed"
+                else:
+                    self.hardware = data['generation']
+                    self.get_port_count()
+                    return "Connection established"
+        except:
+            try:
+                self.https = True
+                gen_test = self.hardware_generation()
+                data = json.loads(gen_test)
+                for item in data:
+                    if item == 'error':
+                        print data['error']
+                        return "Connection test failed"
+                    else:
+                        self.hardware = data['generation']
+                        self.get_port_count()
+                        return "Connection established"
+            except:
+                print "Unable to establish connection; check if IP address is correct."
+
+
     def get_port_count(self):
-        uri = 'http://' + self.address + '/rest/ports/config?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/ports/config?'
+        else:
+            uri = 'http://' + self.address + '/rest/ports/config?'
         ports = list()
         try:
             response = requests.get(uri, auth=(self.username, self.password))
@@ -46,7 +68,10 @@ class PacketmasterEX(object):
 
     #Retrieve firmware version
     def firmware_version(self):
-        uri = 'http://' + self.address + '/rest/device/imageversion?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/imageversion?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/imageversion?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -60,7 +85,10 @@ class PacketmasterEX(object):
 
     #Retrieve IP configuration
     def ip_config(self):
-        uri = 'http://' + self.address + '/rest/device/ipconfig?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/ipconfig?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/ipconfig?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -75,7 +103,10 @@ class PacketmasterEX(object):
 
     #Retrieve Packetmaster model
     def device_model(self):
-        uri = 'http://' + self.address + '/rest/device/model?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/model?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/model?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -90,7 +121,10 @@ class PacketmasterEX(object):
 
     #Retrieve Packetmaster name
     def device_name(self):
-        uri = 'http://' + self.address + '/rest/device/name?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/name?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/name?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -104,7 +138,10 @@ class PacketmasterEX(object):
 
     #Retrieve Packetmaster Name plus Notes
     def device_label(self):
-        uri = 'http://' + self.address + '/rest/device/customident?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/customident?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/customident?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -119,13 +156,15 @@ class PacketmasterEX(object):
 
     #Retrieve hardware generation of the device
     def hardware_generation(self):
-        uri = 'http://' + self.address + '/rest/device/generation?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/generation?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/generation?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
             r = response.content
             data = json.loads(r)
-            self.hardware = data['generation']
             return json.dumps(data, indent=4)
         except ConnectionError as e:
             r = 'No Response'
@@ -133,7 +172,10 @@ class PacketmasterEX(object):
 
     #Retrieve Packetmaster serial number
     def serial_number(self):
-        uri = 'http://' + self.address + '/rest/device/serialno?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/serialno?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/serialno?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -147,7 +189,10 @@ class PacketmasterEX(object):
 
     #Retrieve current port configuration
     def port_config(self):
-        uri = 'http://' + self.address + '/rest/ports/config?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/ports/config?'
+        else:
+            uri = 'http://' + self.address + '/rest/ports/config?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -160,7 +205,10 @@ class PacketmasterEX(object):
 
     #Retrieve port information
     def port_info(self):
-        uri = 'http://' + self.address + '/rest/ports/info?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/ports/info?'
+        else:
+            uri = 'http://' + self.address + '/rest/ports/info?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -173,7 +221,10 @@ class PacketmasterEX(object):
 
     #Retrieve port counters
     def port_statistics(self):
-        uri = 'http://' + self.address + '/rest/ports/stats?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/ports/stats?'
+        else:
+            uri = 'http://' + self.address + '/rest/ports/stats?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -186,7 +237,10 @@ class PacketmasterEX(object):
 
     #Retrieve SFP information
     def sfp_info(self):
-        uri = 'http://' + self.address + '/rest/ports/sfpstatus?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/ports/sfpstatus?'
+        else:
+            uri = 'http://' + self.address + '/rest/ports/sfpstatus?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -200,7 +254,10 @@ class PacketmasterEX(object):
 
     #Retrieve active rules
     def rules_active(self):
-        uri = 'http://' + self.address + '/rest/rules/all?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/rules/all?'
+        else:
+            uri = 'http://' + self.address + '/rest/rules/all?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -213,7 +270,10 @@ class PacketmasterEX(object):
 
     #Retrieve active groups
     def groups_active(self):
-        uri = 'http://' + self.address + '/rest/groups/all?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/groups/all?'
+        else:
+            uri = 'http://' + self.address + '/rest/groups/all?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -226,7 +286,10 @@ class PacketmasterEX(object):
 
     #List all available apps
     def device_apps(self):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -239,7 +302,10 @@ class PacketmasterEX(object):
 
     #Retrieve running apps
     def apps_active(self):
-        uri = 'http://' + self.address + '/rest/apps/running?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps/running?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps/running?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -252,7 +318,10 @@ class PacketmasterEX(object):
 
     #Retrieve hash algorithm information
     def hash_algorithms(self):
-        uri = 'http://' + self.address + '/rest/device/grouphash?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/grouphash?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/grouphash?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -265,7 +334,10 @@ class PacketmasterEX(object):
 
     #Retrieve rule permanence mode
     def rule_permanence(self):
-        uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -278,7 +350,10 @@ class PacketmasterEX(object):
 
     #Retrieve rule storage mode
     def storage_mode(self):
-        uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/rulestoragemode?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -291,7 +366,10 @@ class PacketmasterEX(object):
 
     #Retrieve environment information
     def env_info(self):
-        uri = 'http://' + self.address + '/rest/device/environment?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/environment?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/environment?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -304,7 +382,10 @@ class PacketmasterEX(object):
 
     #Retrieve deice ID LED status_code
     def id_led(self):
-        uri = 'http://' + self.address + '/rest/device/idled?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/idled?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/idled?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -317,7 +398,10 @@ class PacketmasterEX(object):
 
     #Retrieve load information
     def load_info(self):
-        uri = 'http://' + self.address + '/rest/device/loadaverage?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/loadaverage?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/loadaverage?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -330,7 +414,10 @@ class PacketmasterEX(object):
 
     #Retrieve the maximum and currently used TCAM flows
     def tcam(self):
-        uri = 'http://' + self.address + '/rest/flownumbers'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/flownumbers?'
+        else:
+            uri = 'http://' + self.address + '/rest/flownumbers?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -343,7 +430,10 @@ class PacketmasterEX(object):
 
     #Retrieve memory usage
     def mem_free(self):
-        uri = 'http://' + self.address + '/rest/device/memoryusage?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/memoryusage?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/memoryusage?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -356,7 +446,10 @@ class PacketmasterEX(object):
 
     #Retrieve cch machinery server revision
     def server_revision(self):
-        uri = 'http://' + self.address + '/rest/device/serverrevision?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/serverrevision?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/serverrevision?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -369,7 +462,10 @@ class PacketmasterEX(object):
 
     #List all save points
     def save_points(self):
-        uri = 'http://' + self.address + '/rest/savepoints?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -382,7 +478,10 @@ class PacketmasterEX(object):
 
     #Retrieve Web Log
     def web_log(self):
-        uri = 'http://' + self.address + '/rest/weblog'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/weblog?'
+        else:
+            uri = 'http://' + self.address + '/rest/weblog?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -395,7 +494,10 @@ class PacketmasterEX(object):
 
     #Retrieve all users
     def get_users(self):
-        uri = 'http://' + self.address + '/rest/users?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/users?'
+        else:
+            uri = 'http://' + self.address + '/rest/users?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -408,7 +510,10 @@ class PacketmasterEX(object):
 
     #Retrieve User Authentication settings
     def user_uac(self):
-        uri = 'http://' + self.address + '/rest/users/uac?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/users/uac?'
+        else:
+            uri = 'http://' + self.address + '/rest/users/uac?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -421,7 +526,10 @@ class PacketmasterEX(object):
 
     #Retrieve RADIUS settings
     def get_radius(self):
-        uri = 'http://' + self.address + '/rest/users/radius?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/users/radius?'
+        else:
+            uri = 'http://' + self.address + '/rest/users/radius?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -434,7 +542,10 @@ class PacketmasterEX(object):
 
     #Retrieve DNS settings
     def get_dns(self):
-        uri = 'http://' + self.address + '/rest/device/nameresolution?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/nameresolution?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/nameresolution?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -447,7 +558,10 @@ class PacketmasterEX(object):
 
     #Retrieve telnet service status_code
     def get_telnet(self):
-        uri = 'http://' + self.address + '/rest/device/telnet?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/telnet?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/telnet?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -468,7 +582,10 @@ class PacketmasterEX(object):
 
     #Change the management IP configuration with arguments
     def set_ip_config(self, address, netmask, gateway):
-        uri = 'http://' + self.address + '/rest/device/ipconfig?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/ipconfig?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/ipconfig?'
         newip = address.strip()
         newmask = netmask.strip()
         newgate = gateway.strip()
@@ -491,7 +608,10 @@ class PacketmasterEX(object):
         return run
 
     def set_name(self, name):
-        uri = 'http://' + self.address + '/rest/device/name?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/name?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/name?'
         params = {'name': name}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -510,7 +630,10 @@ class PacketmasterEX(object):
         return run
 
     def set_label(self, name, notes):
-        uri = 'http://' + self.address + '/rest/device/customident?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/customident?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/customident?'
         params = {'name': name,
                   'notes': notes}
         try:
@@ -541,7 +664,10 @@ class PacketmasterEX(object):
         return run
 
     def set_port_config(self, interface, speed='auto', duplex='auto', forcetx='', check='', recalc=''):
-        uri = 'http://' + self.address + '/rest/ports/config?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/ports/config?'
+        else:
+            uri = 'http://' + self.address + '/rest/ports/config?'
         if_name = str(interface).strip()
         port_no = re.findall('[1-9][0-9/]*', if_name)
         if len(port_no) == 1:
@@ -595,7 +721,10 @@ class PacketmasterEX(object):
 
     #Activate or deactivate a port with arguments
     def port_on_off(self, if_name, shutdown):
-        uri = 'http://' + self.address + '/rest/ports/config?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/ports/config?'
+        else:
+            uri = 'http://' + self.address + '/rest/ports/config?'
         if_name = str(if_name).strip()
         port_no = re.findall('[1-9][0-9/]*', if_name)
         interface = 'eth-0-' + port_no[0]
@@ -616,7 +745,10 @@ class PacketmasterEX(object):
 
     #Reset Port Counters
     def reset_port_counters(self):
-        uri = 'http://' + self.address + '/rest/ports/counters?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/ports/counters?'
+        else:
+            uri = 'http://' + self.address + '/rest/ports/counters?'
         try:
             requests.delete(uri, auth=(self.username, self.password))
             success = 'Counters deleted successfully'
@@ -627,7 +759,10 @@ class PacketmasterEX(object):
 
     #Reset Rule Counters
     def reset_rule_counters(self):
-        uri = 'http://' + self.address + '/rest/rules/counters?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/rules/counters?'
+        else:
+            uri = 'http://' + self.address + '/rest/rules/counters?'
         try:
             requests.delete(uri, auth=(self.username, self.password))
             success = 'Counters deleted successfully'
@@ -835,7 +970,10 @@ class PacketmasterEX(object):
 
     #Add rule by providing all parameters
     def add_rule(self, params):
-        uri = 'http://' + self.address + '/rest/rules?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/rules?'
+        else:
+            uri = 'http://' + self.address + '/rest/rules?'
         if type(params) is not dict:
             return "That is not a valid format for rule; please provide a dictionary object with valid rule parameters."
         try:
@@ -1046,7 +1184,10 @@ class PacketmasterEX(object):
 
     #Modify a rule with arguments
     def mod_rule(self, params):
-        uri = 'http://' + self.address + '/rest/rules?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/rules?'
+        else:
+            uri = 'http://' + self.address + '/rest/rules?'
         if type(params) is not dict:
             return "That is not a valid format for rule; please provide a dictionary object with valid rule parameters."
         try:
@@ -1245,7 +1386,10 @@ class PacketmasterEX(object):
 
     #Delete a rule with arguments
     def del_rule(self, params):
-        uri = 'http://' + self.address + '/rest/rules?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/rules?'
+        else:
+            uri = 'http://' + self.address + '/rest/rules?'
         if type(params) is not dict:
             return "That is not a valid format for rule; please provide a dictionary object with valid rule parameters."
         try:
@@ -1260,7 +1404,10 @@ class PacketmasterEX(object):
 
     #Delete all rules
     def del_rule_all(self):
-        uri = 'http://' + self.address + '/rest/rules/all?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/rules/all?'
+        else:
+            uri = 'http://' + self.address + '/rest/rules/all?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -1423,7 +1570,10 @@ class PacketmasterEX(object):
 
     #Add a group with arguments
     def add_group(self, gid, json_app):
-        uri = 'http://' + self.address + '/rest/groups?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/groups?'
+        else:
+            uri = 'http://' + self.address + '/rest/groups?'
         try:
             input_check = int(gid)
         except:
@@ -1586,7 +1736,10 @@ class PacketmasterEX(object):
 
     #Modify a group with arguments
     def modify_group(self, gid, json_app):
-        uri = 'http://' + self.address + '/rest/groups?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/groups?'
+        else:
+            uri = 'http://' + self.address + '/rest/groups?'
         try:
             input_check = int(gid)
         except:
@@ -1624,7 +1777,10 @@ class PacketmasterEX(object):
 
     #Delete a group
     def delete_group(self, gid):
-        uri = 'http://' + self.address + '/rest/groups?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/groups?'
+        else:
+            uri = 'http://' + self.address + '/rest/groups?'
         try:
             input_check = int(gid)
         except:
@@ -1651,7 +1807,10 @@ class PacketmasterEX(object):
 
     #Delete all active groups
     def delete_groups_all(self):
-        uri = 'http://' + self.address + '/rest/groups/all?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/groups/all?'
+        else:
+            uri = 'http://' + self.address + '/rest/groups/all?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -1670,7 +1829,10 @@ class PacketmasterEX(object):
 
     #Make a port save point active
     def set_port_savepoint(self, savename):
-        uri = 'http://' + self.address + '/rest/savepoints/activeportsavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/activeportsavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/activeportsavepoint?'
         #Add check against system savepoints
         params = {'name': savename}
         try:
@@ -1691,7 +1853,10 @@ class PacketmasterEX(object):
 
     #Make a rule save point active
     def set_rule_savepoint(self, savename):
-        uri = 'http://' + self.address + '/rest/savepoints/activerulesavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/activerulesavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/activerulesavepoint?'
         #Add check against system savepoints
         params = {'name': savename}
         try:
@@ -1712,7 +1877,10 @@ class PacketmasterEX(object):
 
     #Set a save point as the default boot configuration
     def set_boot_savepoint(self, savename):
-        uri = 'http://' + self.address + '/rest/savepoints/defaultrulesavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/defaultrulesavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/defaultrulesavepoint?'
         #Add check against system savepoints
         params = {'name': savename}
         try:
@@ -1735,7 +1903,10 @@ class PacketmasterEX(object):
 
     #Export a save point from the Packetmaster.  This still needs worked out; Packetmaster returns empty save points
     def export_savepoint(self, rspname, pspname, filename):
-        uri = 'http://' + self.address + '/rest/savepoints/export?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/export?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/export?'
         #Add checks to see if names exist
         params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
         try:
@@ -1768,7 +1939,10 @@ class PacketmasterEX(object):
 
     #Modify a port savepoint
     def modify_port_savepoint(self, oldname, newname, description, override=True):
-        uri = 'http://' + self.address + '/rest/savepoints/modportsavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/modportsavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/modportsavepoint?'
         if override == False:
             override = False
         elif override.lower() in ('false', 'f', 'n', 'no'):
@@ -1801,7 +1975,10 @@ class PacketmasterEX(object):
 
     #Modify a rule save point with arguments
     def modify_rule_savepoint(self, oldname, newname, description, override=True):
-        uri = 'http://' + self.address + '/rest/savepoints/modrulesavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/modrulesavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/modrulesavepoint?'
         if override == False:
             override = False
         elif override.lower() in ('false', 'f', 'n', 'no'):
@@ -1828,7 +2005,10 @@ class PacketmasterEX(object):
 
     #Create a port save point from current configuration using arguments
     def create_port_savepoint(self, name, description):
-        uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/portsavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
         params = {'name': name, 'description': description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -1842,7 +2022,10 @@ class PacketmasterEX(object):
 
     #Create a quicksave point of current configuration
     def create_quick_savepoint(self):
-        uri = 'http://' + self.address + '/rest/savepoints/quicksaverules?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/quicksaverules?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/quicksaverules?'
         try:
             response = requests.put(uri, auth=(self.username, self.password))
             # print response.status_code
@@ -1862,7 +2045,10 @@ class PacketmasterEX(object):
 
     #Create a rule save point from current configuration using arguments
     def create_rule_savepoint(self, name, description):
-        uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/rulesavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
         params = {'name': name, 'description': description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -1882,7 +2068,10 @@ class PacketmasterEX(object):
 
     #Delete a port save point with arguments
     def delete_port_savepoint(self, name):
-        uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/portsavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
         #Add check to see if port savepoint exists
         params = {'name': name}
         try:
@@ -1903,7 +2092,10 @@ class PacketmasterEX(object):
 
     #Delete a rule save point with arguments
     def delete_rule_savepoint(self, name):
-        uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/savepoints/rulesavepoint?'
+        else:
+            uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
         #Add check to see if rule savepoint exists
         params = {'name': name}
         try:
@@ -2085,7 +2277,10 @@ class PacketmasterEX(object):
 
     #Start NTP App
     def start_app_ntp(self, server1, server2=None, user_description=''):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         params = {'name': 'NTP',
                   'description': 'Syncs time with remote NTP servers.',
                   'server1': server1,
@@ -2103,7 +2298,10 @@ class PacketmasterEX(object):
 
     #Start ArpResponder App
     def start_app_arpresponder(self, outport, src_mac, dst_mac, src_ip, dst_ip, interval='5000', inport=None, match_srcmac=None, user_description=''):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(interval)
         except:
@@ -2142,7 +2340,10 @@ class PacketmasterEX(object):
 
     #Start SNMP app instance
     def start_app_snmp(self, interval='5000', snmp_port='161', community='public', user_description='',trap_enable=True, trap1='1.1.1.1', trap1_port='162', trap2='', trap2_port='162'):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(interval)
         except:
@@ -2206,7 +2407,10 @@ class PacketmasterEX(object):
 
     #Start app instance for bypass switch control
     def start_app_heartbeatbypass(self, bypass_port1, bypass_port2, hb_in, hb_out, conn_type='ip', interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556', bypass_ip='1.1.1.1'):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(bypass_port1)
         except:
@@ -2291,7 +2495,10 @@ class PacketmasterEX(object):
 
     #Start syslog app instance
     def start_app_syslog(self, ip, port='514', user_description=''):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', ip)
             server = ip_check[0]
@@ -2318,7 +2525,10 @@ class PacketmasterEX(object):
 
     #Start heartbeat app instance
     def start_app_heartbeat(self, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(hb_in)
         except:
@@ -2551,7 +2761,10 @@ class PacketmasterEX(object):
 
     #Modify NTP App
     def mod_app_ntp(self, pid, server1, server2=None, user_description=''):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(pid)
         except:
@@ -2574,7 +2787,10 @@ class PacketmasterEX(object):
 
     #Modify ArpResponder App
     def mod_app_arpresponder(self, pid, outport, src_mac, dst_mac, src_ip, dst_ip, interval='5000', inport=None, match_srcmac=None, user_description=''):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(pid)
         except:
@@ -2618,7 +2834,10 @@ class PacketmasterEX(object):
 
     #Modify SNMP app instance
     def mod_app_snmp(self, pid, interval='5000', snmp_port='161', community='public', user_description='',trap_enable=True, trap1='1.1.1.1', trap1_port='162', trap2='', trap2_port='162'):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(pid)
         except:
@@ -2688,7 +2907,10 @@ class PacketmasterEX(object):
 
     #Modify app instance for bypass switch control
     def mod_app_heartbeatbypass(self, pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type='ip', interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556', bypass_ip='1.1.1.1'):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(pid)
         except:
@@ -2778,7 +3000,10 @@ class PacketmasterEX(object):
 
     #Modify syslog app instance
     def mod_app_syslog(self, pid, ip, port='514', user_description=''):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(pid)
         except:
@@ -2810,7 +3035,10 @@ class PacketmasterEX(object):
 
     #Modify heartbeat app instance
     def mod_app_heartbeat(self, pid, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(pid)
         except:
@@ -2885,7 +3113,10 @@ class PacketmasterEX(object):
 
     #Call a custom app action with arguments
     def call_app_action(self, pid, name):
-        uri = 'http://' + self.address + '/rest/apps/action?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps/action?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps/action?'
         try:
             pid = int(pid)
         except:
@@ -2910,7 +3141,10 @@ class PacketmasterEX(object):
 
     #Stop a running app with arguments
     def kill_app(self, pid):
-        uri = 'http://' + self.address + '/rest/apps?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
         try:
             pid = int(pid)
         except:
@@ -2941,7 +3175,10 @@ class PacketmasterEX(object):
 
     #Change group hash algorithms with arguments
     def set_hash_algorithms(self, macsa, madca, ether, ipsa, ipda, proto, src, dst):
-        uri = 'http://' + self.address + '/rest/device/grouphash?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/grouphash?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/grouphash?'
         if macsa.lower() in ('false', 'f', 'no', 'n'):
             macsa = False
         else:
@@ -3000,7 +3237,10 @@ class PacketmasterEX(object):
 
     #Change rule mode permanence with arguments
     def set_rule_permanence(self, permanence):
-        uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
         if permanence in ('true', 'True', True):
             permanence = True
         else:
@@ -3037,7 +3277,10 @@ class PacketmasterEX(object):
 
     #Set rule storage mode
     def set_storage_mode(self, mode):
-        uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/rulestoragemode?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
         try:
             mode = mode.lower()
         except:
@@ -3074,7 +3317,10 @@ class PacketmasterEX(object):
 
     #Add a user
     def add_user(self, username, access_level, passwd, description='', rad=False):
-        uri = 'http://' + self.address + '/rest/users?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/users?'
+        else:
+            uri = 'http://' + self.address + '/rest/users?'
         user_list = []
         if username == '':
             return "That is not a valid username; canceling Add User."
@@ -3126,7 +3372,10 @@ class PacketmasterEX(object):
 
     #Modify a user
     def mod_user(self, cur_name, new_name, access_level, passwd, description='', rad=False ):
-        uri = 'http://' + self.address + '/rest/users?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/users?'
+        else:
+            uri = 'http://' + self.address + '/rest/users?'
         user_list = []
         active_users = self.get_users()
         json_users = json.loads(active_users)
@@ -3172,7 +3421,10 @@ class PacketmasterEX(object):
 
     #Delete a user
     def delete_user(self, username):
-        uri = 'http://' + self.address + '/rest/users?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/users?'
+        else:
+            uri = 'http://' + self.address + '/rest/users?'
         user_list = []
         active_users = self.get_users()
         json_users = json.loads(active_users)
@@ -3199,7 +3451,10 @@ class PacketmasterEX(object):
 
     #Turn mandatory user authentication on or off with arguments
     def set_uac(self, uac):
-        uri = 'http://' + self.address + '/rest/users/uac?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/users/uac?'
+        else:
+            uri = 'http://' + self.address + '/rest/users/uac?'
         if uac.lower() == 'true' or uac == True:
             uac = True
         else:
@@ -3236,7 +3491,10 @@ class PacketmasterEX(object):
 
     #Set RADIUS settings with arguments
     def set_radius(self, server, secret, refresh, level, port=1812):
-        uri = 'http://' + self.address + '/rest/users/radius?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/users/radius?'
+        else:
+            uri = 'http://' + self.address + '/rest/users/radius?'
         server = server.strip()
         try:
             refresh = int(refresh)
@@ -3281,7 +3539,10 @@ class PacketmasterEX(object):
 
     #Turn HTTPS secure web interface on or off with arguments
     def set_https(self, enabled=False, ssl=None):
-        uri = 'http://' + self.address + '/rest/device/https?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/https?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/https?'
         if enabled.lower() == 'true' or enabled == True:
             enabled = True
         else:
@@ -3306,7 +3567,10 @@ class PacketmasterEX(object):
 
     #Turn Telnet service on or off with arguments
     def set_telnet(self, enabled=False):
-        uri = 'http://' + self.address + '/rest/device/telnet?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/telnet?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/telnet?'
         if enabled.lower() == 'true' or enabled == True:
             enabled = True
         else:
@@ -3324,7 +3588,10 @@ class PacketmasterEX(object):
 
     #Delete Web Logs
     def del_web_log(self):
-        uri = 'http://' + self.address + '/rest/weblog?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/weblog?'
+        else:
+            uri = 'http://' + self.address + '/rest/weblog?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -3346,7 +3613,10 @@ class PacketmasterEX(object):
 
     #Set DNS server settings
     def set_dns(self, dns1='', dns2='', dns3=''):
-        uri = 'http://' + self.address + '/rest/device/nameresolution?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/nameresolution?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/nameresolution?'
         params = {}
         if dns1 != '':
             params['dns1'] = dns1
@@ -3375,7 +3645,10 @@ class PacketmasterEX(object):
 
     #Turn the ID LED on or off with arguments
     def set_id_led(self, led):
-        uri = 'http://' + self.address + '/rest/device/idled?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/idled?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/idled?'
         led = led.lower()
         if led == 'true' or led == True:
             led = True
@@ -3394,7 +3667,10 @@ class PacketmasterEX(object):
 
     #Restart Web Server without rebooting the device
     def restart_webserver(self):
-        uri = 'http://' + self.address + '/rest/device/restartwebserver'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/restartwebserver?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/restartwebserver?'
 
         try:
             response = requests.post(uri, auth=(self.username, self.password))
@@ -3408,7 +3684,10 @@ class PacketmasterEX(object):
 
     #Reboot the Packetmaster
     def reboot(self):
-        uri = 'http://' + self.address + '/rest/device/reboot?'
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/reboot?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/reboot?'
 
         try:
             requests.post(uri, auth=(self.username, self.password))
