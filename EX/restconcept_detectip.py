@@ -1,4 +1,8 @@
 #Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
+#Use a Packetmaster 'A' to detect the presence of traffic rom a specified IP address and, upon detection,
+# create a rule on Packetmater 'B' to block all traffic from that IP address.
+#Prerequisites are that Packetmaster 'A' must have a higher priority rule filtering on the IP address in question.
+# User should edit the 'execute' function in this script as desired for his rule parameters.
 
 #!/usr/bin/python
 
@@ -18,7 +22,7 @@ def query(detector, blocker, address):
             if field == 'match':
                 for criteria in rules_json['rules'][count]['match']:
                     if 'nw_src' in criteria and rules_json['rules'][count]['match']['nw_src'] == address:
-                        if int(rules_json['rules'][count]['datarate_raw']) > 0:
+                        if float(rules_json['rules'][count]['n_packets']) > 0:
                             execute(blocker, address)
         count += 1
     ttl = ttl - 1
