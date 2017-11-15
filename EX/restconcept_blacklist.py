@@ -3,11 +3,11 @@
 #!/usr/bin/python
 import requests, json, re
 from getpass import getpass
+from packetmasterEX_rest import PacketmasterEX
 from requests.exceptions import ConnectionError
 
 #Drop the retrieved IPs on the Packetmaster
-def createblacklist(match, address, username=None, password=None):
-    uri = 'http://' + address + '/rest/rules?'
+def createblacklist(match, pm, interface):
     count = 0
     priority = 65536
     for m in match:
@@ -20,26 +20,22 @@ def createblacklist(match, address, username=None, password=None):
             'name': rulename,
             'description': 'This rule was created by blacklist.py',
             'priority': rulepriority,
-            'match[in_port]': '1,2',
+            'match[in_port]': interface,
             'match[protocol]': 'ip',
             'match[nw_src]': m + '/24',
             'match[extra]': 'idle_timeout=65535',
             'actions': 'drop'
         }
-        try:
-            response = requests.post(uri, data=params, auth=(username, password))
-            print response.status_code
-            r = response.content
-            data = json.loads(r)
-            print json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            return e
+        pm.add_rule(params)
 
 if __name__ == '__main__':
-    address = raw_input('What is the IP address of the Packetmaster you want to apply the black list to?: ')
-    username = raw_input('Enter your username: ')
+    address = raw_input('IP address of Packetmaster to apply blacklist to: ')
+    username = raw_input('Username for Packetmaster: ')
     password = getpass()
+    pm = PacketmasterEX(address, username, password)
+    interface = raw_input(""""What is(are) the port number(s) or range of ports on which to block malicious IPs?
+                              e.g. '5' or '1,2,5' or '5-10': """)
+    print "Retrieving malicious IP list from sans.edu."
     try:
         blacklist = requests.get('https://isc.sans.edu/block.txt?').text
         text = blacklist.rstrip()
@@ -48,4 +44,5 @@ if __name__ == '__main__':
             match = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', text)
     except:
         print 'Site is unavailable \n'
-    createblacklist(match, address, username, password)
+        exit()
+    createblacklist(match, pm, interface)

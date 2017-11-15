@@ -82,7 +82,7 @@ def recreate(pm, interface, output, priority1, priority2):
 
 if __name__ == '__main__':
     address = raw_input('IP address of the Packetmaster to monitor: ')
-    username = raw_input('Username for Packetmaster if required: ')
+    username = raw_input('Username for Packetmaster: ')
     password = getpass()
     pm = PacketmasterEX(address, username, password)
     interface = raw_input(""""What is(are) the port number(s) or range of ports for the ICMP monitoring rule set
