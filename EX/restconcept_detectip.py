@@ -14,6 +14,7 @@ from packetmasterEX_rest import PacketmasterEX
 
 #Function to query for the existence of the specified IP address on Packetmaster 'A' (detector)
 def query(detector, blocker, address):
+    global ttl
     rules = detector.rules_active()
     rules_json = json.loads(rules)
     count = 0
@@ -37,7 +38,7 @@ def execute(blocker, address):
               'description': 'This rule was created by Python via REST API',
               'priority': priority,
               'match[in_port]': inport,
-              'match[nw_src]', address
+              'match[nw_src]': address,
               'actions': 'drop'}
     blocker.add_rule(params)
     ttl = 0
@@ -60,7 +61,7 @@ if __name__ == '__main__':
 
     #while loop executes 'query' so long as ttl value is greater than zero
     while ttl > 0:
-        query(detector, detect_ip)
+        query(detector, blocker, detect_ip)
         print ttl
         time.sleep(1)
 

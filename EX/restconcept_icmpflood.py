@@ -55,10 +55,10 @@ def dropicmp(pm, interface, output, priority1, priority2):
     pm.add_rule(params1)
     pm.add_rule(params2)
     time.sleep(60)
-    recreate(pm, interface, ouput, priority1, priority2)
+    recreate(pm, interface, output, priority1, priority2)
 
 #Function that recreates the original rules present on the EX device prior to dropicmp function.  Calls query function.
-def recreate(pm, interface, ouput, priority1, priority2):
+def recreate(pm, interface, output, priority1, priority2):
     params1 = {
     'name': 'Watch ICMP',
     'description': 'Pass ICMP packets',
@@ -85,9 +85,9 @@ if __name__ == '__main__':
     username = raw_input('Username for Packetmaster if required: ')
     password = getpass()
     pm = PacketmasterEX(address, username, password)
-    interface = raw_input(""""What is the port number(s) or range of ports for the ICMP monitoring rule set
-                          e.g. '5' or '1,2,5' or '5-10'
-                          (Must match the rule set on the Packetmaster exactly): """)
+    interface = raw_input(""""What is(are) the port number(s) or range of ports for the ICMP monitoring rule set
+                              e.g. '5' or '1,2,5' or '5-10'
+                              (Must match the rule set on the Packetmaster exactly): """)
     priority1 = raw_input("What is the priority of the rule monitoring ICMP traffic: ")
     try:
         priority1 = int(priority1)
