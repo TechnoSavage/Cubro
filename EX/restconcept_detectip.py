@@ -6,10 +6,9 @@
 
 #!/usr/bin/python
 
-#Import necessary Python libraries for interacting with the REST API
-import requests, json, time
+#Import necessary Python libraries
+import json, time
 from getpass import getpass
-from requests.exceptions import ConnectionError
 from packetmasterEX_rest import PacketmasterEX
 
 #Function to query for the existence of the specified IP address on Packetmaster 'A' (detector)

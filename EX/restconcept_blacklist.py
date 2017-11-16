@@ -42,7 +42,7 @@ if __name__ == '__main__':
         for l in text:
             #match = re.findall('(\S[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', text)
             match = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', text)
-    except:
+    except ConnectionError as e:
         print 'Site is unavailable \n'
         exit()
     createblacklist(match, pm, interface)

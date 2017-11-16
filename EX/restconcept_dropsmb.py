@@ -3,11 +3,10 @@
 #!/usr/bin/python
 
 #Import necessary libraries
-import requests, json, time
+import json, time
 from getpass import getpass
 from datetime import datetime
 from packetmasterEX_rest import PacketmasterEX
-from requests.exceptions import ConnectionError
 
 #Check system time
 def checktime(pm, drop_time, interface, duration):

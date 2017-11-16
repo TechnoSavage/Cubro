@@ -6,10 +6,9 @@
 #!/usr/bin/python
 
 #Import necessary Python libraries for interacting with the REST API
-import requests, json, time
+import json, time
 from getpass import getpass
 from packetmasterEX_rest import PacketmasterEX
-from requests.exceptions import ConnectionError
 
 #Function that repeatedly queries flow statisctics and parses the JSON response down to the datarate of a rule passing ICMP packets at a specific port.  Calls dropicmp function if daterate exceeds 2.5Kbps
 def query(pm, interface, priority1, priority2, limit):
