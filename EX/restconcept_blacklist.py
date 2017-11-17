@@ -1,6 +1,8 @@
 #Use with firmware version 2.1.0.x or later. Python2.7 Cubro Packetmaster Blacklist REST API demo.
 #Import necessary Python libraries for interacting with the REST API
+
 #!/usr/bin/python
+
 import requests, json, re
 from getpass import getpass
 from packetmasterEX_rest import PacketmasterEX
@@ -39,9 +41,7 @@ if __name__ == '__main__':
     try:
         blacklist = requests.get('https://isc.sans.edu/block.txt?').text
         text = blacklist.rstrip()
-        for l in text:
-            #match = re.findall('(\S[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)', text)
-            match = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', text)
+        match = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', text)
     except ConnectionError as e:
         print 'Site is unavailable \n'
         exit()
