@@ -601,12 +601,13 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Change the device name
+    #Change the device name with guided options
     def set_name_guided(self):
         newname = raw_input('Enter device name: ')
         run = self.set_name(newname)
         return run
 
+    #Change the device name with arguments
     def set_name(self, name):
         if self.https:
             uri = 'https://' + self.address + '/rest/device/name?'
@@ -623,12 +624,14 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
+    #Change the device name and notes with guided options
     def set_label_guided(self):
         newname = raw_input('Enter device name: ')
         newnotes = raw_input('Enter device notes: ')
         run = self.set_label(newname, newnotes)
         return run
 
+    #Change the device name and notes with arguments
     def set_label(self, name, notes):
         if self.https:
             uri = 'https://' + self.address + '/rest/device/customident?'
@@ -683,15 +686,15 @@ class PacketmasterEX(object):
         else:
             print "That is not a valid duplex; defaulting to auto"
             duplex = 'auto'
-        if forcetx.lower() in ('true', 't', 'yes', 'y'):
+        if forcetx in (True, 'True', 'true', 't', 'Yes', 'yes', 'y', 'T', 'Y'):
             forcetx = True
         else:
             forcetx = False
-        if check.lower() in ('true', 't', 'yes', 'y'):
+        if check in (True, 'True', 'true', 't', 'Yes', 'yes', 'y', 'T', 'Y'):
             check = True
         else:
             check = False
-        if recalc.lower() in ('true', 't', 'yes', 'y'):
+        if recalc in (True, 'True', 'true', 't', 'Yes', 'yes', 'y', 'T', 'Y'):
             recalc = True
         else:
             recalc = False
@@ -3174,40 +3177,40 @@ class PacketmasterEX(object):
         return run
 
     #Change group hash algorithms with arguments
-    def set_hash_algorithms(self, macsa, madca, ether, ipsa, ipda, proto, src, dst):
+    def set_hash_algorithms(self, macsa, macda, ether, ipsa, ipda, proto, src, dst):
         if self.https:
             uri = 'https://' + self.address + '/rest/device/grouphash?'
         else:
             uri = 'http://' + self.address + '/rest/device/grouphash?'
-        if macsa.lower() in ('false', 'f', 'no', 'n'):
+        if macsa in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             macsa = False
         else:
             macsa = True
-        if macda.lower() in ('false', 'f', 'no', 'n'):
+        if macda in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             macda = False
         else:
             macda = True
-        if ether.lower() in ('false', 'f', 'no', 'n'):
+        if ether in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             ether = False
         else:
             ether = True
-        if ipsa.lower() in ('false', 'f', 'no', 'n'):
+        if ipsa in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             ipsa = False
         else:
             ipsa = True
-        if ipda.lower() in ('false', 'f', 'no', 'n'):
+        if ipda in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             ipda = False
         else:
             ipda = True
-        if proto.lower() in ('false', 'f', 'no', 'n'):
+        if proto in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             proto = False
         else:
             proto = True
-        if src.lower() in ('false', 'f', 'no', 'n'):
+        if src in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             src = False
         else:
             src = True
-        if dst.lower() in ('false', 'f', 'no', 'n'):
+        if dst in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             dst = False
         else:
             dst = True
@@ -3241,7 +3244,7 @@ class PacketmasterEX(object):
             uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
         else:
             uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
-        if permanence in ('true', 'True', True):
+        if permanence in (True, 'True', 'true', 'Yes', 'yes', 'y', 't', 'T', 'Y'):
             permanence = True
         else:
             permanence == False
@@ -3336,7 +3339,7 @@ class PacketmasterEX(object):
             return "That is not a valid user access level; canceling Add User."
         if access_level not in (1, 7, 31):
             return "That is not a valid user access level; canceling Add User."
-        if rad in (True, 'true', 'True', 'Y', 'Yes', 'y', 'yes'):
+        if rad in (True, 'True', 'true', 'Yes', 'y', 'yes', 't', 'T', 'Y'):
             rad = True
         else:
             rad = False
@@ -3393,7 +3396,7 @@ class PacketmasterEX(object):
             return "That is not a valid user access level; canceling Modify User."
         if access_level not in (1, 7, 31):
             return "That is not a valid user access level; canceling Modify User."
-        if rad in (True, 'true', 'True', 'Y', 'Yes', 'y', 'yes'):
+        if rad in (True, 'True', 'true', 'Yes', 'y', 'yes', 't', 'Y', 'T'):
             rad = True
         else:
             rad = False
@@ -3455,7 +3458,7 @@ class PacketmasterEX(object):
             uri = 'https://' + self.address + '/rest/users/uac?'
         else:
             uri = 'http://' + self.address + '/rest/users/uac?'
-        if uac.lower() == 'true' or uac == True:
+        if uac in (True, 'True', 'true', 'Yes', 'yes', 't', 'y', 'T', 'Y'):
             uac = True
         else:
             uac = False

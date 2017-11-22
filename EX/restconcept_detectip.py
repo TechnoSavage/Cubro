@@ -37,6 +37,7 @@ def execute(blocker, address):
               'description': 'This rule was created by Python via REST API',
               'priority': priority,
               'match[in_port]': inport,
+              'match[protocol]': 'ip',
               'match[nw_src]': address,
               'actions': 'drop'}
     blocker.add_rule(params)
