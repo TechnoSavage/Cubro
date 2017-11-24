@@ -654,19 +654,39 @@ class PacketmasterEX(object):
         #Add provision to handle devices which require reboot for speed change e.g. EX2 (10G is XG)
         #Add shutdown true/false parameter for EX2 (more?)
         interface = raw_input('Enter the interface name of the port you want to change: ')
-        speed = raw_input('Enter the desired interface speed; options are  "10", "100", "1000", "10G", "40G", "100G", or "auto": ').strip()
-        if speed.lower() == 'auto':
-            speed = 'auto'
+        if self.hardware == '4':
+            speed = raw_input('Enter interface speed; e.g. "1000", "10G", "40G", "100G": ').strip()
+            if speed in ('1000', '10g', '10G', '40g', '40G', '100g', '100G'):
+                speed = speed.upper()
+            else:
+                return "That is not a valid input for port speed; canceling Set Port Config."
         else:
-            speed = speed.upper() #More checks needed here
-        duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto" [auto]: ')
+            speed = raw_input('Enter interface speed; e.g. "10", "100", "1000", "XG" or "auto": ').strip()
+            if speed.lower() == 'auto':
+                speed = 'auto'
+            elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG'):
+                speed = speed.upper()
+            else:
+                return "That is not a valid input for port speed; canceling Set Port Config."
+        if speed in ('10', '100', '1000', 'auto'):
+            duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto" [auto]: ')
+            if duplex == '':
+                duplex = 'auto'
+        else:
+            duplex = 'full'
         forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
+        if forcetx == '':
+            forcetx = False
         check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
+        if check == '':
+            check = False
         recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
+        if recalc == '':
+            recalc = False
         run = self.set_port_config(interface, speed, duplex, forcetx, check, recalc)
         return run
 
-    def set_port_config(self, interface, speed='auto', duplex='auto', forcetx='', check='', recalc=''):
+    def set_port_config(self, interface, speed, duplex, forcetx=False, check=False, recalc=False):
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
         else:
@@ -677,15 +697,24 @@ class PacketmasterEX(object):
             interface = 'eth-0-' + port_no[0]
         else:
             return "That is not a valid port number; canceling Set Port Config."
-        if speed.lower() == 'auto':
-            speed = 'auto'
+        if self.hardware == '4':
+            if speed.lower() == 'auto':
+                speed = 'auto'
+            elif speed in ('1000', '10g', '10G', '40g', '40G', '100g', '100G'):
+                speed = speed.upper()
+            else:
+                return "That is not a valid input for port speed; canceling Set Port Config."
         else:
-            speed = speed.upper()
-        if duplex.lower() in ('auto', 'full', 'half'):
-            duplex = duplex.lower()
+            if speed.lower() == 'auto':
+                speed = 'auto'
+            elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG'):
+                speed = speed.upper()
+            else:
+                return "That is not a valid input for port speed; canceling Set Port Config."
+        if speed in ('10', '100', '1000', 'auto'):
+            duplex = duplex
         else:
-            print "That is not a valid duplex; defaulting to auto"
-            duplex = 'auto'
+            duplex = 'full'
         if forcetx in (True, 'True', 'true', 't', 'Yes', 'yes', 'y', 'T', 'Y'):
             forcetx = True
         else:
