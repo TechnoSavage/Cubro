@@ -674,17 +674,23 @@ class PacketmasterEX(object):
                 duplex = 'auto'
         else:
             duplex = 'full'
-        forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
-        if forcetx == '':
-            forcetx = False
-        check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
-        if check == '':
-            check = False
-        recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
-        if recalc == '':
-            recalc = False
-        run = self.set_port_config(interface, speed, duplex, forcetx, check, recalc)
-        return run
+        if self.hardware == '4':
+            forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
+            if forcetx == '':
+                forcetx = False
+            check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
+            if check == '':
+                check = False
+            recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
+            if recalc == '':
+                recalc = False
+            run = self.set_port_config(interface, speed, duplex, forcetx, check, recalc)
+        else:
+            run = self.set_port_config(interface, speed, duplex)
+        advisory = """\n Changing between 1G and 10G on pre-G4 devices
+                    or changing to/from breakout cables on QSFP ports on G4 devices
+                    requires a reboot before taking effect \n"""
+        return (advisory, run)
 
     def set_port_config(self, interface, speed, duplex, forcetx=False, check=False, recalc=False):
         if self.https:
@@ -727,13 +733,17 @@ class PacketmasterEX(object):
             recalc = True
         else:
             recalc = False
-        params = {
-            'if_name': interface,
-            'speed': speed,
-            'duplex': duplex,
-            'unidirectional': forcetx,
-            'crc_check': check,
-            'crc_recalculation': recalc }
+        if self.hardware == '4':
+            params = {'if_name': interface,
+                      'speed': speed,
+                      'duplex': duplex,
+                      'unidirectional': forcetx,
+                      'crc_check': check,
+                      'crc_recalculation': recalc }
+        else:
+            params = {'if_name': interface,
+                      'speed': speed,
+                      'duplex': duplex}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
