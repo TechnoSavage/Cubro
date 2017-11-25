@@ -689,6 +689,17 @@ class PacketmasterEX(object):
             recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
+            run = self.set_port_config(interface, speed, duplex, forcetx, check, recalc)
+        elif self.hardware == '4' and speed in ('40G', '100G'):
+            forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
+            if forcetx == '':
+                forcetx = False
+            check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
+            if check == '':
+                check = False
+            recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
+            if recalc == '':
+                recalc = False
             run = self.set_port_config(interface, speed, duplex, forcetx, check, recalc, split)
         else:
             run = self.set_port_config(interface, speed, duplex)
@@ -709,7 +720,7 @@ class PacketmasterEX(object):
         else:
             return "That is not a valid port number; canceling Set Port Config."
         if port_no > self.ports:
-            return "Port number does not exist on this device; this device has %s ports.  Canceling Set Port Config" % self.ports 
+            return "Port number does not exist on this device; this device has %s ports.  Canceling Set Port Config" % self.ports
         if self.hardware == '4':
             if speed.lower() == 'auto':
                 speed = 'auto'
