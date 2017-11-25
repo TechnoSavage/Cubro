@@ -680,18 +680,7 @@ class PacketmasterEX(object):
             if split == '':
                 split = 'no'
         description = raw_input('Enter description for this port; leave blank for none: ')
-        if self.hardware == '4':
-            forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
-            if forcetx == '':
-                forcetx = False
-            check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
-            if check == '':
-                check = False
-            recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
-            if recalc == '':
-                recalc = False
-            run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc)
-        elif self.hardware == '4' and speed in ('40G', '100G'):
+        if self.hardware == '4' and speed in ('40G', '100G'):
             forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
             if forcetx == '':
                 forcetx = False
@@ -702,6 +691,17 @@ class PacketmasterEX(object):
             if recalc == '':
                 recalc = False
             run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc, split)
+        elif self.hardware == '4':
+            forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
+            if forcetx == '':
+                forcetx = False
+            check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
+            if check == '':
+                check = False
+            recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
+            if recalc == '':
+                recalc = False
+            run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc)
         else:
             run = self.set_port_config(interface, speed, duplex, description)
         advisory = """Changing between 1G and 10G on pre-G4 devices
