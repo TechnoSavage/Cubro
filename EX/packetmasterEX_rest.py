@@ -719,7 +719,7 @@ class PacketmasterEX(object):
             interface = 'eth-0-' + port_no[0]
         else:
             return "That is not a valid port number; canceling Set Port Config."
-        if int(port_no) > self.ports:
+        if int(port_no[0]) > self.ports:
             return "Port number does not exist on this device; this device has %s ports.  Canceling Set Port Config" % self.ports
         if self.hardware == '4':
             if speed.lower() == 'auto':
