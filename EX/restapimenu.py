@@ -82,7 +82,8 @@ if __name__ == '__main__':
                   3 - App Configuration Menu
                   4 - Savepoint Configuration Menu
                   5 - User Management Menu
-                  6 - Back \n
+                  6 - Back
+                  7 - Quit \n
                  Enter the number of the selection to check: ''')
         try:
             choice = int(choice)
@@ -101,6 +102,9 @@ if __name__ == '__main__':
             userconfig()
         elif choice == 6:
             topmenu()
+        elif choice == 7:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             manage()
@@ -126,7 +130,8 @@ if __name__ == '__main__':
                 16 - Telnet service submenu
                 17 - Webserver Submenu
                 18 - Reboot Packetmaster
-                19 - Back \n
+                19 - Back
+                20 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -195,6 +200,9 @@ if __name__ == '__main__':
             hardwareconfig()
         elif choice == 19:
             manage()
+        elif choice == 20:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             hardwareconfig()
@@ -205,7 +213,8 @@ if __name__ == '__main__':
                  1 - Get Label and Notes
                  2 - Change Label only
                  3 - Change Label and Notes
-                 4 - Back \n
+                 4 - Back
+                 5 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -226,6 +235,9 @@ if __name__ == '__main__':
             notesmenu()
         elif choice == 4:
             hardwareconfig()
+        elif choice == 5:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             notes()
@@ -235,7 +247,8 @@ if __name__ == '__main__':
         choice = raw_input('''
                  1 - Get current IP configuration
                  2 - Change IP configuration
-                 3 - Back \n
+                 3 - Back
+                 4 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -252,6 +265,9 @@ if __name__ == '__main__':
             ipconfig()
         elif choice == 3:
             hardwareconfig()
+        elif choice == 4:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             ipconfig()
@@ -261,7 +277,8 @@ if __name__ == '__main__':
         choice = raw_input('''
                  1 - Get current DNS configuration
                  2 - Change DNS configuration
-                 3 - Back \n
+                 3 - Back
+                 4 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -278,6 +295,9 @@ if __name__ == '__main__':
             dns()
         elif choice == 3:
             hardwareconfig()
+        elif choice == 4:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             dns()
@@ -292,7 +312,8 @@ if __name__ == '__main__':
                  5 - Change Port Configuration
                  6 - Shut Down or Activate Port
                  7 - Reset Port Counters
-                 8 - Back \n
+                 8 - Back
+                 9 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -329,6 +350,9 @@ if __name__ == '__main__':
             portconfig()
         elif choice == 8:
             hardwareconfig()
+        elif choice == 9:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             portconfig()
@@ -340,7 +364,8 @@ if __name__ == '__main__':
                  2 - Delete web Logs
                  3 - Restart webserver
                  4 - Enable or Disable HTTPS secure web interface
-                 5 - Back \n
+                 5 - Back
+                 6 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -365,6 +390,9 @@ if __name__ == '__main__':
             web()
         elif choice == 5:
             hardwareconfig()
+        elif choice == 6:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             web()
@@ -374,7 +402,8 @@ if __name__ == '__main__':
         choice = raw_input('''
                  1 - Get current Telnet status
                  2 - Enable or Disable Telnet service
-                 3 - Back \n
+                 3 - Back
+                 4 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -391,6 +420,9 @@ if __name__ == '__main__':
             telnet()
         elif choice == 3:
             hardwareconfig()
+        elif choice == 4:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             telnet()
@@ -415,7 +447,8 @@ if __name__ == '__main__':
                 15 - Set Rule Permanence Mode
                 16 - Show Rule Storage Mode
                 17 - Set Rule Storage Mode
-                18 - Back \n
+                18 - Back
+                19 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -492,6 +525,9 @@ if __name__ == '__main__':
             ruleconfig()
         elif choice == 18:
             manage()
+        elif choice == 19:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             ruleconfig()
@@ -505,7 +541,8 @@ if __name__ == '__main__':
                  4 - Modify an App instance
                  5 - Kill an App instance
                  6 - Call a custom App action
-                 7 - Back \n
+                 7 - Back
+                 8 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -538,6 +575,9 @@ if __name__ == '__main__':
             appconfig()
         elif choice == 7:
             manage()
+        elif choice == 8:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             appconfig()
@@ -557,7 +597,8 @@ if __name__ == '__main__':
                 10 - Create a save point from current rules
                 11 - Delete a port save point
                 12 - Delete a rule save point
-                13 - Back \n
+                13 - Back
+                14 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -614,6 +655,9 @@ if __name__ == '__main__':
             saveconfig()
         elif choice == 13:
             manage()
+        elif choice == 14:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             saveconfig()
@@ -629,7 +673,8 @@ if __name__ == '__main__':
                  6 - Enable or Disable UAC
                  7 - Show RADIUS Settings
                  8 - Configure RADIUS settings
-                 9 - Back \n
+                 9 - Back
+                10 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -670,6 +715,9 @@ if __name__ == '__main__':
             userconfig()
         elif choice == 9:
             manage()
+        elif choice == 10:
+            print 'Goodbye'
+            exit()
         else:
             print "That is not a valid selection."
             userconfig()
