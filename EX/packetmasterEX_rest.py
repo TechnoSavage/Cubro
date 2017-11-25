@@ -679,6 +679,7 @@ class PacketmasterEX(object):
             split = raw_input('Split to breakout cable?  Enter "yes" for yes and "no" for no [no]: ')
             if split == '':
                 split = 'no'
+        description = raw_input('Enter description for this port; leave blank for none: ')
         if self.hardware == '4':
             forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
             if forcetx == '':
@@ -689,7 +690,7 @@ class PacketmasterEX(object):
             recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
-            run = self.set_port_config(interface, speed, duplex, forcetx, check, recalc)
+            run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc)
         elif self.hardware == '4' and speed in ('40G', '100G'):
             forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
             if forcetx == '':
@@ -700,15 +701,15 @@ class PacketmasterEX(object):
             recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
-            run = self.set_port_config(interface, speed, duplex, forcetx, check, recalc, split)
+            run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc, split)
         else:
-            run = self.set_port_config(interface, speed, duplex)
+            run = self.set_port_config(interface, speed, duplex, description)
         advisory = """Changing between 1G and 10G on pre-G4 devices
         or changing to/from breakout cables on QSFP ports on G4 devices
         requires a reboot before taking effect."""
         return advisory, run
 
-    def set_port_config(self, interface, speed, duplex, forcetx=False, check=False, recalc=False, split=False):
+    def set_port_config(self, interface, speed, duplex, description='', forcetx=False, check=False, recalc=False, split=False):
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
         else:
@@ -757,15 +758,22 @@ class PacketmasterEX(object):
             split = 'no'
         if self.hardware == '4':
             params = {'if_name': interface,
+                      'description': description,
                       'speed': speed,
                       'duplex': duplex,
                       'unidirectional': forcetx,
                       'crc_check': check,
                       'crc_recalculation': recalc }
-            if speed in ('40G', '100G'):
-                params['split'] = split
+        elif self.hardware == '4' and speed in ('40G', '100G'):
+            params = {'if_name': interface,
+                      'description': description,
+                      'unidirectional': forcetx,
+                      'crc_check': check,
+                      'crc_recalculation': recalc,
+                      'split': split}
         else:
             params = {'if_name': interface,
+                      'description': description,
                       'speed': speed,
                       'duplex': duplex}
         try:
