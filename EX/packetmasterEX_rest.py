@@ -777,6 +777,7 @@ class PacketmasterEX(object):
                       'description': description,
                       'speed': speed,
                       'duplex': duplex}
+        print params
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
