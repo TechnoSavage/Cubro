@@ -770,12 +770,14 @@ class PacketmasterEX(object):
                       'unidirectional': forcetx,
                       'crc_check': check,
                       'crc_recalculation': recalc,
+                      'shutdown': 'false',
                       'split': split}
         else:
             params = {'if_name': interface,
                       'description': description,
                       'speed': speed,
                       'duplex': duplex}
+        print params
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
