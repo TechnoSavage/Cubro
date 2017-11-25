@@ -756,15 +756,7 @@ class PacketmasterEX(object):
             split = 'break-out'
         else:
             split = 'no'
-        if self.hardware == '4':
-            params = {'if_name': interface,
-                      'description': description,
-                      'speed': speed,
-                      'duplex': duplex,
-                      'unidirectional': forcetx,
-                      'crc_check': check,
-                      'crc_recalculation': recalc }
-        elif self.hardware == '4' and speed in ('40G', '100G'):
+        if self.hardware == '4' and speed in ('40G', '100G'):
             params = {'if_name': interface,
                       'description': description,
                       'unidirectional': forcetx,
@@ -772,12 +764,19 @@ class PacketmasterEX(object):
                       'crc_recalculation': recalc,
                       'shutdown': 'false',
                       'split': split}
+        elif self.hardware == '4':
+            params = {'if_name': interface,
+                      'description': description,
+                      'speed': speed,
+                      'duplex': duplex,
+                      'unidirectional': forcetx,
+                      'crc_check': check,
+                      'crc_recalculation': recalc }
         else:
             params = {'if_name': interface,
                       'description': description,
                       'speed': speed,
                       'duplex': duplex}
-        print params
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
