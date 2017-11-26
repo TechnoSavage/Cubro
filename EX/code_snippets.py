@@ -38,3 +38,9 @@ def port_count(address, username=None, password=None):
         return len(ports)
     except ConnectionError as e:
         raise e
+
+#Regex isolate one and only one IP.  Does not catch subnet.
+nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
+
+#Regex isolate all valid IP addresses and subnets
+nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)

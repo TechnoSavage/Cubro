@@ -720,7 +720,7 @@ class PacketmasterEX(object):
             interface = 'eth-0-' + port_no[0]
         else:
             return "That is not a valid port number; canceling Set Port Config."
-        if int(port_no[0]) > self.ports:
+        if '/' not in port_no[0] and int(port_no[0]) > self.ports:
             return "Port number does not exist on this device; this device has %s ports.  Canceling Set Port Config" % self.ports
         if self.hardware == '4':
             if speed.lower() == 'auto':
@@ -917,18 +917,30 @@ class PacketmasterEX(object):
             pass
         elif int(proto) == 2:
             params['match[protocol]'] = 'ip'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address (e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"): ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address (e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"): ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
         elif int(proto) == 3:
@@ -936,15 +948,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
             tcpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
@@ -958,15 +982,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
             udpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
@@ -980,15 +1016,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
             sctpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
@@ -1002,15 +1050,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
             nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Add Rule."
                 except:
                     return "That is not a valid IP address, canceling Add Rule."
             icmpt = raw_input('Filter on ICMP type?  Leave blank for no or enter ICMP type number: ')
@@ -1134,15 +1194,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
         elif int(proto) == 3:
@@ -1150,15 +1222,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             tcpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
@@ -1172,15 +1256,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             udpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
@@ -1194,15 +1290,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             sctpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
@@ -1216,15 +1324,27 @@ class PacketmasterEX(object):
             nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
+                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
+                    if len(nwsrc) == 1:
+                        params['match[nw_src]'] = nwsrc[0]
+                    elif len(nwsrc) > 1:
+                        nw_src = nwsrc[0] + '/' + nwsrc[1]
+                        params['match[nw_src]'] = nw_src
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
+                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
+                    if len(nwdst) == 1:
+                        params['match[nw_dst]'] = nwdst[0]
+                    elif len(nwdst) > 1:
+                        nw_dst = nwsrc[0] + '/' + nwdst[1]
+                        params['match[nw_dst]'] = nw_dst
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
                 except:
                     return "That is not a valid IP address, canceling Modify Rule."
             icmpt = raw_input('Filtering on ICMP type?  Leave blank for no or enter ICMP type number: ')
