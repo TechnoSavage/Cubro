@@ -17,7 +17,6 @@ class PacketmasterEX(object):
         self.https = False
         conn_test = self.conn_test()
         print conn_test
-        self.get_port_count()
 
     def conn_test(self):
         try:
@@ -30,6 +29,7 @@ class PacketmasterEX(object):
                 else:
                     self.hardware = data['generation']
                     self.get_port_count()
+                    self.device_model()
                     return "Connection established"
         except:
             try:
@@ -48,6 +48,7 @@ class PacketmasterEX(object):
                 print "Unable to establish connection; check if IP address is correct."
 
 
+    #Enumerate the number of ports on the device.
     def get_port_count(self):
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
@@ -650,10 +651,8 @@ class PacketmasterEX(object):
             r = 'No Response'
             raise e
 
-    #Change the configuration of a port
+    #Change the configuration of a port using guided options
     def set_port_config_guided(self):
-        #Add provision to handle devices which require reboot for speed change e.g. EX2 (10G is XG)
-        #Add shutdown true/false parameter for EX2 (more?)
         interface = raw_input('Enter the interface name of the port you want to change: ')
         if self.hardware == '4':
             speed = raw_input('Enter interface speed; e.g. "1000", "10G", "40G", "100G": ').strip()
@@ -661,11 +660,11 @@ class PacketmasterEX(object):
                 speed = speed.upper()
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
-        else:
-            speed = raw_input('Enter interface speed; e.g. "10", "100", "1000", "XG" or "auto": ').strip()
+        else: #May need to become 'elif self.hardware == '2'' with new else clause; need EX5-2 and EX12 to verify
+            speed = raw_input('Enter interface speed; e.g. "10", "100", "1000", "auto" for Copper or SFP ports; "XG" or "1G" for SFP+ ports: ').strip()
             if speed.lower() == 'auto':
                 speed = 'auto'
-            elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG'):
+            elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG', '1g', '1G'):
                 speed = speed.upper()
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
@@ -705,10 +704,11 @@ class PacketmasterEX(object):
         else:
             run = self.set_port_config(interface, speed, duplex, description)
         advisory = """Changing between 1G and 10G on pre-G4 devices
-        or changing to/from breakout cables on QSFP ports on G4 devices
+        or changing to/from breakout cables on QSFP ports of G4 devices
         requires a reboot before taking effect."""
         return advisory, run
 
+    #Change the configuration of a port using arguments
     def set_port_config(self, interface, speed, duplex, description='', forcetx=False, check=False, recalc=False, split=False):
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
@@ -732,7 +732,7 @@ class PacketmasterEX(object):
         else:
             if speed.lower() == 'auto':
                 speed = 'auto'
-            elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG'):
+            elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG', '1g', '1G'):
                 speed = speed.upper()
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
@@ -772,6 +772,13 @@ class PacketmasterEX(object):
                       'unidirectional': forcetx,
                       'crc_check': check,
                       'crc_recalculation': recalc }
+        elif self.hardware == '2' and speed in ('1G', 'XG'):
+            params = {'if_name': interface,
+                      'description': description,
+                      'speed': 'auto',
+                      'duplex': duplex,
+                      'xg_speed': speed,
+                      'shutdown': 'false'}
         else:
             params = {'if_name': interface,
                       'description': description,
@@ -3357,19 +3364,28 @@ class PacketmasterEX(object):
 
     #Change group hash algorithms with guided options
     def set_hash_algorithms_guided(self):
-        macsa = raw_input('Type "true" to use MAC source address; type "false" to ignore [true]: ')
-        macda = raw_input('Type "true" to use MAC destination address; type "false" to ignore [true]: ')
-        ether = raw_input('Type "true" to use ether type; type "false" to ignore [true]: ')
-        ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ')
-        ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ')
-        proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
-        src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
-        dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
-        run = self.set_hash_algorithms(macsa, macda, ether, ipsa, ipda, proto, src, dst)
+        if self.hardware == '4':
+            macsa = raw_input('Type "true" to use MAC source address; type "false" to ignore [true]: ')
+            macda = raw_input('Type "true" to use MAC destination address; type "false" to ignore [true]: ')
+            ether = raw_input('Type "true" to use ether type; type "false" to ignore [true]: ')
+            ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ')
+            ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ')
+            proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
+            src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
+            dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
+            run = self.set_hash_algorithms(macsa, macda, ether, ipsa, ipda, proto, src, dst)
+        else:
+            ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ')
+            ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ')
+            proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
+            src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
+            dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
+            run = self.set_hash_algorithms('', '', '', ipsa, ipda, proto, src, dst)
         return run
 
     #Change group hash algorithms with arguments
     def set_hash_algorithms(self, macsa, macda, ether, ipsa, ipda, proto, src, dst):
+        #EX2 has only 'ipsa', 'ipda', 'ip_protocol', 'scp_port', 'dst_port'
         if self.https:
             uri = 'https://' + self.address + '/rest/device/grouphash?'
         else:
@@ -3406,14 +3422,21 @@ class PacketmasterEX(object):
             dst = False
         else:
             dst = True
-        params = {'macsa': macsa,
-                  'macda': macda,
-                  'ether_type': ether,
-                  'ipsa': ipsa,
-                  'ipda': ipda,
-                  'ip_protocol': proto,
-                  'src_port': src,
-                  'dst_port': dst}
+        if self.hardware == '4':
+            params = {'macsa': macsa,
+                      'macda': macda,
+                      'ether_type': ether,
+                      'ipsa': ipsa,
+                      'ipda': ipda,
+                      'ip_protocol': proto,
+                      'src_port': src,
+                      'dst_port': dst}
+        else: #May need to become 'elif self.hardware =='2'' with new elif statements for gen 3.  Need EX5-2 and EX12 to verify
+            params = {'ipsa': ipsa,
+                      'ipda': ipda,
+                      'ip_protocol': proto,
+                      'src_port': src,
+                      'dst_port': dst}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
