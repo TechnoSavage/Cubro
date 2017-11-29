@@ -703,10 +703,10 @@ class PacketmasterEX(object):
             run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc)
         else:
             run = self.set_port_config(interface, speed, duplex, description)
-        advisory = """Changing between 1G and 10G on pre-G4 devices
-        or changing to/from breakout cables on QSFP ports of G4 devices
-        requires a reboot before taking effect."""
-        return advisory, run
+        print """\nA device reboot is required for changes to take effect when changing
+between 1G and 10G on pre-G4 devices and when changing to or from breakout cables
+on QSFP ports of G4 devices. \n"""
+        return run
 
     #Change the configuration of a port using arguments
     def set_port_config(self, interface, speed, duplex, description='', forcetx=False, check=False, recalc=False, split=False):
