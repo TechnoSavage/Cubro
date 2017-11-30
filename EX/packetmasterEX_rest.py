@@ -660,7 +660,7 @@ class PacketmasterEX(object):
                 speed = speed.upper()
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
-        else: #May need to become 'elif self.hardware == '3'' with new else clause; need EX5-2 and EX12 to verify
+        else: #May need to become 'elif self.hardware == '3.1'' with new else clause; need EX5-2 and EX12 to verify
             speed = raw_input('Enter interface speed; e.g. "10", "100", "1000", "auto" for Copper or SFP ports; "XG" or "1G" for SFP+ ports: ').strip()
             if speed.lower() == 'auto':
                 speed = 'auto'
@@ -772,7 +772,7 @@ on QSFP ports of G4 devices. \n"""
                       'unidirectional': forcetx,
                       'crc_check': check,
                       'crc_recalculation': recalc }
-        elif self.hardware == '3' and speed in ('1G', 'XG'):
+        elif self.hardware == '3.1' and speed in ('1G', 'XG'):
             params = {'if_name': interface,
                       'description': description,
                       'speed': 'auto',
@@ -3431,7 +3431,7 @@ on QSFP ports of G4 devices. \n"""
                       'ip_protocol': proto,
                       'src_port': src,
                       'dst_port': dst}
-        else: #May need to become 'elif self.hardware == '3'' with new elif statements for gen 3.  Need EX5-2 and EX12 to verify
+        else: #May need to become 'elif self.hardware == '3.1'' with new elif statements for gen 3.  Need EX5-2 and EX12 to verify
             params = {'ipsa': ipsa,
                       'ipda': ipda,
                       'ip_protocol': proto,
