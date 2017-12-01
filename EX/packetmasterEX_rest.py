@@ -43,6 +43,7 @@ class PacketmasterEX(object):
                     else:
                         self.hardware = data['generation']
                         self.get_port_count()
+                        self.device_model()
                         return "Connection established"
             except:
                 print "Unable to establish connection; check if IP address is correct."
