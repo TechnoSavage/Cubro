@@ -7,6 +7,7 @@ from getpass import getpass
 #TO-DO Add code to handle case and verify input in all areas where needed
 #add_rule_guided requires many input checks
 #Add code to validate input for IPv6 as well as IPv4
+#Add confirmation section
 
 class PacketmasterEX(object):
 
@@ -580,8 +581,16 @@ class PacketmasterEX(object):
         newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ')
         newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ')
         newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ')
-        run = self.set_ip_config(newip, newmask, newgate)
-        return run
+        confirm = raw_input("""Configuration change summary:
+                            New management IP: %s
+                            New Subnet Mask: %s
+                            New Gateway: %s
+                            Confirm changes [y/n]: """ % (newip, newmask, newgate))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_ip_config(newip, newmask, newgate)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Change the management IP configuration with arguments
     def set_ip_config(self, address, netmask, gateway):
@@ -607,8 +616,14 @@ class PacketmasterEX(object):
     #Change the device name with guided options
     def set_name_guided(self):
         newname = raw_input('Enter device name: ')
-        run = self.set_name(newname)
-        return run
+        confirm = raw_input("""Configuration change summary:
+                            New Device Name: %s
+                            Confirm changes [y/n]: """ % newname)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_name(newname)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Change the device name with arguments
     def set_name(self, name):
@@ -631,8 +646,15 @@ class PacketmasterEX(object):
     def set_label_guided(self):
         newname = raw_input('Enter device name: ')
         newnotes = raw_input('Enter device notes: ')
-        run = self.set_label(newname, newnotes)
-        return run
+        confirm = raw_input("""Configuration change summary:
+                            New Device Name: %s
+                            New Device Notes: %s
+                            Confirm changes [y/n]: """ % (newname, newnotes))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_label(newname, newnotes)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Change the device name and notes with arguments
     def set_label(self, name, notes):
@@ -661,8 +683,8 @@ class PacketmasterEX(object):
                 speed = speed.upper()
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
-        else: #May need to become 'elif self.hardware == '3.1'' with new else clause; need EX5-2 and EX12 to verify
-            speed = raw_input('Enter interface speed; e.g. "10", "100", "1000", "auto" for Copper or SFP ports; "XG" or "1G" for SFP+ ports: ').strip()
+        else: #May need to become 'elif self.hardware == '3.1'' with new else clause; need EX5-2, EX6, and EX12 to verify
+            speed = raw_input('Enter interface speed; e.g. "10", "100", "1000", "auto" for Copper or SFP ports; "XG" (10G) or "1G" for SFP+ ports: ').strip()
             if speed.lower() == 'auto':
                 speed = 'auto'
             elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG', '1g', '1G'):
@@ -690,7 +712,20 @@ class PacketmasterEX(object):
             recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
-            run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc, split)
+            confirm = raw_input("""Configuration change summary:
+                                Interface: %s
+                                New Speed: %s
+                                New Duplex: %s
+                                New Description: %s
+                                Force TX (unidirectional): %s
+                                CRC Check: %s
+                                CRC Recalculation: %s
+                                Split Interface: %s
+                                Confirm changes [y/n]: """ % (interface, speed, duplex, description, forcetx, check, recalc, split))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc, split)
+            else:
+                return "Canceling; no changes made.\n"
         elif self.hardware == '4':
             forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
             if forcetx == '':
@@ -701,9 +736,30 @@ class PacketmasterEX(object):
             recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
-            run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc)
+            confirm = raw_input("""Configuration change summary:
+                                Interface: %s
+                                New Speed: %s
+                                New Duplex: %s
+                                New Description: %s
+                                Force TX (unidirectional): %s
+                                CRC Check: %s
+                                CRC Recalculation: %s
+                                Confirm changes [y/n]: """ % (interface, speed, duplex, description, forcetx, check, recalc))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc)
+            else:
+                return "Canceling; no changes made.\n"
         else:
-            run = self.set_port_config(interface, speed, duplex, description)
+            confirm = raw_input("""Configuration change summary:
+                                Interface: %s
+                                New Speed: %s
+                                New Duplex: %s
+                                New Description: %s
+                                Confirm changes [y/n]: """ % (interface, speed, duplex, description))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.set_port_config(interface, speed, duplex, description)
+            else:
+                return "Canceling; no changes made.\n"
         print """\nA device reboot is required for changes to take effect when changing
 between 1G and 10G on pre-G4 devices and when changing to or from breakout cables
 on QSFP ports of G4 devices. \n"""
@@ -799,8 +855,15 @@ on QSFP ports of G4 devices. \n"""
     def port_on_off_guided(self):
         if_name = raw_input('Enter the interface name of the port you want to change: ')
         shutdown = raw_input('Enter "true" to shut port down; Enter "false" to activate port [false]: ')
-        run = self.port_on_off(if_name, shutdown)
-        return run
+        confirm = raw_input("""Configuration change summary:
+                            Interface: %s
+                            Shutdown: %s
+                            Confirm changes [y/n]: """ % (if_name, shutdown))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.port_on_off(if_name, shutdown)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Activate or deactivate a port with arguments
     def port_on_off(self, if_name, shutdown):
@@ -1106,10 +1169,17 @@ on QSFP ports of G4 devices. \n"""
         extra = raw_input('Enter Extra Custom Match String: ')
         if extra != '':
             params['match[extra]'] = extra
-        ruleaction = raw_input('Enter the desired output actions separated by commas; order matters - improper syntax will cause Add Rule to fail: ')
+        ruleaction = raw_input('\nEnter the desired output actions separated by commas; order matters - improper syntax will cause Add Rule to fail: ')
         params['actions'] = ruleaction
-        run = self.add_rule(params)
-        return run
+        check_params = json.dumps(params, indent=4)
+        confirm = raw_input("""Configuration change summary:
+                            Rule Parameters: %s
+                            Confirm changes [y/n]: """ % check_params)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.add_rule(params)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Add rule by providing all parameters
     def add_rule(self, params):
