@@ -1452,8 +1452,15 @@ on QSFP ports of G4 devices. \n"""
             params['match[extra]'] = extra
         ruleaction = raw_input('Enter the new output actions separated by commas; order matters - improper syntax will cause Modify Rule to fail: ')
         params['actions'] = ruleaction
-        run = self.mod_rule(params)
-        return run
+        check_params = json.dumps(params, indent=4)
+        confirm = raw_input("""Configuration change summary:
+                            Modified Rule Parameters: %s
+                            Confirm changes [y/n]: """ % check_params)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.mod_rule(params)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Modify a rule with arguments
     def mod_rule(self, params):
@@ -1654,8 +1661,15 @@ on QSFP ports of G4 devices. \n"""
         extra = raw_input('Enter Extra Custom Match String: ')
         if extra != '':
             params['match[extra]'] = extra
-        run = self.del_rule(params)
-        return run
+        check_params = json.dumps(params, indent=4)
+        confirm = raw_input("""Configuration change summary:
+                            Delete Rule Matching: %s
+                            Confirm changes [y/n]: """ % check_params)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.del_rule(params)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Delete a rule with arguments
     def del_rule(self, params):
@@ -1838,8 +1852,15 @@ on QSFP ports of G4 devices. \n"""
                    'type': type_group,
                    'description': description
                  }
-        run = self.add_group(name, params)
-        return run
+        check_params = json.dumps(params, indent=4)
+        confirm = raw_input("""Configuration change summary:
+                            Add Group Parameters: %s
+                            Confirm changes [y/n]: """ % check_params)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.add_group(name, params)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Add a group with arguments
     def add_group(self, gid, json_app):
@@ -2004,8 +2025,15 @@ on QSFP ports of G4 devices. \n"""
                    'type': group_type,
                    'description': description
                  }
-        run = self.modify_group(name, params)
-        return run
+        check_params = json.dumps(params, indent=4)
+        confirm = raw_input("""Configuration change summary:
+                            Modified Group Parameters: %s
+                            Confirm changes [y/n]: """ % check_params)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.modify_group(name, params)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Modify a group with arguments
     def modify_group(self, gid, json_app):
@@ -2045,8 +2073,14 @@ on QSFP ports of G4 devices. \n"""
             input_check = int(name)
         except:
             return "That is not a valid group ID, canceling Delete Group."
-        run = self.delete_group(name)
-        return run
+        confirm = raw_input("""Configuration Change Summary:
+                            Delete Group ID: %s
+                            Confirm changes [y/n]: """ % name))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.delete_group(name)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Delete a group
     def delete_group(self, gid):
