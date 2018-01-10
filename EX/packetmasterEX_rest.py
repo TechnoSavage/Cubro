@@ -2131,8 +2131,14 @@ on QSFP ports of G4 devices. \n"""
     #Make a port save point active with guided options
     def set_port_savepoint_guided(self):
         savename = raw_input('What is the name of the port save point to make active?: ')
-        run = self.set_port_savepoint(savename)
-        return run
+        confirm = raw_input("""Configuration Change Summary:
+                            You are about to make port save point %s active.
+                            Confirm changes [y/n]: """ % savename))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_port_savepoint(savename)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Make a port save point active
     def set_port_savepoint(self, savename):
@@ -2155,8 +2161,14 @@ on QSFP ports of G4 devices. \n"""
     #Make a rule save point active with guided options
     def set_rule_savepoint_guided(self):
         savename = raw_input('What is the name of the rule save point to make active?: ')
-        run = self.set_rule_savepoint(savename)
-        return run
+        confirm = raw_input("""Configuration Change Summary:
+                            You are about to make rule save point %s active.
+                            Confirm changes [y/n]: """ % savename))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_rule_savepoint(savename)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Make a rule save point active
     def set_rule_savepoint(self, savename):
@@ -2179,8 +2191,14 @@ on QSFP ports of G4 devices. \n"""
     #Set a save point as the default boot configuration with guided options
     def set_boot_savepoint_guided(self):
         savename = raw_input('What is the name of the save point to make the default at boot configuration?: ')
-        run = self.set_boot_savepoint(savename)
-        return run
+        confirm = raw_input("""Configuration Change Summary:
+                            You are about to set save point %s the default boot configuration.
+                            Confirm changes [y/n]: """ % savename))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_boot_savepoint(savename)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Set a save point as the default boot configuration
     def set_boot_savepoint(self, savename):
@@ -2205,8 +2223,16 @@ on QSFP ports of G4 devices. \n"""
         rspname = raw_input('What is the name of the rule save point to export? (leave blank for none): ')
         pspname = raw_input('What is the name of the port save point to export? (leave blank for none): ')
         filename = raw_input("Enter a file name for the savepoint: ")
-        run = self.export_savepoint(rspname, pspname, filename)
-        return run
+        confirm = raw_input("""Savepoint Export Summary:
+                            Rule Save Point: %s
+                            Port Save Point: %s
+                            Saved to file: %s
+                            Confirm changes [y/n]: """ % (rspname, pspname, filename))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.export_savepoint(rspname, pspname, filename)
+            return run
+        else:
+            return "Canceling; save points not exported.\n"
 
     #Export a save point from the Packetmaster.  This still needs worked out; Packetmaster returns empty save points
     def export_savepoint(self, rspname, pspname, filename):
@@ -2241,8 +2267,17 @@ on QSFP ports of G4 devices. \n"""
             override = False
         else:
             override = True
-        run = self.modify_port_savepoint(oldname, newname, desc, override)
-        return run
+        confirm = raw_input("""Modify Port Save Point Summary:
+                            Save Point to Modify: %s
+                            New Save Point Name: %s
+                            New Description: %s
+                            Save Active Ports: %s
+                            Confirm changes [y/n]: """ % (oldname, newname, desc, override))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.modify_port_savepoint(oldname, newname, desc, override)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Modify a port savepoint
     def modify_port_savepoint(self, oldname, newname, description, override=True):
@@ -2277,8 +2312,17 @@ on QSFP ports of G4 devices. \n"""
             override = False
         else:
             override = True
-        run = self.modify_rule_savepoint(oldname, newname, desc, override)
-        return run
+        confirm = raw_input("""Modify Rule Save Point Summary:
+                            Save Point to Modify: %s
+                            New Save Point Name: %s
+                            New Description: %s
+                            Save Active Rules: %s
+                            Confirm changes [y/n]: """ % (oldname, newname, desc, override))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.modify_rule_savepoint(oldname, newname, desc, override)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Modify a rule save point with arguments
     def modify_rule_savepoint(self, oldname, newname, description, override=True):
