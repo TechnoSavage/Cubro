@@ -2351,8 +2351,15 @@ on QSFP ports of G4 devices. \n"""
     def create_port_savepoint_guided(self):
         name = raw_input("Name for  newly created port savepoint: ")
         desc = raw_input("Description for the port save point: ")
-        run = self.create_port_savepoint(name, desc)
-        return run
+        confirm = raw_input("""Create Port Save Point:
+                            Save Point Name: %s
+                            Description: %s
+                            Confirm changes [y/n]: """ % (name, desc))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.create_port_savepoint(name, desc)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Create a port save point from current configuration using arguments
     def create_port_savepoint(self, name, description):
@@ -2391,8 +2398,15 @@ on QSFP ports of G4 devices. \n"""
     def create_rule_savepoint_guided(self):
         name = raw_input("Name for newly created rule save point: ")
         desc = raw_input("Description for the rule save point: ")
-        run = self.create_rule_savepoint(name, desc)
-        return run
+        confirm = raw_input("""Create Rule Save Point:
+                            Save Point Name: %s
+                            Description: %s
+                            Confirm changes [y/n]: """ % (name, desc))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.create_rule_savepoint(name, desc)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Create a rule save point from current configuration using arguments
     def create_rule_savepoint(self, name, description):
@@ -2414,8 +2428,14 @@ on QSFP ports of G4 devices. \n"""
     #Delete a port save point with guided options
     def delete_port_savepoint_guided(self):
         name = raw_input("Port save point to delete: ")
-        run = self.delete_port_savepoint(name)
-        return run
+        confirm = raw_input("""Delete Port Save Point Summary:
+                            Save Point Name: %s
+                            Confirm changes [y/n]: """ % name)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.delete_port_savepoint(name)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Delete a port save point with arguments
     def delete_port_savepoint(self, name):
@@ -2438,8 +2458,14 @@ on QSFP ports of G4 devices. \n"""
     #Delete a rule save point with guided options
     def delete_rule_savepoint_guided(self):
         name = raw_input("Rule save point to delete:  ")
-        run = self.delete_rule_savepoint(name)
-        return run
+        confirm = raw_input("""Delete Rule Save Point Summary:
+                            Save Point Name: %s
+                            Confirm changes [y/n]: """ % name)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.delete_rule_savepoint(name)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Delete a rule save point with arguments
     def delete_rule_savepoint(self, name):
