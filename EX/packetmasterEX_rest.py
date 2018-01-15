@@ -2503,7 +2503,15 @@ on QSFP ports of G4 devices. \n"""
         if app == 1:
             server1 = raw_input("Enter NTP target IP or Host Name: ")
             server2 = raw_input("Enter NTP backup IP or Host Name: ")
-            run = self.start_app_ntp(server1, server2, description)
+            confirm = raw_input("""Start NTP App Summary:
+                                Server 1: %s
+                                Server 2: %s
+                                Description: %s
+                                Confirm changes [y/n]: """ % (server1, server2, description))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.start_app_ntp(server1, server2, description)
+            else:
+                return "Canceling; no changes made.\n"
         elif app == 2:
             interval = raw_input("Enter the check interval in milliseconds [5000]: ")
             if interval == '':
@@ -2515,7 +2523,20 @@ on QSFP ports of G4 devices. \n"""
             dst_mac = raw_input("Destination MAC address of outgoing ARP response: ")
             src_ip = raw_input("Source IP address of outgoing ARP response: ")
             dst_ip = raw_input("Destination IP of outgoing ARP response: ")
-            run = self.start_app_arpresponder(out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
+            confirm = raw_input("""Start ARP Responder App Summary:
+                                Check Interval: %s
+                                Port of incoming ARP packets: %s
+                                Port to send ARP packets: %s
+                                Source MAC of outgoing ARPs: %s
+                                Destinaton MAC of outgoing ARPs: %s
+                                Source IP of outgoing ARPs: %s
+                                Destination IP of outgoing ARPs: %s
+                                Description: %s
+                                Confirm changes [y/n]: """ % (interval, in_port, out_port, match_mac, src_mac, dst_mac, src_ip, dst_ip, description))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.start_app_arpresponder(out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
+            else:
+                return "Canceling; no changes made.\n"
         elif app == 3:
             interval = raw_input("Enter the check interval in milliseconds [5000]: ")
             if interval == '':
@@ -2540,9 +2561,33 @@ on QSFP ports of G4 devices. \n"""
                 trap2_port = raw_input('Enter port number for additional SNMP trap [162]: ')
                 if trap2_port == '':
                     trap2_port = '162'
-                run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable, trap1, trap1_port, trap2, trap2_port)
+                confirm = raw_input("""Start SNMP App Summary:
+                                    Check Interval: %s
+                                    SNMP Port: %s
+                                    SNMP Community: %s
+                                    Trap Enabled: %s
+                                    Trap 1 IP: %s
+                                    Trap 1 Port: %s
+                                    Trap 2 IP: %s
+                                    Trap 2 Port: %s
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, trap1, trap1_port, trap2, trap2_port, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable, trap1, trap1_port, trap2, trap2_port)
+                else:
+                    return "Canceling; no changes made.\n"
             else:
-                run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable)
+                confirm = raw_input("""Start SNMP App Summary:
+                                    Check Interval: %s
+                                    SNMP Port: %s
+                                    SNMP Community: %s
+                                    Trap Enabled: %s
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable)
+                else:
+                    return "Canceling; no changes made.\n"
         elif app == 4:
             conn_type = raw_input('''Control Bypass Switch using:
                                     1 - IP Address
@@ -2591,13 +2636,87 @@ on QSFP ports of G4 devices. \n"""
             if dst_ip == '':
                 dst_ip = '0.0.0.2'
             if conn_type == 'IP' and proto == 'UDP':
-                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
+                confirm = raw_input("""Start Heartbeat Bypass App Summary:
+                                    First Port connected to Bypass Switch: %s
+                                    Second Port connected to Bypass Switch: %s
+                                    Port to receive Heartbeat packets: %s
+                                    Port to send heartbeat packets: %s
+                                    Connection Type: %s
+                                    Check Interval: %s
+                                    Heartbeat Protocol: %s
+                                    Heartbeat Source MAC: %s
+                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Source IP: %s
+                                    Heartbeat Destination IP: %S
+                                    Heartbeat Source Port: %S
+                                    Heartbeat Destination Port: %s
+                                    Bypass Switch IP: %S
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
+                else:
+                    return "Canceling; no changes made.\n"
             elif conn_type == 'IP' and proto == 'ICMP':
-                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
+                confirm = raw_input("""Start Heartbeat Bypass App Summary:
+                                    First Port connected to Bypass Switch: %s
+                                    Second Port connected to Bypass Switch: %s
+                                    Port to receive Heartbeat packets: %s
+                                    Port to send heartbeat packets: %s
+                                    Connection Type: %s
+                                    Check Interval: %s
+                                    Heartbeat Protocol: %s
+                                    Heartbeat Source MAC: %s
+                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Source IP: %s
+                                    Heartbeat Destination IP: %S
+                                    Bypass Switch IP: %S
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
+                else:
+                    return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'UDP':
-                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                confirm = raw_input("""Start Heartbeat Bypass App Summary:
+                                    First Port connected to Bypass Switch: %s
+                                    Second Port connected to Bypass Switch: %s
+                                    Port to receive Heartbeat packets: %s
+                                    Port to send heartbeat packets: %s
+                                    Connection Type: %s
+                                    Check Interval: %s
+                                    Heartbeat Protocol: %s
+                                    Heartbeat Source MAC: %s
+                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Source IP: %s
+                                    Heartbeat Destination IP: %S
+                                    Heartbeat Source Port: %S
+                                    Heartbeat Destination Port: %s
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                else:
+                    return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'ICMP':
-                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                confirm = raw_input("""Start Heartbeat Bypass App Summary:
+                                    First Port connected to Bypass Switch: %s
+                                    Second Port connected to Bypass Switch: %s
+                                    Port to receive Heartbeat packets: %s
+                                    Port to send heartbeat packets: %s
+                                    Connection Type: %s
+                                    Check Interval: %s
+                                    Heartbeat Protocol: %s
+                                    Heartbeat Source MAC: %s
+                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Source IP: %s
+                                    Heartbeat Destination IP: %S
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                else:
+                    return "Canceling; no changes made.\n"
             else:
                 return "Something went wrong."
         elif app == 5:
@@ -2605,7 +2724,15 @@ on QSFP ports of G4 devices. \n"""
             port = raw_input("Server port [514]: ")
             if port == '':
                 port = '514'
-            run = self.start_app_syslog(server_ip, port, description)
+            confirm = raw_input("""Start Syslog App Summary:
+                                Syslog Server IP: %s
+                                Syslog Server Port: %s
+                                Description: %s
+                                Confirm changes [y/n]: """ % (server_ip, port, description))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.start_app_syslog(server_ip, port, description)
+            else:
+                return "Canceling; no changes made.\n"
         elif app == 6:
             hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
             act_comm = raw_input("Command to run when heartbeat packets are detected: ")
