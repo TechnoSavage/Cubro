@@ -2640,7 +2640,7 @@ on QSFP ports of G4 devices. \n"""
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
-                                    Port to send heartbeat packets: %s
+                                    Port to send Heartbeat packets: %s
                                     Connection Type: %s
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
@@ -2662,7 +2662,7 @@ on QSFP ports of G4 devices. \n"""
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
-                                    Port to send heartbeat packets: %s
+                                    Port to send Heartbeat packets: %s
                                     Connection Type: %s
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
@@ -2682,7 +2682,7 @@ on QSFP ports of G4 devices. \n"""
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
-                                    Port to send heartbeat packets: %s
+                                    Port to send Heartbeat packets: %s
                                     Connection Type: %s
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
@@ -2703,7 +2703,7 @@ on QSFP ports of G4 devices. \n"""
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
-                                    Port to send heartbeat packets: %s
+                                    Port to send Heartbeat packets: %s
                                     Connection Type: %s
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
@@ -2770,9 +2770,43 @@ on QSFP ports of G4 devices. \n"""
             if dst_ip == '':
                 dst_ip = '0.0.0.2'
             if proto == 'UDP':
-                run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                confirm = raw_input("""Start Heartbeat App Summary:
+                                    Port to receive Heartbeat packets: %s
+                                    Activation Command: %s
+                                    Port to send Heartbeat packets: %s
+                                    Deactivation Command: %S
+                                    Check Interval: %s
+                                    Heartbeat Protocol: %s
+                                    Heartbeat Source MAC: %s
+                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Source IP: %s
+                                    Heartbeat Destination IP: %S
+                                    Heartbeat Source Port: %s
+                                    Heartbeat Destination Port: %S
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                else:
+                    return "Canceling; no changes made.\n"
             elif proto == 'ICMP':
-                run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                confirm = raw_input("""Start Heartbeat App Summary:
+                                    Port to receive Heartbeat packets: %s
+                                    Activation Command: %s
+                                    Port to send heartbeat packets: %s
+                                    Deactivation Command: %s
+                                    Check Interval: %s
+                                    Heartbeat Protocol: %s
+                                    Heartbeat Source MAC: %s
+                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Source IP: %s
+                                    Heartbeat Destination IP: %S
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                else:
+                    return "Canceling; no changes made.\n"
             else:
                 return "Something went wrong."
         else:
