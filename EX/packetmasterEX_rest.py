@@ -2847,6 +2847,8 @@ on QSFP ports of G4 devices. \n"""
             return "That is not an valid input for interval (number in milliseconds); canceling start ArpResponder."
         try:
             input_check = int(outport)
+            if input_check > self.ports:
+                return "Physical port does not exist on device."
         except:
             return "That is not an valid input for output port; canceling start ArpResponder."
         params = {'name': 'ArpResponder',
@@ -2860,6 +2862,8 @@ on QSFP ports of G4 devices. \n"""
         if inport:
             try:
                 input_check = int(inport)
+                if input_check > self.ports:
+                    return "Physical port does not exist on device."
             except:
                 return "That is not a valid input for input port; canceling ArpResponder."
             params['inPort'] = inport
@@ -3460,6 +3464,8 @@ on QSFP ports of G4 devices. \n"""
             return "That is not an valid input for interval (number in milliseconds); canceling Modify ArpResponder."
         try:
             input_check = int(outport)
+            if input_check > self.ports:
+                return "Physical port does not exist on device."
         except:
             return "That is not an valid input for output port; canceling Modify ArpResponder."
         params = {'name': 'ArpResponder',
@@ -3474,6 +3480,8 @@ on QSFP ports of G4 devices. \n"""
         if inport:
             try:
                 input_check = int(inport)
+                if input_check > self.ports:
+                    return "Physical port does not exist on device."
             except:
                 return "That is not a valid input for input port; canceling ArpResponder."
             params['inPort'] = inport
