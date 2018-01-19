@@ -3375,7 +3375,15 @@ on QSFP ports of G4 devices. \n"""
             port = raw_input("Server port [514]: ")
             if port == '':
                 port = '514'
-            run = self.mod_app_syslog(pid, server_ip, port, description)
+            confirm = raw_input("""Modify Syslog App Summary:
+                                Syslog Server IP: %s
+                                Syslog Server Port: %s
+                                Description: %s
+                                Confirm changes [y/n]: """ % (server_ip, port, description))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.mod_app_syslog(pid, server_ip, port, description)
+            else:
+                return "Canceling; no changes made.\n"
         elif instance == 'Heartbeat':
             hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
             act_comm = raw_input("Command to run when heartbeat packets are detected: ")
@@ -3413,9 +3421,43 @@ on QSFP ports of G4 devices. \n"""
             if dst_ip == '':
                 dst_ip = '0.0.0.2'
             if proto == 'UDP':
-                run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                confirm = raw_input("""Modify Heartbeat App Summary:
+                                    Port to receive Heartbeat packets: %s
+                                    Activation Command: %s
+                                    Port to send Heartbeat packets: %s
+                                    Deactivation Command: %S
+                                    Check Interval: %s
+                                    Heartbeat Protocol: %s
+                                    Heartbeat Source MAC: %s
+                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Source IP: %s
+                                    Heartbeat Destination IP: %S
+                                    Heartbeat Source Port: %s
+                                    Heartbeat Destination Port: %S
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                else:
+                    return "Canceling; no changes made.\n"
             elif proto == 'ICMP':
-                run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                confirm = raw_input("""Modify Heartbeat App Summary:
+                                    Port to receive Heartbeat packets: %s
+                                    Activation Command: %s
+                                    Port to send heartbeat packets: %s
+                                    Deactivation Command: %s
+                                    Check Interval: %s
+                                    Heartbeat Protocol: %s
+                                    Heartbeat Source MAC: %s
+                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Source IP: %s
+                                    Heartbeat Destination IP: %S
+                                    Description: %s
+                                    Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                else:
+                    return "Canceling; no changes made.\n"
             else:
                 return "Something went wrong."
         else:
@@ -3775,8 +3817,15 @@ on QSFP ports of G4 devices. \n"""
     def call_app_action_guided(self):
         pid = raw_input('Enter the PID of the app instance: ')
         name = raw_input('Enter the name of the custom app action: ')
-        run = self.call_app_action(pid, name)
-        return run
+        confirm = raw_input("""Call App Action Summary:
+                            Process ID: %s
+                            Action Name: %s
+                            Confirm changes [y/n]: """ % (pid, name))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.call_app_action(pid, name)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Call a custom app action with arguments
     def call_app_action(self, pid, name):
@@ -3803,8 +3852,14 @@ on QSFP ports of G4 devices. \n"""
     #Stop a running app with guided options
     def kill_app_guided(self):
         pid = raw_input('What is the process ID of the app to kill: ')
-        run = self.kill_app(pid)
-        return run
+        confirm = raw_input("""Kill App Summary:
+                            Process ID: %s
+                            Confirm changes [y/n]: """ % pid)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.kill_app(pid)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Stop a running app with arguments
     def kill_app(self, pid):
@@ -3838,14 +3893,37 @@ on QSFP ports of G4 devices. \n"""
             proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
             src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
             dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
-            run = self.set_hash_algorithms(macsa, macda, ether, ipsa, ipda, proto, src, dst)
+            confirm = raw_input("""Set Hash Algorithms Summary:
+                                Use Source MAC Address: %s
+                                Use Destination MAC Address: %s
+                                Use Ethertype:%s
+                                Use Source IP Address: %s
+                                Use Destination IP Address: %s
+                                Use IP Protocol: %s
+                                Use Source Port: %s
+                                Use Destination Port: %s
+                                Confirm changes [y/n]: """ % (macsa, macda, ether, ipsa, ipda, proto, src, dst))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.set_hash_algorithms(macsa, macda, ether, ipsa, ipda, proto, src, dst)
+            else:
+                return "Canceling; no changes made.\n"
         else:
             ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ')
             ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ')
             proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
             src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
             dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
-            run = self.set_hash_algorithms('', '', '', ipsa, ipda, proto, src, dst)
+            confirm = raw_input("""Set Hash Algorithms Summary:
+                                Use Source IP Address: %s
+                                Use Destination IP Address: %s
+                                Use IP Protocol: %s
+                                Use Source Port: %s
+                                Use Destination Port: %s
+                                Confirm changes [y/n]: """ % (ipsa, ipda, proto, src, dst))
+            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                run = self.set_hash_algorithms('', '', '', ipsa, ipda, proto, src, dst)
+            else:
+                return "Canceling; no changes made.\n"
         return run
 
     #Change group hash algorithms with arguments
@@ -3915,8 +3993,14 @@ on QSFP ports of G4 devices. \n"""
     #Change rule mode permanence with guided options
     def set_rule_permanence_guided(self):
         perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off [false]: ').lower()
-        run = self.set_rule_permanence(perm)
-        return run
+        confirm = raw_input("""Set Rule Permamence Summary:
+                            Permanance Enabled: %s
+                            Confirm changes [y/n]: """ % perm)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_rule_permanence(perm)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Change rule mode permanence with arguments
     def set_rule_permanence(self, permanence):
@@ -3955,8 +4039,14 @@ on QSFP ports of G4 devices. \n"""
             mode = 'ipv6'
         else:
             return "That is not a valid selection; canceling set rule storage mode."
-        run = self.set_storage_mode(mode)
-        return run
+        confirm = raw_input("""Set Rule Storage Summary:
+                            Rule Storage Mode: %s
+                            Confirm changes [y/n]: """ % mode)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_storage_mode(mode)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Set rule storage mode
     def set_storage_mode(self, mode):
