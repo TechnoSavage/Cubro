@@ -4085,8 +4085,18 @@ on QSFP ports of G4 devices. \n"""
         passwd = raw_input("Enter a password for the user: ")
         description = raw_input("Add a description for this user: ")
         rad = raw_input("Use RADIUS authentication?  Y or N [N]: ").lower()
-        run = self.add_user(username, access_level, passwd, description, rad)
-        return run
+        confirm = raw_input("""Add User Summary:
+                            Username: %s
+                            Access Level: %s
+                            Password Hidden
+                            Description: %s
+                            Use RADIUS AAA: %s
+                            Confirm changes [y/n]: """ % (username, access_level, description, rad))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.add_user(username, access_level, passwd, description, rad)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Add a user
     def add_user(self, username, access_level, passwd, description='', rad=False):
@@ -4140,8 +4150,19 @@ on QSFP ports of G4 devices. \n"""
                                Enter the numeric value for the access level: """).strip()
         passwd = raw_input("Enter a new password for the user: ")
         rad = raw_input("Use RADIUS authentication?  Y or N [N]: ").lower()
-        run = self.mod_user(cur_name, new_name, access_level, passwd, description, rad)
-        return run
+        confirm = raw_input("""Modify User Summary:
+                            Modify User: %s
+                            New Username: %s
+                            Access Level: %s
+                            Password Hidden
+                            Description: %s
+                            Use RADIUS AAA: %s
+                            Confirm changes [y/n]: """ % (cur_name, new_name, access_level, description, rad))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.mod_user(cur_name, new_name, access_level, passwd, description, rad)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Modify a user
     def mod_user(self, cur_name, new_name, access_level, passwd, description='', rad=False ):
@@ -4189,8 +4210,14 @@ on QSFP ports of G4 devices. \n"""
     #Delete a user with guided options
     def delete_user_guided(self):
         username = raw_input('What is the user name to delete: ')
-        run = self.delete_user(username)
-        return run
+        confirm = raw_input("""Delete User Summary:
+                            Delete User: %s
+                            Confirm changes [y/n]: """ % username)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.delete_user(username)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Delete a user
     def delete_user(self, username):
@@ -4219,8 +4246,14 @@ on QSFP ports of G4 devices. \n"""
     #Turn mandatory user authentication on or off with guided options
     def set_uac_guided(self):
         access = raw_input('type "true" to turn on UAC; type "false" to turn it off [false]: ').lower()
-        run = self.set_uac(access)
-        return run
+        confirm = raw_input("""UAC Summary:
+                            User Access Control On: %s
+                            Confirm changes [y/n]: """ % access)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_uac(access)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Turn mandatory user authentication on or off with arguments
     def set_uac(self, uac):
@@ -4259,8 +4292,18 @@ on QSFP ports of G4 devices. \n"""
         port = raw_input('Enter the UDP port of the RADIUS server [1812]: ')
         if port == '':
             port = 1812
-        run = self.set_radius(server, secret, refresh, level, port)
-        return run
+        confirm = raw_input("""RADIUS Summary:
+                            RADIUS Server: %s
+                            Secret Hidden
+                            Refresh Rate: %s
+                            Default RADIUS Login Level: %s
+                            RADIUS Port: %s
+                            Confirm changes [y/n]: """ % (server, refresh, level, port))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_radius(server, secret, refresh, level, port)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Set RADIUS settings with arguments
     def set_radius(self, server, secret, refresh, level, port=1812):
