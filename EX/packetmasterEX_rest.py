@@ -4350,8 +4350,14 @@ on QSFP ports of G4 devices. \n"""
         else:
             enabled = False
             ssl = 'none'
-        run = self.set_https(enabled, ssl)
-        return run
+        confirm = raw_input("""Set HTTPS Summary:
+                            HTTPS Secure Web Server On: %s
+                            Confirm changes [y/n]: """ % enabled)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_https(enabled, ssl)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Turn HTTPS secure web interface on or off with arguments
     def set_https(self, enabled=False, ssl=None):
@@ -4378,8 +4384,14 @@ on QSFP ports of G4 devices. \n"""
     #Turn Telnet service on or off with guided options
     def set_telnet_guided(self):
         enabled = raw_input('Type "true" to enable Telnet; type "false" to turn it off [false]: ').lower()
-        run = self.set_telnet(enabled)
-        return run
+        confirm = raw_input("""Set Telnet Summary:
+                            Telnet Service On: %s
+                            Confirm changes [y/n]: """ % enabled)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_telnet(enabled)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Turn Telnet service on or off with arguments
     def set_telnet(self, enabled=False):
@@ -4424,8 +4436,16 @@ on QSFP ports of G4 devices. \n"""
         dns1 = raw_input('Enter the IP address of the first DNS server or leave blank for none [none]: ').strip()
         dns2 = raw_input('Enter the IP address of the second DNS server or leave blank for none [none]: ').strip()
         dns3 = raw_input('Enter the IP address of the third DNS server or leave blank for none [none]: ').strip()
-        run = self.set_dns(dns1, dns2, dns3)
-        return run
+        confirm = raw_input("""Set DNS Summary:
+                            DNS Server 1: %s
+                            DNS Server 2: %s
+                            DNS Server 3: %s
+                            Confirm changes [y/n]: """ % (dns1, dns2, dns3))
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_dns(dns1, dns2, dns3)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Set DNS server settings
     def set_dns(self, dns1='', dns2='', dns3=''):
@@ -4456,8 +4476,14 @@ on QSFP ports of G4 devices. \n"""
     #Turn the ID LED on or off with guided options
     def set_id_led_guided(self):
         led = raw_input('type "true" to turn the ID LED on; type "false" to turn it off [false]: ').lower()
-        run = self.set_id_led(led)
-        return run
+        confirm = raw_input("""Set ID LED Summary:
+                            ID LED On: %s
+                            Confirm changes [y/n]: """ % led)
+        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            run = self.set_id_led(led)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
 
     #Turn the ID LED on or off with arguments
     def set_id_led(self, led):
