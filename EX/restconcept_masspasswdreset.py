@@ -48,9 +48,10 @@ def rand_reset(ip, admin_username, admin_password):
     data = json.loads(user_list)
     for user in data:
         passwd = rand_generator()
-        changes[user] = passwd 
+        changes[user] = passwd
         reset = ex.mod_user(user, user, data[user]["accesslevel"], passwd, data[user]["description"], data[user]["radius"])
-    return results, changes
+
+    return results
 
 def file_reset(ip, admin_username, admin_password, user_list):
     ex = PacketmasterEX(ip, admin_username, admin_password)
@@ -74,6 +75,7 @@ if __name__ == '__main__':
         success = []
         failed = []
         user_list = []
+        output_file = {}
         with open(filename) as f:
             device_file = json.load(f)
             for item in device_file["packetmaster"]:
@@ -85,12 +87,19 @@ if __name__ == '__main__':
                     success.append(ip)
                 else:
                     failed.append(ip)
-                user_list.append(run["users"])
+                for pair in run["changes"]:
+                    user_list.append(pair)
+        output_file["Successfully Changed"] = success
+        output_file["Failed to connect"] = failed
+        output_file["New User Passwords"] = user_list
+        with open('password_reset.json', 'w') as output:
+            output.write(output_file)
     elif len(sys.argv) > 1 and str(sys.argv[1]) == '-f' or len(sys.argv) > 1 and str(sys.argv[1]) == '--fromfile':
         filename = sys.argv[2]
         device_list = []
         success = []
         failed = []
+        output_file = {}
         with open(filename) as f:
             device_file = json.load(f)
             user_list = device_file["users"]
@@ -103,5 +112,9 @@ if __name__ == '__main__':
                     success.append(ip)
                 else:
                     failed.append(ip)
+        output_file["Successfully Changed"] = success
+        output_file["Failed to connect"] = failed
+        with open('password_reset.json', 'w') as output:
+            output.write(output_file)
     else:
         usage()
