@@ -11,8 +11,9 @@ from packetmasterEX_rest import PacketmasterEX
 
 def usage():
     print """Usage:
-             -r, --read <file name> Use a list of IP addresses from a text file to provision Packetmasters.
-             -l, --list <ip address> <ip address> Enter IP addresses separated by spaces to provision Packetmasters.
+             -r, --read FILE   Use a list of IP addresses from a text file to provision Packetmasters.
+             -l, --list 192.168.1.2 [192.168.1.3][...]   Enter IP addresses separated by spaces to
+                                                         provision Packetmasters.
 
              This script will apply a preset baseline configuration to each Packetmaster IP address provided.
              This script assumes that the Packetmasters do not have UAC enabled."""
@@ -57,7 +58,7 @@ if __name__ == '__main__':
         ip_list = []
         with open(filename, 'r') as f:
             for line in f:
-                stuff = line.rstrip()
+                stuff = line.rstrip() #Provide capability to read usernames and passwords in order to use with UAC on
                 ip = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', stuff)
                 for item in ip:
                     ip_list.append(item)
