@@ -50,7 +50,7 @@ def rand_reset(ip, admin_username, admin_password):
         passwd = rand_generator()
         changes[user] = passwd
         reset = ex.mod_user(user, user, data[user]["accesslevel"], passwd, data[user]["description"], data[user]["radius"])
-
+    results["changes"] = changes
     return results
 
 def file_reset(ip, admin_username, admin_password, user_list):
