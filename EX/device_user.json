@@ -1,10 +1,11 @@
 {
-"packetmaster": [
-  {"ip": "192.168.1.221", "admin": "admin", "passwd": "admin"},
-  {"ip": "192.168.1.222", "admin": "admin", "passwd": "cubro"}
-  ],
-"users": [
-  {"username": "bob", "password": "dangerous"},
-  {"username": "frank", "password": "frankenfurter"}
-]
+  "packetmaster": [
+    {"ip": "192.168.1.221", "admin": "admin", "passwd": "cubro"},
+    {"ip": "192.168.1.222", "admin": "admin", "passwd": "cubro"}
+                   ],
+  "users": [
+    {"username": "Bob", "password": "dangerous"},
+    {"username": "george", "password": "washington"},
+    {"username": "jim", "password": "jimmyboy"}
+            ]
 }

@@ -89,7 +89,7 @@ def file_reset(ip, admin_username, admin_password, user_list):
     to_change = []
     cur_users = ex.get_users()
     data = json.loads(cur_users)
-    for user in cur_users:
+    for user in data:
         to_change.append(user)
     for user in user_list:
         if user["username"] in to_change and user["username"] != admin_username:
@@ -105,25 +105,23 @@ def file_reset(ip, admin_username, admin_password, user_list):
 def admin_reset(ip, admin_username, admin_password):
     ex = PacketmasterEX(ip, admin_username, admin_password)
     results = {}
+    changes = {}
     if ex.conn_test() == "Connection established":
         results["conn"] = True
     else:
         results["conn"] = False
         return results
-    user_list = ex.get_users()
-    data = json.loads(user_list)
+    cur_users = ex.get_users()
+    data = json.loads(cur_users)
     passwd = rand_generator()
-    for user in data:
-        if user == admin_username
-        changes[admin_username + "@" + ip] = {"device": ip,
-                                              "username": user,
-                                              "password": passwd}
-        reset = ex.mod_user(data[user]["username"],
-                            data[user]["username"],
-                            data[user]["accesslevel"],
-                            passwd,
-                            data[user]["description"],
-                            data[user]["radius"])
+    changes[admin_username + "@" + ip] = {"device": ip,
+                                          "username": user,
+                                          "password": passwd}
+    reset = ex.mod_user(data[admin_username]["username"],
+                        data[admin_username]["username"],
+                        data[admin_username]["accesslevel"],
+                        passwd,
+                        data[admin_username]["description"])
     results["users"] = changes
     return results
 
@@ -151,8 +149,7 @@ if __name__ == '__main__':
                 else:
                     failed.append(ip)
                 try:
-                    for entry in run["users"]:
-                        user_list.append(entry)
+                    user_list.append(run["users"])
                 except:
                     pass
         output_file["Successfully Changed"] = success
@@ -189,6 +186,7 @@ if __name__ == '__main__':
         device_list = []
         success = []
         failed = []
+        user_list = []
         output_file = {}
         with open(filename) as f:
             device_file = json.load(f)
@@ -196,14 +194,13 @@ if __name__ == '__main__':
                 ip = item["ip"]
                 user = item["admin"]
                 passwd = item["passwd"]
-                run = rand_reset(ip, user, passwd)
+                run = admin_reset(ip, user, passwd)
                 if run["conn"] == True:
                     success.append(ip)
                 else:
                     failed.append(ip)
                 try:
-                    for entry in run["users"]:
-                        user_list.append(entry)
+                    user_list.append(run["users"])
                 except:
                     pass
         output_file["Successfully Changed"] = success

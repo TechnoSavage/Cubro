@@ -4179,8 +4179,6 @@ on QSFP ports of G4 devices. \n"""
             return "That username does not exist; please use Add User.  Canceling Modify User."
         if new_name == '':
             return "That is not a valid username; canceling Modify User."
-        if new_name in user_list:
-            return "The newly entered user name is already in use; canceling Modify User."
         try:
             access_level = int(access_level)
         except:
