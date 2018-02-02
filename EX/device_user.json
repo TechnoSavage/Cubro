@@ -4,8 +4,8 @@
     {"ip": "192.168.1.222", "admin": "admin", "passwd": "cubro"}
                    ],
   "users": [
-    {"username": "Bob", "password": "dangerous"},
-    {"username": "george", "password": "washington"},
-    {"username": "jim", "password": "jimmyboy"}
+    {"username": "Bob", "passwd": "dangerous"},
+    {"username": "george", "passwd": "washington"},
+    {"username": "jim", "passwd": "jimmyboy"}
             ]
 }

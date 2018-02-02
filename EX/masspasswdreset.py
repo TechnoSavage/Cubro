@@ -6,7 +6,7 @@
 #!/usr/bin/python
 
 #Import necessary Python libraries
-import json, sys, re, string, random
+import json, sys, string, random
 from getpass import getpass
 from packetmasterEX_rest import PacketmasterEX
 
@@ -20,8 +20,8 @@ def usage():
                             Format:
                             {
                             "packetmaster": [
-                                            {"ip": "192.168.0.2", "admin": "username", "pass": "passwd"},
-                                            {"ip": "192.168.0.3", "admin": "username", "pass": "passwd"}
+                                            {"ip": "192.168.0.2", "admin": "username", "passwd": "password"},
+                                            {"ip": "192.168.0.3", "admin": "username", "passwd": "password"}
                                             ]
                             }
 
@@ -35,8 +35,8 @@ def usage():
                                 {"ip": "192.168.1.222", "admin": "username", "passwd": "password"}
                                 ],
                               "users": [
-                                {"username": "user1", "password": "passwd1"},
-                                {"username": "user2", "password": "passwd2"}
+                                {"username": "user1", "passwd": "passwd1"},
+                                {"username": "user2", "passwd": "passwd2"}
                               ]
                               }
 
@@ -47,8 +47,8 @@ def usage():
                              Format:
                              {
                              "packetmaster": [
-                                             {"ip": "192.168.0.2", "admin": "username", "pass": "passwd"},
-                                             {"ip": "192.168.0.3", "admin": "username", "pass": "passwd"}
+                                             {"ip": "192.168.0.2", "admin": "username", "passwd": "password"},
+                                             {"ip": "192.168.0.3", "admin": "username", "passwd": "password"}
                                              ]
                              }"""
 
@@ -65,14 +65,14 @@ def rand_reset(ip, admin_username, admin_password):
     data = json.loads(user_list)
     for user in data:
         if user != admin_username:
-            passwd = rand_generator()
+            rand_pass = rand_generator()
             changes[user + "@" + ip] = {"device": ip,
                                         "username": user,
-                                        "password": passwd}
+                                        "password": rand_pass}
             reset = ex.mod_user(data[user]["username"],
                                 data[user]["username"],
                                 data[user]["accesslevel"],
-                                passwd,
+                                rand_pass,
                                 data[user]["description"],
                                 data[user]["radius"])
     results["users"] = changes
@@ -97,7 +97,7 @@ def file_reset(ip, admin_username, admin_password, user_list):
             reset = ex.mod_user(data[key]["username"],
                                 data[key]["username"],
                                 data[key]["accesslevel"],
-                                user["password"],
+                                user["passwd"],
                                 data[key]["description"],
                                 data[key]["radius"])
     return results
@@ -113,14 +113,14 @@ def admin_reset(ip, admin_username, admin_password):
         return results
     cur_users = ex.get_users()
     data = json.loads(cur_users)
-    passwd = rand_generator()
+    rand_pass = rand_generator()
     changes[admin_username + "@" + ip] = {"device": ip,
-                                          "username": user,
-                                          "password": passwd}
+                                          "username": admin_user,
+                                          "password": rand_pass}
     reset = ex.mod_user(data[admin_username]["username"],
                         data[admin_username]["username"],
                         data[admin_username]["accesslevel"],
-                        passwd,
+                        rand_pass,
                         data[admin_username]["description"])
     results["users"] = changes
     return results
@@ -130,7 +130,7 @@ def rand_generator(size=16, chars=string.ascii_uppercase + string.ascii_lowercas
     return passwd
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3 and str(sys.argv[1]) == '-r' or len(sys.argv) == 3 and str(sys.argv[1]) == '--random':
+    if len(sys.argv) == 3 and str(sys.argv[1]) in ('-r','--random'):
         filename = sys.argv[2]
         device_list = []
         success = []
@@ -141,9 +141,9 @@ if __name__ == '__main__':
             device_file = json.load(f)
             for item in device_file["packetmaster"]:
                 ip = item["ip"]
-                user = item["admin"]
-                passwd = item["passwd"]
-                run = rand_reset(ip, user, passwd)
+                admin_user = item["admin"]
+                admin_password = item["passwd"]
+                run = rand_reset(ip, admin_user, admin_password)
                 if run["conn"] == True:
                     success.append(ip)
                 else:
@@ -158,7 +158,7 @@ if __name__ == '__main__':
         output = json.dumps(output_file, indent=4)
         with open('random_password_reset.json', 'w') as o:
             o.write(output)
-    elif len(sys.argv) > 1 and str(sys.argv[1]) == '-f' or len(sys.argv) > 1 and str(sys.argv[1]) == '--fromfile':
+    elif len(sys.argv) > 1 and str(sys.argv[1]) in ('-f', '--fromfile'):
         filename = sys.argv[2]
         device_list = []
         success = []
@@ -169,9 +169,9 @@ if __name__ == '__main__':
             user_list = device_file["users"]
             for item in device_file["packetmaster"]:
                 ip = item["ip"]
-                user = item["admin"]
-                passwd = item["passwd"]
-                run = file_reset(ip, user, passwd, user_list)
+                admin_user = item["admin"]
+                admin_password = item["passwd"]
+                run = file_reset(ip, admin_user, admin_password, user_list)
                 if run["conn"] == True:
                     success.append(ip)
                 else:
@@ -181,7 +181,7 @@ if __name__ == '__main__':
         output = json.dumps(output_file, indent=4)
         with open('password_reset.json', 'w') as o:
             o.write(output)
-    elif len(sys.argv) > 1 and str(sys.argv[1]) == '-a' or len(sys.argv) > 1 and str(sys.argv[1]) == '--admin':
+    elif len(sys.argv) > 1 and str(sys.argv[1]) in ('-a', '--admin'):
         filename = sys.argv[2]
         device_list = []
         success = []
@@ -192,9 +192,9 @@ if __name__ == '__main__':
             device_file = json.load(f)
             for item in device_file["packetmaster"]:
                 ip = item["ip"]
-                user = item["admin"]
-                passwd = item["passwd"]
-                run = admin_reset(ip, user, passwd)
+                admin_user = item["admin"]
+                admin_password = item["passwd"]
+                run = admin_reset(ip, admin_user, admin_password)
                 if run["conn"] == True:
                     success.append(ip)
                 else:
