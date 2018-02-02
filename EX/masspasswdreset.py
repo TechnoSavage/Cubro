@@ -7,7 +7,6 @@
 
 #Import necessary Python libraries
 import json, sys, string, random
-from getpass import getpass
 from packetmasterEX_rest import PacketmasterEX
 
 def usage():
