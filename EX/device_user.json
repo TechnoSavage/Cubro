@@ -5,7 +5,7 @@
                    ],
   "users": [
     {"username": "Bob", "passwd": "dangerous"},
-    {"username": "george", "passwd": "washington"},
-    {"username": "jim", "passwd": "jimmyboy"}
+    {"username": "George", "passwd": "washington"},
+    {"username": "Jim", "passwd": "jimmyboy"}
             ]
 }

@@ -28,32 +28,31 @@ def usage():
              This script will apply a preset baseline configuration to each Packetmaster IP address provided."""
 
 def apply_config(device_ip, admin_user=None, admin_password=None):
-    for address in ip_list:
-        ex = PacketmasterEX(address, admin_user, admin_password)
-        #Enter ReST API calls for configuration below this line.  See packetmasterEX_rest object class for methods.
-        ex.set_port_config('1', '10G', 'full', False, False, False)
-        ex.set_port_config('2', '10G', 'full', False, False, False)
-        ex.set_port_config('3', '10G', 'full', False, False, False)
-        ex.set_port_config('4', '10G', 'full', False, False, False)
-        ex.add_rule({'name': '1 & 2 to 3',
-                     'description': 'Inbound traffic on ports 1 and 2 is output on port 3',
-                     'priority': 32768,
-                     'match[in_port]': '1,2',
-                     'actions': '3'})
-        ex.add_rule({'name': '10.0.0.5 to 4',
-                     'description': 'Filter IP 10.0.0.5 out of inbound traffic on ports 1 and 2 and output on port 4; reinsert into traffic on port 3',
-                     'priority': 50000,
-                     'match[in_port]': '1,2',
-                     'match[protocol]': 'ip',
-                     'match[nw_src]': '10.0.0.5',
-                     'actions': '3,4'})
-        ex.start_app_ntp('0.north-america.pool.ntp.org', '', 'Use pool.ntp.org for NTP')
-        ex.set_hash_algorithms(False, False, False, False, True, True, True, True)
-        ex.set_rule_permanence('y')
-        ex.add_user('Bob', '7', 'bobby boy!', 'Network Engineer', False)
-        ex.add_user('Jim', '7', 'Jimminy Cricket', 'Security Guy', False)
-        ex.set_dns('9.9.9.9', '149.112.112.112')
-        ex.set_uac('t')
+    ex = PacketmasterEX(device_ip, admin_user, admin_password)
+    #Enter ReST API calls for configuration below this line.  See packetmasterEX_rest object class for methods.
+    ex.set_port_config('1', '10G', 'full', False, False, False)
+    ex.set_port_config('2', '10G', 'full', False, False, False)
+    ex.set_port_config('3', '10G', 'full', False, False, False)
+    ex.set_port_config('4', '10G', 'full', False, False, False)
+    ex.add_rule({'name': '1 & 2 to 3',
+                 'description': 'Inbound traffic on ports 1 and 2 is output on port 3',
+                 'priority': 32768,
+                 'match[in_port]': '1,2',
+                 'actions': '3'})
+    ex.add_rule({'name': '10.0.0.5 to 4',
+                 'description': 'Filter IP 10.0.0.5 out of inbound traffic on ports 1 and 2 and output on port 4; reinsert into traffic on port 3',
+                 'priority': 50000,
+                 'match[in_port]': '1,2',
+                 'match[protocol]': 'ip',
+                 'match[nw_src]': '10.0.0.5',
+                 'actions': '3,4'})
+    ex.start_app_ntp('0.north-america.pool.ntp.org', '', 'Use pool.ntp.org for NTP')
+    ex.set_hash_algorithms(False, False, False, False, True, True, True, True)
+    ex.set_rule_permanence('y')
+    ex.add_user('Bob', '7', 'bobby boy!', 'Network Engineer', False)
+    ex.add_user('Jim', '7', 'Jimminy Cricket', 'Security Guy', False)
+    ex.set_dns('9.9.9.9', '149.112.112.112')
+    ex.set_uac('t')
 
 if __name__ == '__main__':
     if len(sys.argv) == 3 and str(sys.argv[1]) in ('-f', '--filename'):
@@ -72,12 +71,13 @@ if __name__ == '__main__':
             admin_user = raw_input("Administrator Username: ")
             admin_pass = getpass()
         ip_list = sys.argv[2:]
-        addresses = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', sys.argv)
-        for ip in addresses:
-            if admin_user:
-                run = apply_config(ip, admin_user, admin_pass)
-            else:
-                run = apply_config(ip)
-            print run
+        for item in ip_list:
+            address = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', item)
+            if len(address) > 0:
+                if admin_user:
+                    run = apply_config(address[0], admin_user, admin_pass)
+                else:
+                    run = apply_config(address[0])
+                print run
     else:
         usage()
