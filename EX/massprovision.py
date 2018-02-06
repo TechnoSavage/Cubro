@@ -52,7 +52,7 @@ def apply_config(device_ip, admin_user=None, admin_password=None):
         ex.set_rule_permanence('y')
         ex.add_user('Bob', '7', 'bobby boy!', 'Network Engineer', False)
         ex.add_user('Jim', '7', 'Jimminy Cricket', 'Security Guy', False)
-        ex.set_dns('9.9.9.9', '149.112.112.112', '8.8.4.4')
+        ex.set_dns('9.9.9.9', '149.112.112.112')
         ex.set_uac('t')
 
 if __name__ == '__main__':
