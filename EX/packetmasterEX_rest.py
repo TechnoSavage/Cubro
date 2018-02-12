@@ -7,7 +7,6 @@ from getpass import getpass
 #TO-DO Add code to handle case and verify input in all areas where needed
 #add_rule_guided requires many input checks
 #Add code to validate input for IPv6 as well as IPv4
-#Add confirmation section
 
 class PacketmasterEX(object):
 
@@ -51,6 +50,7 @@ class PacketmasterEX(object):
 
 
     #Enumerate the number of ports on the device.
+    #This will currently return both Physical and Locical ports.  Find way to list Physcial ports only.
     def get_port_count(self):
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
