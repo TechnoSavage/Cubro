@@ -1,17 +1,21 @@
 Packmaster CLI Rules syntax examples
 --------------------------------------------------------------------------------------------------------------------
+Show Rules:
+cc dump-flows br0
+
 Add rule:
 cc add-flow br0 in_port=1,priority=32768,actions=output:2
-																				 actions=output:2,3,4    output to multiple ports can also be abbreviated as actions="2,3,4"
-																				 actions=drop
-																				 actions="set_field:4196->vlan_vid,output:2"  modify VLAN ID (in the CLI there is an offset of 4096 for VLAN ID; i.e. set_field:4196 = VLAN ID 100)
-																				 actions="push_vlan:0x8100,set_field:4196->vlan_vid,output:2"  push VLAN
+																				 actions=output:2,3,4    #output to multiple ports can also be abbreviated as actions="2,3,4"
+																				 actions=drop            #drop all traffic
+																				 actions=group:100       #output to group 100
+																				 actions="set_field:4196->vlan_vid,output:2"    #modify VLAN ID (in the CLI there is an offset of 4096 for VLAN ID; i.e. set_field:4196 = VLAN ID 100)
+																				 actions="push_vlan:0x8100,set_field:4196->vlan_vid,output:2"    #push VLAN
 																				 actions="strip_vlan,output:2"  strip VLAN ID
-																				 actions="set_field:10:AB:11:CD:12:EF->eth_src,2"  modify MAC source
-																				 actions="set_field:10:AB:11:CD:12:EF->eth_dst,2"  modify MAC destination
-																				 actions="pop_l2,push_mpls:0x8847,set_field:16->mpls_label,push_l2,set_field:10:AB:11:CD:12:EF->eth_dst,output:2" Push MPLS
-																				 actions="pop_l2,pop_mpls:0x8847,push_mpls:0x8847,set_field:16->mpls_label,push_l2,set_field:10:AB:11:CD:12:EF->eth_dst,output:2" Set MPLS Label
-																				 actions="pop_l2,pop_mpls:0,push_l2,set_field:10:AB:11:CD:12:EF->eth_dst,output:2" Pop MPLS
+																				 actions="set_field:10:AB:11:CD:12:EF->eth_src,2"    #modify MAC source
+																				 actions="set_field:10:AB:11:CD:12:EF->eth_dst,2"    #modify MAC destination
+																				 actions="pop_l2,push_mpls:0x8847,set_field:16->mpls_label,push_l2,set_field:10:AB:11:CD:12:EF->eth_dst,output:2"   #Push MPLS
+																				 actions="pop_l2,pop_mpls:0x8847,push_mpls:0x8847,set_field:16->mpls_label,push_l2,set_field:10:AB:11:CD:12:EF->eth_dst,output:2"   #Set MPLS Label
+																				 actions="pop_l2,pop_mpls:0,push_l2,set_field:10:AB:11:CD:12:EF->eth_dst,output:2"   #Pop MPLS
 
 Filter by Protocol:
  cc add-flow br0 in_port=1,priority=32768,tcp,actions=output:2
@@ -165,3 +169,17 @@ GRE: (EX2 uses different syntax, see lower.  Ex2 will automatically untunnel any
 	Decap (Decap PM)
 	----------------
 	cc add-flow br0 in_port=201,actions=output:2
+
+Show Groups:
+cc dump-groups br0
+
+Add Group:
+
+All (Traffic Replication):
+cc add-group br0 group_id=100,type=all,bucket=output:5,bucket=output:6    #Add output actions as above
+
+Select (Load Balancing):
+cc add-group br0 group_id=100,type=select,bucket=output:5,bucket=output:6,bucket=output:7
+
+Fast Failover:
+cc add-group br0 group_id=100,type=ff,bucket=watch_port:7,output:7,bucket=watch_port:8,output:7
