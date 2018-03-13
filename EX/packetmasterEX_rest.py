@@ -683,7 +683,7 @@ class PacketmasterEX(object):
                 speed = speed.upper()
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
-        else: #May need to become 'elif self.hardware == '3.1'' with new else clause; need EX5-2, EX6, and EX12 to verify
+        else: #May need to become 'elif self.hardware == '3.1'' with new else clause; need EX5-2,and EX12 to verify.  EX6 (Gen-2) does not allow speed changes on SFP+ ports
             speed = raw_input('Enter interface speed; e.g. "10", "100", "1000", "auto" for Copper or SFP ports; "XG" (10G) or "1G" for SFP+ ports: ').strip()
             if speed.lower() == 'auto':
                 speed = 'auto'
@@ -840,7 +840,8 @@ on QSFP ports of G4 devices. \n"""
             params = {'if_name': interface,
                       'description': description,
                       'speed': speed,
-                      'duplex': duplex}
+                      'duplex': duplex,
+                      'shutdown': 'false'}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             # print response.status_code
@@ -917,7 +918,7 @@ on QSFP ports of G4 devices. \n"""
             r = 'No Response'
             raise e
 
-    #Add a rule with guided options
+    #Add a rule with guided options.  Create guided options for egress actions
     def add_rule_guided(self):
         params = {}
         rulename = raw_input('Enter a name for the rule [none]: ')
@@ -1705,7 +1706,7 @@ on QSFP ports of G4 devices. \n"""
             r = 'No Response'
             raise e
 
-    #Add a group with guided options
+    #Add a group with guided options.  Alter to guide through egress options.
     def add_group_guided(self):
         name = raw_input("Enter the group ID: ")
         try:
@@ -2493,7 +2494,8 @@ on QSFP ports of G4 devices. \n"""
                             3 - SNMP
                             4 - Heartbeat Bypass (control Bypass Switch)
                             5 - Syslog
-                            6 - Heartbeat
+                            6 - Bypass Keepalive (control Bypass Switch)
+                            7 - Heartbeat
                            Enter the number of the App selection: """)
         try:
             app = int(app)
@@ -2735,6 +2737,42 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Canceling; no changes made.\n"
         elif app == 6:
+            conn_type = raw_input('''Bypass Switch connection type:
+                                    1 - IP Address
+                                    2 - RS232 Console Cable
+                                    Enter selection [1]: ''')
+            if conn_type in ('', '1'):
+                conn_type = 'IP'
+                bypass_ip = raw_input("IP address of Bypass Switch: ")
+            elif int(conn_type) == 2:
+                conn_type = 'RS232'
+            else:
+                return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
+            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            if interval == '':
+                interval = '2000'
+            if conn_type == 'IP':
+                confirm = raw_input('''Start Bypass Keepalive Summary:
+                                    Connection Type: %s
+                                    Bypass Switch IP: %s
+                                    Check Interval: %s
+                                    Description: %s
+                                    Confirm changes [y/n]''' % (conn_type, bypass_ip, interval, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_bypasskeepalive(conn_type, interval, description, bypass_ip)
+                else:
+                    return "Canceling; no changes made.\n"
+            else:
+                confirm = raw_input('''Start Bypass Keepalive Summary:
+                                    Connection Type: %s
+                                    Check Interval: %s
+                                    Description: %s
+                                    Confirm changes [y/n]''' % (conn_type, interval, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.start_app_bypasskeepalive(conn_type, interval, description)
+                else:
+                    return "Canceling; no changes made.\n"
+        elif app == 7:
             hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
             act_comm = raw_input("Command to run when heartbeat packets are detected: ")
             hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
@@ -3066,6 +3104,42 @@ on QSFP ports of G4 devices. \n"""
             r = 'No Response'
             raise e
 
+    #Start bypass keepalive app instance
+    def start_app_bypasskeepalive(self, conn_type='ip', interval='2000', description='', bypass_ip='1.1.1.1'):
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not a valid input for Check Interval; canceling Bypass Keepalive."
+        params = {'description': 'This app is used to control a Cubro Bypass Switch device.',
+                  'interval': interval,
+                  'userDescription': description,
+                  'name': 'BypassKeepalive'}
+        if conn_type.upper() in ('IP', 'RS232'):
+            params['connectionType'] = conn_type.upper()
+            if conn_type == 'RS232' and self.hardware_generation =='4':
+                return "Controlling a Bypass Switch with RS232 is not supported on Gen 4 hardware; please use IP instead."
+            if conn_type == 'IP':
+                try:
+                    ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
+                    params['bypassIP'] = ip_check[0]
+                except:
+                    return "That is not a valid input for Bypass Switch IP; canceling Bypass Keepalive."
+        else:
+            return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling Bypass Keepalive."
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Start heartbeat app instance
     def start_app_heartbeat(self, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
         if self.https:
@@ -3384,6 +3458,42 @@ on QSFP ports of G4 devices. \n"""
                 run = self.mod_app_syslog(pid, server_ip, port, description)
             else:
                 return "Canceling; no changes made.\n"
+        elif instance == 'BypassKeepalive':
+            conn_type = raw_input('''Bypass Switch connection type:
+                                    1 - IP Address
+                                    2 - RS232 Console Cable
+                                    Enter selection [1]: ''')
+            if conn_type in ('', '1'):
+                conn_type = 'IP'
+                bypass_ip = raw_input("IP address of Bypass Switch: ")
+            elif int(conn_type) == 2:
+                conn_type = 'RS232'
+            else:
+                return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
+            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            if interval == '':
+                interval = '2000'
+            if conn_type == 'IP':
+                confirm = raw_input('''Modify Bypass Keepalive Summary:
+                                    Connection Type: %s
+                                    Bypass Switch IP: %s
+                                    Check Interval: %s
+                                    Description: %s
+                                    Confirm changes [y/n]''' % (conn_type, bypass_ip, interval, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.mod_app_bypasskeepalive(pid, conn_type, interval, description, bypass_ip)
+                else:
+                    return "Canceling; no changes made.\n"
+            else:
+                confirm = raw_input('''Modify Bypass Keepalive Summary:
+                                    Connection Type: %s
+                                    Check Interval: %s
+                                    Description: %s
+                                    Confirm changes [y/n]''' % (conn_type, interval, description))
+                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                    run = self.mod_app_bypasskeepalive(pid, conn_type, interval, description)
+                else:
+                    return "Canceling; no changes made.\n"
         elif instance == 'Heartbeat':
             hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
             act_comm = raw_input("Command to run when heartbeat packets are detected: ")
@@ -3742,6 +3852,47 @@ on QSFP ports of G4 devices. \n"""
             r = 'No Response'
             raise e
 
+    #Modify bypass keepalive app instance
+    def mod_app_bypasskeepalive(self, pid, conn_type='ip', interval='2000', description='', bypass_ip='1.1.1.1'):
+        if self.https:
+            uri = 'https://' + self.address + '/rest/apps?'
+        else:
+            uri = 'http://' + self.address + '/rest/apps?'
+        try:
+            input_check = int(pid)
+        except:
+            return "That is not a valid input for PID; canceling Modify Bypass Keepalive."
+        try:
+            input_check = int(interval)
+        except:
+            return "That is not a valid input for Check Interval; canceling Bypass Keepalive."
+        params = {'pid': pid,
+                  'description': 'This app is used to control a Cubro Bypass Switch device.',
+                  'interval': interval,
+                  'userDescription': description,
+                  'name': 'BypassKeepalive'}
+        if conn_type.upper() in ('IP', 'RS232'):
+            params['connectionType'] = conn_type.upper()
+            if conn_type == 'RS232' and self.hardware_generation =='4':
+                return "Controlling a Bypass Switch with RS232 is not supported on Gen 4 hardware; please use IP instead."
+            if conn_type == 'IP':
+                try:
+                    ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
+                    params['bypassIP'] = ip_check[0]
+                except:
+                    return "That is not a valid input for Bypass Switch IP; canceling Modify Bypass Keepalive."
+        else:
+            return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling Modify Bypass Keepalive."
+        try:
+            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            code = response.status_code
+            r = response.content
+            data = json.loads(r)
+            return json.dumps(data, indent=4)
+        except ConnectionError as e:
+            r = 'No Response'
+            raise e
+
     #Modify heartbeat app instance
     def mod_app_heartbeat(self, pid, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
         if self.https:
@@ -3884,7 +4035,7 @@ on QSFP ports of G4 devices. \n"""
 
     #Change group hash algorithms with guided options
     def set_hash_algorithms_guided(self):
-        if self.hardware == '4':
+        if self.hardware in ('4', '2'):
             macsa = raw_input('Type "true" to use MAC source address; type "false" to ignore [true]: ')
             macda = raw_input('Type "true" to use MAC destination address; type "false" to ignore [true]: ')
             ether = raw_input('Type "true" to use ether type; type "false" to ignore [true]: ')
@@ -3965,7 +4116,7 @@ on QSFP ports of G4 devices. \n"""
             dst = False
         else:
             dst = True
-        if self.hardware == '4':
+        if self.hardware in ('4', '2'):
             params = {'macsa': macsa,
                       'macda': macda,
                       'ether_type': ether,

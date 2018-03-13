@@ -175,11 +175,17 @@ cc dump-groups br0
 
 Add Group:
 
-All (Traffic Replication):
-cc add-group br0 group_id=100,type=all,bucket=output:5,bucket=output:6    #Add output actions as above
+  All (Traffic Replication):
+  cc add-group br0 group_id=100,type=all,bucket=output:5,bucket=output:6    #Add output actions as above
 
-Select (Load Balancing):
-cc add-group br0 group_id=100,type=select,bucket=output:5,bucket=output:6,bucket=output:7
+  Select (Load Balancing):
+  cc add-group br0 group_id=100,type=select,bucket=output:5,bucket=output:6,bucket=output:7
 
-Fast Failover:
-cc add-group br0 group_id=100,type=ff,bucket=watch_port:7,output:7,bucket=watch_port:8,output:7
+  Fast Failover:
+  cc add-group br0 group_id=100,type=ff,bucket=watch_port:7,output:7,bucket=watch_port:8,output:7
+
+Delete All Groups:
+cc del-groups br0
+
+Delete Group:
+cc del-groups br0 group_id=100   #Delete only group 100
