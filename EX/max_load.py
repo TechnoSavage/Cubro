@@ -1,6 +1,6 @@
 #Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
-#This script will generate a report showing the peak traffic load per port on a Packetmaster
-#over a 24 hour period.
+#This script will generate a report at 12am daily showing the peak traffic load on a per
+#port basis
 
 #!/usr/bin/python
 
@@ -9,12 +9,19 @@ import json, time, pickle, yaml
 from getpass import getpass
 from packetmasterEX_rest import PacketmasterEX
 
+def query(packetmaster):
+    stats = packetmaster.port_statistics()
+    return stats
+
+def parse(stats)
+
 if __name__ == '__main__':
     #Device credentials
     address = raw_input('Enter IP address of Packetmaster: ')
     username = raw_input('Enter your username: ')
     password = getpass()
     packetmaster = PacketmasterEX(address, username, password)
+    count = packetmaster.ports()
     print '''Save data in which format?
 	1 - Pickle
 	2 - JSON
@@ -39,3 +46,12 @@ if __name__ == '__main__':
     else:
         print "Something went horribly wrong"
         exit()
+
+    while true:
+        # if time in range x and marker false:
+        #     save reset
+        #     set marker
+        # else:
+        #     unset marker
+        stats = query(packetmaster)
+        table = parse(stats)
