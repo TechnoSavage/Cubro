@@ -13,7 +13,7 @@ def usage():
     print """Usage:
              -r, --random FILE   Provide a JSON formatted text file of device IPs and admin credentials.
                                  All users on provided devices will have current password replaced with
-                                 a random password.  A file of usernames and correspnding new passwords
+                                 a random password.  A file of usernames and corresponding new passwords
                                  will be created on this device.  This will NOT change the provided
                                  admin user's password to insure proper execution (see -a option).
                             Format:
