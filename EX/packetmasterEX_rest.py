@@ -50,7 +50,7 @@ class PacketmasterEX(object):
 
 
     #Enumerate the number of ports on the device.
-    #This will currently return both Physical and Locical ports.  Find way to list Physcial ports only.
+    #This will currently return both Physical and Logical ports.  Find way to list Physcial ports only.
     def get_port_count(self):
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
