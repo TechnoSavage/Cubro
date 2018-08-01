@@ -1,14 +1,27 @@
-#Packetmaster EX device class for REST API interaction,  Use with firmware version 2.1.x or newer.
+#Packetmaster EX device class for REST API interaction,
+#Use with firmware version 2.2.5 or newer and up to G4 NPB.
 
-import requests, json, re
-from requests.exceptions import ConnectionError
 from getpass import getpass
+import json
+import re
+import requests
+from requests.exceptions import ConnectionError
+
 
 #TO-DO Add code to handle case and verify input in all areas where needed
 #add_rule_guided requires many input checks
 #Add code to validate input for IPv6 as well as IPv4
+#Integrate new REST rules for 2.2.5 device/setlicense
+
 
 class PacketmasterEX(object):
+    """Object class representing a Cubro Packetmaster EX Network Packet Broker.
+
+    :param address: A string, Management IP of Packetmaster.
+    :param username: A string, username of an account on the Packetmaster.
+    :param password: A string, password for the user accountself.
+    """
+
 
     def __init__(self, address, username=None, password=None):
         self.address = address
@@ -19,6 +32,14 @@ class PacketmasterEX(object):
         print conn_test
 
     def conn_test(self):
+        """Test if device is reachable and assign properties.
+
+        Assigns additional properties including connecting via HTTP or HTTPS
+        Total port count for device
+        Model of Packetmaster
+        Hardware generation of Packetmaster
+        """
+
         try:
             gen_test = self.hardware_generation()
             data = json.loads(gen_test)
@@ -26,11 +47,10 @@ class PacketmasterEX(object):
                 if item == 'error':
                     print data['error']
                     return "Connection test failed"
-                else:
-                    self.hardware = data['generation']
-                    self.get_port_count()
-                    self.device_model()
-                    return "Connection established"
+                self.hardware = data['generation']
+                self.get_port_count()
+                self.device_model()
+                return "Connection established"
         except:
             try:
                 self.https = True
@@ -40,18 +60,17 @@ class PacketmasterEX(object):
                     if item == 'error':
                         print data['error']
                         return "Connection test failed"
-                    else:
-                        self.hardware = data['generation']
-                        self.get_port_count()
-                        self.device_model()
-                        return "Connection established"
+                    self.hardware = data['generation']
+                    self.get_port_count()
+                    self.device_model()
+                    return "Connection established"
             except:
                 print "Unable to establish connection; check if IP address is correct."
 
-
-    #Enumerate the number of ports on the device.
-    #This will currently return both Physical and Logical ports.  Find way to list Physcial ports only.
+    #This will currently return both Physical and Logical ports.
+    #Find way to list Physcial ports only.
     def get_port_count(self):
+        """Return the number of ports on the device."""
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
         else:
@@ -59,525 +78,672 @@ class PacketmasterEX(object):
         ports = list()
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             count = 0
             for port in data['port_config']:
                 ports.append(data['port_config'][count]['if_name'])
                 count += 1
             self.ports = len(ports)
             return len(ports)
-        except ConnectionError as e:
-            raise e
+        except ConnectionError as error:
+            raise error
 
-    #Retrieve firmware version
     def firmware_version(self):
+        """Return firmware version of Packetmaster and set as property."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/imageversion?'
         else:
             uri = 'http://' + self.address + '/rest/device/imageversion?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             self.firmware = data['version']
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve IP configuration
     def ip_config(self):
+        """Return IP config of device and set netmask and gateway properties."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/ipconfig?'
         else:
             uri = 'http://' + self.address + '/rest/device/ipconfig?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             self.netmask = data['current_netmask']
             self.gateway = data['current_gateway']
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve Packetmaster model
     def device_model(self):
+        """Return model of Packetmaster and set model property."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/model?'
         else:
             uri = 'http://' + self.address + '/rest/device/model?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             self.model = data['model']
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
         self.model = data['model']
 
-    #Retrieve Packetmaster name
     def device_name(self):
+        """Return name of Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/name?'
         else:
             uri = 'http://' + self.address + '/rest/device/name?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             self.name = data['name']
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve Packetmaster Name plus Notes
     def device_label(self):
+        """Return name and notes of Packetmaster and set them as properties."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/customident?'
         else:
             uri = 'http://' + self.address + '/rest/device/customident?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             self.name = data['name']
             self.notes = data['notes']
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve hardware generation of the device
     def hardware_generation(self):
+        """Return hardware generation of Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/generation?'
         else:
             uri = 'http://' + self.address + '/rest/device/generation?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve Packetmaster serial number
     def serial_number(self):
+        """Return serial number of Packetmaster and set as property."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/serialno?'
         else:
             uri = 'http://' + self.address + '/rest/device/serialno?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             self.serial = data['serial']
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve current port configuration
     def port_config(self):
+        """Return port configuration of Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
         else:
             uri = 'http://' + self.address + '/rest/ports/config?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve port information
     def port_info(self):
+        """Return port information of Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/info?'
         else:
             uri = 'http://' + self.address + '/rest/ports/info?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve port counters
     def port_statistics(self):
+        """Return port counters of Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/stats?'
         else:
             uri = 'http://' + self.address + '/rest/ports/stats?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve SFP information
     def sfp_info(self):
+        """Return SFP information of any installed transceivers."""
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/sfpstatus?'
         else:
             uri = 'http://' + self.address + '/rest/ports/sfpstatus?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             result = data['result']
             return json.dumps(result, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve active rules
     def rules_active(self):
+        """Return any active rules/filters on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/rules/all?'
         else:
             uri = 'http://' + self.address + '/rest/rules/all?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve active groups
     def groups_active(self):
+        """Return any active port groups on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/groups/all?'
         else:
             uri = 'http://' + self.address + '/rest/groups/all?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #List all available apps
     def device_apps(self):
+        """Return all Apps on Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve running apps
     def apps_active(self):
+        """Return any running Apps on Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps/running?'
         else:
             uri = 'http://' + self.address + '/rest/apps/running?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve hash algorithm information
     def hash_algorithms(self):
+        """Return load balancing hash algorithm configuration."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/grouphash?'
         else:
             uri = 'http://' + self.address + '/rest/device/grouphash?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve rule permanence mode
     def rule_permanence(self):
+        """Return state of Rule Permanance setting."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
         else:
             uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve rule storage mode
     def storage_mode(self):
+        """Return setting of Rule Storage Mode."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/rulestoragemode?'
         else:
             uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve environment information
     def env_info(self):
+        """Return environmental information of Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/environment?'
         else:
             uri = 'http://' + self.address + '/rest/device/environment?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve deice ID LED status_code
     def id_led(self):
+        """Return status of ID LED setting."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/idled?'
         else:
             uri = 'http://' + self.address + '/rest/device/idled?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve load information
     def load_info(self):
+        """Return load information."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/loadaverage?'
         else:
             uri = 'http://' + self.address + '/rest/device/loadaverage?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve the maximum and currently used TCAM flows
     def tcam(self):
+        """Return the max and currently used TCAM flows."""
         if self.https:
             uri = 'https://' + self.address + '/rest/flownumbers?'
         else:
             uri = 'http://' + self.address + '/rest/flownumbers?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve memory usage
     def mem_free(self):
+        """Return memory usage."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/memoryusage?'
         else:
             uri = 'http://' + self.address + '/rest/device/memoryusage?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve cch machinery server revision
     def server_revision(self):
+        """Return CCH machinery server revision."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/serverrevision?'
         else:
             uri = 'http://' + self.address + '/rest/device/serverrevision?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #List all save points
     def save_points(self):
+        """Return all available save points."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints?'
         else:
             uri = 'http://' + self.address + '/rest/savepoints?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve Web Log
     def web_log(self):
+        """Return web server log."""
         if self.https:
             uri = 'https://' + self.address + '/rest/weblog?'
         else:
             uri = 'http://' + self.address + '/rest/weblog?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve all users
     def get_users(self):
+        """Return all user accounts on Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/users?'
         else:
             uri = 'http://' + self.address + '/rest/users?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve User Authentication settings
     def user_uac(self):
+        """Return status of User Authentication setting."""
         if self.https:
             uri = 'https://' + self.address + '/rest/users/uac?'
         else:
             uri = 'http://' + self.address + '/rest/users/uac?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve RADIUS settings
     def get_radius(self):
+        """Return RADIUS settings."""
         if self.https:
             uri = 'https://' + self.address + '/rest/users/radius?'
         else:
             uri = 'http://' + self.address + '/rest/users/radius?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve DNS settings
     def get_dns(self):
+        """Return DNS server settings."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/nameresolution?'
         else:
             uri = 'http://' + self.address + '/rest/device/nameresolution?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Retrieve telnet service status_code
     def get_telnet(self):
+        """Return status of Telnet service setting."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/telnet?'
         else:
             uri = 'http://' + self.address + '/rest/device/telnet?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Change the management IP configuration with guided options
+    def get_controller(self):
+        """Return Vitrum Controller configuration."""
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/controller?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/controller?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
+            return json.dumps(data, indent=4)
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
+
+    def set_controller_guided(self):
+        """Interactive menu for setting Vitrum Controller configuration."""
+        conn = raw_input("""What is the connection type of the controller?
+                1 - TCP
+                2 - SSL
+                Enter the number of your selection: """)
+        if int(conn) == 1 or conn.lower() == "tcp":
+            conn = "tcp"
+        elif int(conn) == 2 or conn.lower() == "ssl":
+            conn = "ssl"
+        else:
+            return "That is not a valid selection; canceling Set Controller. \n"
+        ipadd = raw_input("What is the IP address of the controller: ")
+        try:
+            test = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', ipadd)
+            if len(test) == 1:
+                ipadd = test[0]
+            else:
+                return "That is not a valid IP address; canceling Set Controller. \n"
+        except TypeError as reason:
+            return ("That is not a valid IP address, canceling Set Controller.", reason)
+        port = raw_input("What is the TCP Port of the controller: ")
+        try:
+            test = int(port)
+            if test not in range(1, 65536):
+                return "That is not a valid TCP port number; canceling Set Controller. \n"
+        except ValueError as reason:
+            return ("That is not a valid TCP port number; canceling Set Controller.", reason)
+        confirm = raw_input("""Configuration change summary:
+                            Controller connection type: %s
+                            Controller IP Address: %s
+                            Controller port: %s
+                            Confirm changes [y/n]: """ % (conn, ipadd, port))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.set_controller(conn, ipadd, port)
+            return run
+        return "Canceling; no changes made.\n"
+
+    def set_controller(self, conn, ipadd, port):
+        """Set Vitrum Controller configuration."""
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/controller?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/controller?'
+        if conn.lower() not in ('tcp', 'ssl'):
+            return "That is not a valid connection type; canceling Set Controller. \n"
+        try:
+            test = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', ipadd)
+            if len(test) == 1:
+                ipadd = test[0]
+            else:
+                return "That is not a valid IP address; canceling Set Controller. \n"
+        except TypeError as reason:
+            return ("That is not a valid IP address, canceling Set Controller.", reason)
+        try:
+            test = int(port)
+            if test not in range(1, 65536):
+                return "That is not a valid TCP port number; canceling Set Controller. \n"
+        except ValueError as reason:
+            return ("That is not a valid TCP port number; canceling Set Controller.", reason)
+        params = {'connection': conn, 'ip': ipadd, 'port': port}
+        try:
+            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
+            return json.dumps(data, indent=4)
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
+
+    def del_controller_guided(self):
+        """Interactive menu for removing a Vitrum Controller."""
+        conn = raw_input("""What is the connection type of the controller?
+                1 - TCP
+                2 - SSL
+                Enter the number of your selection: """)
+        if int(conn) == 1 or conn.lower() == "tcp":
+            conn = "tcp"
+        elif int(conn) == 2 or conn.lower() == "ssl":
+            conn = "ssl"
+        else:
+            return "That is not a valid selection; canceling Delete Controller. \n"
+        ipadd = raw_input("What is the IP address of the controller: ")
+        try:
+            test = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', ipadd)
+            if len(test) == 1:
+                ipadd = test[0]
+            else:
+                return "That is not a valid IP address; canceling Delete Controller. \n"
+        except TypeError as reason:
+            return ("That is not a valid IP address, canceling Delete Controller.", reason)
+        port = raw_input("What is the TCP Port of the controller: ")
+        try:
+            test = int(port)
+            if test not in range(1, 65536):
+                return "That is not a valid TCP port number; canceling Delete Controller. \n"
+        except ValueError as reason:
+            return ("That is not a valid TCP port number; canceling Delete Controller.", reason)
+        confirm = raw_input("""Configuration change summary:
+                            Controller connection type: %s
+                            Controller IP Address: %s
+                            Controller port: %s
+                            Confirm changes [y/n]: """ % (conn, ipadd, port))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.del_controller(conn, ipadd, port)
+            return run
+        return "Canceling; no changes made.\n"
+
+    def del_controller(self, conn, ipadd, port):
+        """Remove a Vitrum Controller."""
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/controller?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/controller?'
+        if conn.lower() not in ('tcp', 'ssl'):
+            return "That is not a valid connection type; canceling Delete Controller. \n"
+        try:
+            test = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', ipadd)
+            if len(test) == 1:
+                ipadd = test[0]
+            else:
+                return "That is not a valid IP address; canceling Delete Controller. \n"
+        except TypeError as reason:
+            return ("That is not a valid IP address, canceling Delete Controller.", reason)
+        try:
+            test = int(port)
+            if test not in range(1, 65536):
+                return "That is not a valid TCP port number; canceling Delete Controller. \n"
+        except ValueError as reason:
+            return ("That is not a valid TCP port number; canceling Delete Controller.", reason)
+        params = {'connection': conn, 'ip': ipadd, 'port': port}
+        try:
+            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
+            return json.dumps(data, indent=4)
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
+
+    def get_dpid(self):
+        """Return Device OpenFlow Datapath ID."""
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/dpid?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/dpid?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
+            return json.dumps(data, indent=4)
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
+
+    def set_license_guided(self):
+        """Interactive menu for setting a Vitrum License."""
+        pass
+
+    def set_license(self, controller_id, valid_until, serial_no, sig):
+        """Set Vitrum License information."""
+        pass
+
     def set_ip_config_guided(self):
+        """Interactive menu for configuring management IP settings."""
         newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ')
         newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ')
         newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ')
@@ -586,14 +752,13 @@ class PacketmasterEX(object):
                             New Subnet Mask: %s
                             New Gateway: %s
                             Confirm changes [y/n]: """ % (newip, newmask, newgate))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_ip_config(newip, newmask, newgate)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Change the management IP configuration with arguments
     def set_ip_config(self, address, netmask, gateway):
+        """Set management IP configuration for Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/ipconfig?'
         else:
@@ -605,28 +770,26 @@ class PacketmasterEX(object):
         params = {'ip': newip, 'mask': newmask, 'gw': newgate}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Change the device name with guided options
     def set_name_guided(self):
+        """Interactive menu for setting Packetmaster name."""
         newname = raw_input('Enter device name: ')
         confirm = raw_input("""Configuration change summary:
                             New Device Name: %s
                             Confirm changes [y/n]: """ % newname)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_name(newname)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Change the device name with arguments
     def set_name(self, name):
+        """Set Packetmaster name."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/name?'
         else:
@@ -634,30 +797,28 @@ class PacketmasterEX(object):
         params = {'name': name}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Change the device name and notes with guided options
     def set_label_guided(self):
+        """Interactive menu for setting Packetmaster name and notes."""
         newname = raw_input('Enter device name: ')
         newnotes = raw_input('Enter device notes: ')
         confirm = raw_input("""Configuration change summary:
                             New Device Name: %s
                             New Device Notes: %s
                             Confirm changes [y/n]: """ % (newname, newnotes))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_label(newname, newnotes)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Change the device name and notes with arguments
     def set_label(self, name, notes):
+        """Set Packetmaster name and notes."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/customident?'
         else:
@@ -666,16 +827,15 @@ class PacketmasterEX(object):
                   'notes': notes}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Change the configuration of a port using guided options
     def set_port_config_guided(self):
+        """Interactive menu for setting port configuration on Packetmaster."""
         interface = raw_input('Enter the interface name of the port you want to change: ')
         if self.hardware == '4':
             speed = raw_input('Enter interface speed; e.g. "1000", "10G", "40G", "100G": ').strip()
@@ -683,8 +843,13 @@ class PacketmasterEX(object):
                 speed = speed.upper()
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
-        else: #May need to become 'elif self.hardware == '3.1'' with new else clause; need EX5-2,and EX12 to verify.  EX6 (Gen-2) does not allow speed changes on SFP+ ports
-            speed = raw_input('Enter interface speed; e.g. "10", "100", "1000", "auto" for Copper or SFP ports; "XG" (10G) or "1G" for SFP+ ports: ').strip()
+        else: #May need to become 'elif self.hardware == '3.1'' with new else
+              #clause; need EX5-2,and EX12 to verify.  EX6 (Gen-2) does not
+              #allow speed changes on SFP+ ports
+            print """Enter interface speed:
+                    e.g. "10", "100", "1000", "auto" for copper or SFP ports;
+                    "XG" (10G) or "1G" for SFP+ ports"""
+            speed = raw_input(': ').strip()
             if speed.lower() == 'auto':
                 speed = 'auto'
             elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG', '1g', '1G'):
@@ -692,13 +857,15 @@ class PacketmasterEX(object):
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
         if speed in ('10', '100', '1000', 'auto'):
-            duplex = raw_input('Enter the Duplex of the interface; options are "full", "half, or "auto" [auto]: ')
+            duplex = raw_input('Enter the Duplex of the interface;'
+                               'options are "full", "half, or "auto" [auto]: ')
             if duplex == '':
                 duplex = 'auto'
         else:
             duplex = 'full'
         if speed in ('40G', '100G'):
-            split = raw_input('Split to breakout cable?  Enter "yes" for yes and "no" for no [no]: ')
+            split = raw_input('Split to breakout cable?'
+                              'Enter "yes" for yes and "no" for no [no]: ')
             if split == '':
                 split = 'no'
         description = raw_input('Enter description for this port; leave blank for none: ')
@@ -706,10 +873,12 @@ class PacketmasterEX(object):
             forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
             if forcetx == '':
                 forcetx = False
-            check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
+            check = raw_input('Perform CRC check?'
+                              'Enter "true" for yes and "false" for no [false]: ')
             if check == '':
                 check = False
-            recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
+            recalc = raw_input('Perform CRC recalculation?'
+                               'Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
             confirm = raw_input("""Configuration change summary:
@@ -721,19 +890,30 @@ class PacketmasterEX(object):
                                 CRC Check: %s
                                 CRC Recalculation: %s
                                 Split Interface: %s
-                                Confirm changes [y/n]: """ % (interface, speed, duplex, description, forcetx, check, recalc, split))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
-                run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc, split)
+                                Confirm changes [y/n]: """ % (interface,
+                                                              speed,
+                                                              duplex,
+                                                              description,
+                                                              forcetx,
+                                                              check,
+                                                              recalc,
+                                                              split))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.set_port_config(interface, speed, duplex,
+                                           description, forcetx, check,
+                                           recalc, split)
             else:
                 return "Canceling; no changes made.\n"
         elif self.hardware == '4':
-            forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
+            forcetx = raw_input('Force TX? Enter "true" for yes and "false" for no [false]: ')
             if forcetx == '':
                 forcetx = False
-            check = raw_input('Perform CRC check?  Enter "true" for yes and "false" for no [false]: ')
+            check = raw_input('Perform CRC check? '
+                              'Enter "true" for yes and "false" for no [false]: ')
             if check == '':
                 check = False
-            recalc = raw_input('Perform CRC recalculation?  Enter "true" for yes and "false" for no [false]: ')
+            recalc = raw_input('Perform CRC recalculation? '
+                               'Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
             confirm = raw_input("""Configuration change summary:
@@ -744,9 +924,16 @@ class PacketmasterEX(object):
                                 Force TX (unidirectional): %s
                                 CRC Check: %s
                                 CRC Recalculation: %s
-                                Confirm changes [y/n]: """ % (interface, speed, duplex, description, forcetx, check, recalc))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
-                run = self.set_port_config(interface, speed, duplex, description, forcetx, check, recalc)
+                                Confirm changes [y/n]: """ % (interface,
+                                                              speed,
+                                                              duplex,
+                                                              description,
+                                                              forcetx,
+                                                              check,
+                                                              recalc))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.set_port_config(interface, speed, duplex,
+                                           description, forcetx, check, recalc)
             else:
                 return "Canceling; no changes made.\n"
         else:
@@ -755,8 +942,11 @@ class PacketmasterEX(object):
                                 New Speed: %s
                                 New Duplex: %s
                                 New Description: %s
-                                Confirm changes [y/n]: """ % (interface, speed, duplex, description))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                                Confirm changes [y/n]: """ % (interface,
+                                                              speed,
+                                                              duplex,
+                                                              description))
+            if confirm.lower() in ('y', 'yes'):
                 run = self.set_port_config(interface, speed, duplex, description)
             else:
                 return "Canceling; no changes made.\n"
@@ -765,8 +955,9 @@ between 1G and 10G on pre-G4 devices and when changing to or from breakout cable
 on QSFP ports of G4 devices. \n"""
         return run
 
-    #Change the configuration of a port using arguments
-    def set_port_config(self, interface, speed, duplex, description='', forcetx=False, check=False, recalc=False, split=False):
+    def set_port_config(self, interface, speed, duplex, description='',
+                        forcetx=False, check=False, recalc=False, split=False):
+        """Set configuration of a port on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
         else:
@@ -778,21 +969,22 @@ on QSFP ports of G4 devices. \n"""
         else:
             return "That is not a valid port number; canceling Set Port Config."
         if '/' not in port_no[0] and int(port_no[0]) > self.ports:
-            return "Port number does not exist on this device; this device has %s ports.  Canceling Set Port Config" % self.ports
+            return ("Port number does not exist on this device; "
+                    "this device has %s ports. Canceling Set Port Config.\n" % self.ports)
         if self.hardware == '4':
             if speed.lower() == 'auto':
                 speed = 'auto'
             elif speed in ('1000', '10g', '10G', '40g', '40G', '100g', '100G'):
                 speed = speed.upper()
             else:
-                return "That is not a valid input for port speed; canceling Set Port Config."
+                return "That is not a valid input for port speed; canceling Set Port Config.\n"
         else:
             if speed.lower() == 'auto':
                 speed = 'auto'
             elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG', '1g', '1G'):
                 speed = speed.upper()
             else:
-                return "That is not a valid input for port speed; canceling Set Port Config."
+                return "That is not a valid input for port speed; canceling Set Port Config.\n"
         if speed in ('10', '100', '1000', 'auto'):
             duplex = duplex
         else:
@@ -828,7 +1020,7 @@ on QSFP ports of G4 devices. \n"""
                       'duplex': duplex,
                       'unidirectional': forcetx,
                       'crc_check': check,
-                      'crc_recalculation': recalc }
+                      'crc_recalculation': recalc}
         elif self.hardware == '3.1' and speed in ('1G', 'XG'):
             params = {'if_name': interface,
                       'description': description,
@@ -844,30 +1036,29 @@ on QSFP ports of G4 devices. \n"""
                       'shutdown': 'false'}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Activate or deactivate a port with guided options
     def port_on_off_guided(self):
+        """Interactive menu for enabling/disabling a port on the Packetmaster."""
         if_name = raw_input('Enter the interface name of the port you want to change: ')
-        shutdown = raw_input('Enter "true" to shut port down; Enter "false" to activate port [false]: ')
+        shutdown = raw_input('Enter "true" to shut port down; '
+                             'Enter "false" to activate port [false]: ')
         confirm = raw_input("""Configuration change summary:
                             Interface: %s
                             Shutdown: %s
                             Confirm changes [y/n]: """ % (if_name, shutdown))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.port_on_off(if_name, shutdown)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Activate or deactivate a port with arguments
     def port_on_off(self, if_name, shutdown):
+        """Enable/disable a port on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/config?'
         else:
@@ -882,44 +1073,45 @@ on QSFP ports of G4 devices. \n"""
         params = {'if_name': interface, 'shutdown': updown}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Reset Port Counters
     def reset_port_counters(self):
+        """Reser all port counters to zero."""
         if self.https:
             uri = 'https://' + self.address + '/rest/ports/counters?'
         else:
             uri = 'http://' + self.address + '/rest/ports/counters?'
         try:
-            requests.delete(uri, auth=(self.username, self.password))
-            success = 'Counters deleted successfully'
-            return success
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+            response = requests.delete(uri, auth=(self.username, self.password))
+            code = response.status_code
+            if int(code) == 200:
+                return 'Counters deleted successfully.'
+            return 'Unable to delete counters.'
+        except ConnectionError as error:
+            raise error
 
-    #Reset Rule Counters
     def reset_rule_counters(self):
+        """Reset all rule counters to zero."""
         if self.https:
             uri = 'https://' + self.address + '/rest/rules/counters?'
         else:
             uri = 'http://' + self.address + '/rest/rules/counters?'
         try:
-            requests.delete(uri, auth=(self.username, self.password))
-            success = 'Counters deleted successfully'
-            return success
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+            response = requests.delete(uri, auth=(self.username, self.password))
+            code = response.status_code
+            if int(code) == 200:
+                return 'Counters deleted successfully.'
+            return 'Unable to delete counters.'
+        except ConnectionError as error:
+            raise error
 
-    #Add a rule with guided options.  Create guided options for egress actions
     def add_rule_guided(self):
+        """Interactive menu to add a rule/filter."""
         params = {}
         rulename = raw_input('Enter a name for the rule [none]: ')
         if rulename != '':
@@ -927,7 +1119,8 @@ on QSFP ports of G4 devices. \n"""
         ruledescrip = raw_input('Enter a description for the rule [none]: ')
         if ruledescrip != '':
             params['description'] = ruledescrip
-        priority = raw_input('Enter the priority level of the rule; 0 - 65535 higher number = higher priority [32768]: ')
+        priority = raw_input('Enter the priority level of the rule; '
+                             '0 - 65535 higher number = higher priority [32768]: ')
         if priority != '':
             try:
                 priority = int(priority)
@@ -935,11 +1128,12 @@ on QSFP ports of G4 devices. \n"""
                     params['priority'] = int(priority)
                 else:
                     return "That is not a valid input for priority; canceling Add Rule."
-            except:
-                 return "That is not a valid input for priority; canceling Add Rule."
+            except ValueError as reason:
+                return ("That is not a valid input for priority; canceling Add Rule.", reason)
         else:
             params['priority'] = 32768
-        portin = raw_input('Enter the port number or numbers for incoming traffic; multiple ports separated by a comma: ')
+        portin = raw_input('Enter the port number or numbers for incoming traffic; '
+                           'multiple ports separated by a comma: ')
         params['match[in_port]'] = portin
         print '''\nMatch VLAN tag?
                 1 - No, match all tagged and untagged traffic
@@ -958,21 +1152,22 @@ on QSFP ports of G4 devices. \n"""
             if vpri == '':
                 pass
             else:
-                vpri != ''
                 try:
                     if int(vpri) >= 0 or int(vpri) <= 7:
                         params['match[vlan_priority]'] = vpri
                     else:
                         print "That is not a valid selection; VLAN priority defaulting to '0'"
                         params['match[vlan_priority]'] = '0'
-                except:
-                    print "That is not a valid selection; canceling Add Rule."
+                except ValueError as reason:
+                    print ("That is not a valid selection; canceling Add Rule.", reason)
         else:
             return "That is not a valid selection; canceling Add Rule \n"
-        macsrc = raw_input('Filter by source MAC address?  Leave blank for no or enter MAC address: ')
+        macsrc = raw_input('Filter by source MAC address? '
+                           'Leave blank for no or enter MAC address: ')
         if macsrc != '':
             params['match[dl_src]'] = macsrc
-        macdst = raw_input('Filter by destination MAC address?  Leave blank for no or enter MAC address: ')
+        macdst = raw_input('Filter by destination MAC address? '
+                           'Leave blank for no or enter MAC address: ')
         if macdst != '':
             params['match[dl_dst]'] = macdst
         print '''\nFilter on protocol?
@@ -989,7 +1184,9 @@ on QSFP ports of G4 devices. \n"""
             pass
         elif int(proto) == 2:
             params['match[protocol]'] = 'ip'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address (e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"): ')
+            nwsrc = raw_input('Filter on source IP address? '
+                              'Leave blank for no or enter IP address '
+                              '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"): ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1000,9 +1197,11 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address (e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"): ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
+            nwdst = raw_input('Filter on destination IP address? '
+                              'Leave blank for no or enter IP address '
+                              '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"): ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1013,11 +1212,12 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
         elif int(proto) == 3:
             params['match[protocol]'] = 'tcp'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filter on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1028,9 +1228,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
+            nwdst = raw_input('Filter on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1041,17 +1242,19 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
             tcpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
             if tcpsrc != '':
                 params['match[tcp_src]'] = tcpsrc
-            tcpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+            tcpdst = raw_input('Filter on destination port? '
+                               'Leave blank for no or enter port number: ')
             if tcpdst != '':
                 params['match[tcp_dst]'] = tcpdst
         elif int(proto) == 4:
             params['match[protocol]'] = 'udp'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filter on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1062,9 +1265,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
+            nwdst = raw_input('Filter on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1075,17 +1279,19 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
             udpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
             if udpsrc != '':
                 params['match[udp_src]'] = udpsrc
-            udpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+            udpdst = raw_input('Filter on destination port? '
+                               'Leave blank for no or enter port number: ')
             if udpdst != '':
                 params['match[udp_dst]'] = udpdst
         elif int(proto) == 5:
             params['match[protocol]'] = 'sctp'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filter on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1096,9 +1302,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
+            nwdst = raw_input('Filter on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1109,17 +1316,19 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
             sctpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
             if sctpsrc != '':
                 params['match[sctp_src]'] = sctpsrc
-            sctpdst = raw_input('Filter on destination port?  Leave blank for no or enter port number: ')
+            sctpdst = raw_input('Filter on destination port? '
+                                'Leave blank for no or enter port number: ')
             if sctpdst != '':
                 params['match[sctp_dst]'] = sctpdst
         elif int(proto) == 6:
             params['match[protocol]'] = 'icmp'
-            nwsrc = raw_input('Filter on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filter on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1130,9 +1339,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
-            nwdst = raw_input('Filter on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
+            nwdst = raw_input('Filter on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1143,12 +1353,14 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except:
-                    return "That is not a valid IP address, canceling Add Rule."
-            icmpt = raw_input('Filter on ICMP type?  Leave blank for no or enter ICMP type number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Add Rule.", reason)
+            icmpt = raw_input('Filter on ICMP type? '
+                              'Leave blank for no or enter ICMP type number: ')
             if icmpt != '':
                 params['match[icmp_type]'] = icmpt
-            icmpc = raw_input('Filter on ICMP code?  Leave blank for no or enter ICMP code number: ')
+            icmpc = raw_input('Filter on ICMP code? '
+                              'Leave blank for no or enter ICMP code number: ')
             if icmpc != '':
                 params['match[icmp_code]'] = icmpc
         elif int(proto) == 7:
@@ -1158,7 +1370,9 @@ on QSFP ports of G4 devices. \n"""
             ether = raw_input('Enter Ethertype e.g. 0x800: ')
             if ether != '':
                 params['match[dl_type]'] = ether
-            nwproto = raw_input('Enter protocol number (protocol number in IPv4, header type in IPv6, opcode in ARP) or leave blank for none: ')
+            nwproto = raw_input('Enter protocol number '
+                                '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                'or leave blank for none: ')
             if nwproto != '':
                 params['match[nw_proto]'] = nwproto
         else:
@@ -1170,47 +1384,49 @@ on QSFP ports of G4 devices. \n"""
         extra = raw_input('Enter Extra Custom Match String: ')
         if extra != '':
             params['match[extra]'] = extra
-        ruleaction = raw_input('\nEnter the desired output actions separated by commas; order matters - improper syntax will cause Add Rule to fail: ')
+        ruleaction = raw_input('\nEnter the desired output actions separated by commas; '
+                               'order matters - improper syntax will cause Add Rule to fail: ')
         params['actions'] = ruleaction
         check_params = json.dumps(params, indent=4)
         confirm = raw_input("""Configuration change summary:
                             Rule Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.add_rule(params)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Add rule by providing all parameters
     def add_rule(self, params):
+        """Add a rule/filter to the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/rules?'
         else:
             uri = 'http://' + self.address + '/rest/rules?'
         if type(params) is not dict:
-            return "That is not a valid format for rule; please provide a dictionary object with valid rule parameters."
+            return ("That is not a valid format for rule; "
+                    "please provide a dictionary object with valid rule parameters.")
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify a rule with guided options
     def mod_rule_guided(self):
+        """Interactive menu to modify a rule/filter on the Packetmaster."""
         name = raw_input('Enter a new name for the rule: ')
         cookie = raw_input('Enter the cookie of the rule to modify: ')
         description = raw_input('Enter a new description for the rule: ')
-        priority = raw_input('Enter the priority of the rule (priority cannot be changed; must match rule to be modified)[32768]: ')
+        priority = raw_input('Enter the priority of the rule (priority cannot be changed; '
+                             'must match rule to be modified)[32768]: ')
         if priority != '':
             try:
                 priority = int(priority)
-            except:
-                return "That is not a valid input for rule priority; canceling modify rule."
+            except ValueError as reason:
+                return ("That is not a valid input for rule priority; "
+                        "canceling modify rule.", reason)
         else:
             priority = 32768
         if priority < 0 or priority > 65535:
@@ -1221,7 +1437,8 @@ on QSFP ports of G4 devices. \n"""
                   'cookie': cookie,
                   'priority': priority,
                   'match[in_port]': in_port}
-        print "For the following input filters the selected option must match the rule being modified; these fields cannot be changed."
+        print ("For the following input filters the selected option must match "
+               "the rule being modified; these fields cannot be changed.")
         print '''\nIs the rule matching a VLAN tag?
                 1 - No, matching all tagged and untagged traffic
                 2 - No, matching only untagged traffic
@@ -1239,21 +1456,22 @@ on QSFP ports of G4 devices. \n"""
             if vpri == '':
                 pass
             else:
-                vpri != ''
                 try:
                     if int(vpri) >= 0 or int(vpri) <= 7:
                         params['match[vlan_priority]'] = vpri
                     else:
                         print "That is not a valid selection; VLAN priority defaulting to '0'"
                         params['match[vlan_priority]'] = '0'
-                except:
-                    return "That is not a valid selection; canceling Modify Rule."
+                except ValueError as reason:
+                    return ("That is not a valid selection; canceling Modify Rule.", reason)
         else:
             return "That is not a valid selection; canceling Modify Rule \n"
-        macsrc = raw_input('Filtering by source MAC address?  Leave blank for no or enter MAC address: ')
+        macsrc = raw_input('Filtering by source MAC address? '
+                           'Leave blank for no or enter MAC address: ')
         if macsrc != '':
             params['match[dl_src]'] = macsrc
-        macdst = raw_input('Filtering by destination MAC address?  Leave blank for no or enter MAC address: ')
+        macdst = raw_input('Filtering by destination MAC address? '
+                           'Leave blank for no or enter MAC address: ')
         if macdst != '':
             params['match[dl_dst]'] = macdst
         print '''\nFiltering on a protocol?
@@ -1270,7 +1488,8 @@ on QSFP ports of G4 devices. \n"""
             params['match[protocol]'] = ''
         elif int(proto) == 2:
             params['match[protocol]'] = 'ip'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1281,9 +1500,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1294,11 +1514,12 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
         elif int(proto) == 3:
             params['match[protocol]'] = 'tcp'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1309,9 +1530,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1322,17 +1544,20 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            tcpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            tcpsrc = raw_input('Filtering on source port? '
+                               'Leave blank for no or enter port number: ')
             if tcpsrc != '':
                 params['match[tcp_src]'] = tcpsrc
-            tcpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            tcpdst = raw_input('Filtering on destination port? '
+                               'Leave blank for no or enter port number: ')
             if tcpdst != '':
                 params['match[tcp_dst]'] = tcpdst
         elif int(proto) == 4:
             params['match[protocol]'] = 'udp'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1343,9 +1568,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1356,17 +1582,20 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            udpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            udpsrc = raw_input('Filtering on source port? '
+                               'Leave blank for no or enter port number: ')
             if udpsrc != '':
                 params['match[udp_src]'] = udpsrc
-            udpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            udpdst = raw_input('Filtering on destination port? '
+                               'Leave blank for no or enter port number: ')
             if udpdst != '':
                 params['match[udp_dst]'] = udpdst
         elif int(proto) == 5:
             params['match[protocol]'] = 'sctp'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1377,9 +1606,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1390,17 +1620,20 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            sctpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            sctpsrc = raw_input('Filtering on source port? '
+                                'Leave blank for no or enter port number: ')
             if sctpsrc != '':
                 params['match[sctp_src]'] = sctpsrc
-            sctpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            sctpdst = raw_input('Filtering on destination port? '
+                                'Leave blank for no or enter port number: ')
             if sctpdst != '':
                 params['match[sctp_dst]'] = sctpdst
         elif int(proto) == 6:
             params['match[protocol]'] = 'icmp'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
@@ -1411,9 +1644,10 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = nw_src
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
@@ -1424,12 +1658,14 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = nw_dst
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                except:
-                    return "That is not a valid IP address, canceling Modify Rule."
-            icmpt = raw_input('Filtering on ICMP type?  Leave blank for no or enter ICMP type number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+            icmpt = raw_input('Filtering on ICMP type? '
+                              'Leave blank for no or enter ICMP type number: ')
             if icmpt != '':
                 params['match[icmp_type]'] = icmpt
-            icmpc = raw_input('Filtering on ICMP code?  Leave blank for no or enter ICMP code number: ')
+            icmpc = raw_input('Filtering on ICMP code? '
+                              'Leave blank for no or enter ICMP code number: ')
             if icmpc != '':
                 params['match[icmp_code]'] = icmpc
         elif int(proto) == 7:
@@ -1439,7 +1675,9 @@ on QSFP ports of G4 devices. \n"""
             ether = raw_input('Enter Ethertype e.g. 0x800: ')
             if ether != '':
                 params['match[dl_type]'] = ether
-            nwproto = raw_input('Enter protocol number (protocol number in IPv4, header type in IPv6, opcode in ARP) or leave blank for none: ')
+            nwproto = raw_input('Enter protocol number '
+                                '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                'or leave blank for none: ')
             if nwproto != '':
                 params['match[nw_proto]'] = nwproto
         else:
@@ -1451,43 +1689,43 @@ on QSFP ports of G4 devices. \n"""
         extra = raw_input('Enter Extra Custom Match String: ')
         if extra != '':
             params['match[extra]'] = extra
-        ruleaction = raw_input('Enter the new output actions separated by commas; order matters - improper syntax will cause Modify Rule to fail: ')
+        ruleaction = raw_input('Enter the new output actions separated by commas; '
+                               'order matters - improper syntax will cause Modify Rule to fail: ')
         params['actions'] = ruleaction
         check_params = json.dumps(params, indent=4)
         confirm = raw_input("""Configuration change summary:
                             Modified Rule Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.mod_rule(params)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Modify a rule with arguments
     def mod_rule(self, params):
+        """Modify a rule/filter on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/rules?'
         else:
             uri = 'http://' + self.address + '/rest/rules?'
         if type(params) is not dict:
-            return "That is not a valid format for rule; please provide a dictionary object with valid rule parameters."
+            return ("That is not a valid format for rule; "
+                    "please provide a dictionary object with valid rule parameters.")
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Delete a rule with guided options
     def del_rule_guided(self):
+        """Interactive menu to delete a rule/filter."""
         priority = raw_input("What is the priority of the rule to delete: ")
         try:
             priority = int(priority)
-        except:
-            print "That is not a valid input for rule priority; canceling Delete Rule."
+        except ValueError as reason:
+            return ("That is not a valid input for rule priority; canceling Delete Rule.", reason)
         if priority < 0 or priority > 65535:
             print "That is not a valid input for rule priority; canceling Delete Rule."
         in_port = raw_input("What is (are) the input port(s)for the rule separated by commas: ")
@@ -1510,21 +1748,22 @@ on QSFP ports of G4 devices. \n"""
             if vpri == '':
                 pass
             else:
-                vpri != ''
                 try:
                     if int(vpri) >= 0 or int(vpri) <= 7:
                         params['match[vlan_priority]'] = vpri
                     else:
                         print "That is not a valid selection; VLAN priority defaulting to '0'"
                         params['match[vlan_priority]'] = '0'
-                except:
-                    return "That is not a valid selection; canceling Delete Rule."
+                except ValueError as reason:
+                    return ("That is not a valid selection; canceling Delete Rule.", reason)
         else:
             return "That is not a valid selection; canceling Delete Rule \n"
-        macsrc = raw_input('Filtering by source MAC address?  Leave blank for no or enter MAC address: ')
+        macsrc = raw_input('Filtering by source MAC address? '
+                           'Leave blank for no or enter MAC address: ')
         if macsrc != '':
             params['match[dl_src]'] = macsrc
-        macdst = raw_input('Filtering by destination MAC address?  Leave blank for no or enter MAC address: ')
+        macdst = raw_input('Filtering by destination MAC address? '
+                           'Leave blank for no or enter MAC address: ')
         if macdst != '':
             params['match[dl_dst]'] = macdst
         print '''\nFiltering on a protocol?
@@ -1541,106 +1780,124 @@ on QSFP ports of G4 devices. \n"""
             params['match[protocol]'] = ''
         elif int(proto) == 2:
             params['match[protocol]'] = 'ip'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
         elif int(proto) == 3:
             params['match[protocol]'] = 'tcp'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            tcpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            tcpsrc = raw_input('Filtering on source port? '
+                               'Leave blank for no or enter port number: ')
             if tcpsrc != '':
                 params['match[tcp_src]'] = tcpsrc
-            tcpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            tcpdst = raw_input('Filtering on destination port? '
+                               'Leave blank for no or enter port number: ')
             if tcpdst != '':
                 params['match[tcp_dst]'] = tcpdst
         elif int(proto) == 4:
             params['match[protocol]'] = 'udp'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            udpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            udpsrc = raw_input('Filtering on source port? '
+                               'Leave blank for no or enter port number: ')
             if udpsrc != '':
                 params['match[udp_src]'] = udpsrc
-            udpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            udpdst = raw_input('Filtering on destination port? '
+                               'Leave blank for no or enter port number: ')
             if udpdst != '':
                 params['match[udp_dst]'] = udpdst
         elif int(proto) == 5:
             params['match[protocol]'] = 'sctp'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            sctpsrc = raw_input('Filtering on source port?  Leave blank for no or enter port number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            sctpsrc = raw_input('Filtering on source port? '
+                                'Leave blank for no or enter port number: ')
             if sctpsrc != '':
                 params['match[sctp_src]'] = sctpsrc
-            sctpdst = raw_input('Filtering on destination port?  Leave blank for no or enter port number: ')
+            sctpdst = raw_input('Filtering on destination port? '
+                                'Leave blank for no or enter port number: ')
             if sctpdst != '':
                 params['match[sctp_dst]'] = sctpdst
         elif int(proto) == 6:
             params['match[protocol]'] = 'icmp'
-            nwsrc = raw_input('Filtering on source IP address?  Leave blank for no or enter IP address: ')
+            nwsrc = raw_input('Filtering on source IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwsrc != '':
                 try:
                     nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
                     params['match[nw_src]'] = nwsrc[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            nwdst = raw_input('Filtering on destination IP address?  Leave blank for no or enter IP address: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            nwdst = raw_input('Filtering on destination IP address? '
+                              'Leave blank for no or enter IP address: ')
             if nwdst != '':
                 try:
                     nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
                     params['match[nw_dst]'] = nwdst[0]
-                except:
-                    return "That is not a valid IP address, canceling Delete Rule."
-            icmpt = raw_input('Filtering on ICMP type?  Leave blank for no or enter ICMP type number: ')
+                except TypeError as reason:
+                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
+            icmpt = raw_input('Filtering on ICMP type? '
+                              'Leave blank for no or enter ICMP type number: ')
             if icmpt != '':
                 params['match[icmp_type]'] = icmpt
-            icmpc = raw_input('Filtering on ICMP code?  Leave blank for no or enter ICMP code number: ')
+            icmpc = raw_input('Filtering on ICMP code? '
+                              'Leave blank for no or enter ICMP code number: ')
             if icmpc != '':
                 params['match[icmp_code]'] = icmpc
         elif int(proto) == 7:
@@ -1650,7 +1907,9 @@ on QSFP ports of G4 devices. \n"""
             ether = raw_input('Enter Ethertype e.g. 0x800: ')
             if ether != '':
                 params['match[dl_type]'] = ether
-            nwproto = raw_input('Enter protocol number (protocol number in IPv4, header type in IPv6, opcode in ARP) or leave blank for none: ')
+            nwproto = raw_input('Enter protocol number '
+                                '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                'or leave blank for none: ')
             if nwproto != '':
                 params['match[nw_proto]'] = nwproto
         else:
@@ -1666,62 +1925,61 @@ on QSFP ports of G4 devices. \n"""
         confirm = raw_input("""Configuration change summary:
                             Delete Rule Matching: %s
                             Confirm changes [y/n]: """ % check_params)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.del_rule(params)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Delete a rule with arguments
     def del_rule(self, params):
+        """Delete a rule/filter from the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/rules?'
         else:
             uri = 'http://' + self.address + '/rest/rules?'
         if type(params) is not dict:
-            return "That is not a valid format for rule; please provide a dictionary object with valid rule parameters."
+            return ("That is not a valid format for rule; "
+                    "please provide a dictionary object with valid rule parameters.")
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Delete all rules
     def del_rule_all(self):
+        """Delete all rules from the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/rules/all?'
         else:
             uri = 'http://' + self.address + '/rest/rules/all?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Add a group with guided options.  Alter to guide through egress options.
     def add_group_guided(self):
+        """Interactive menu for adding a port group."""
         name = raw_input("Enter the group ID: ")
         try:
-            input_check = int(name)
-        except:
-            return "That is not a valid group ID, canceling Add Group."
+            int(name)
+        except ValueError as reason:
+            return ("That is not a valid group ID, canceling Add Group.", reason)
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
         count = 0
         for group in json_groups['groups']:
             existing.append(json_groups['groups'][count]['group_id'])
-            count +=1
+            count += 1
         if name in existing:
-            return "A group with this group ID already exists; use Modify Group or select a different group ID. Canceling Add Group"
+            return ("A group with this group ID already exists; "
+                    "use Modify Group or select a different group ID. Canceling Add Group")
         description = raw_input("Enter the group description: ")
         group_type = raw_input(""" Select the group type:
                                 1 - All
@@ -1730,8 +1988,8 @@ on QSFP ports of G4 devices. \n"""
                                 Enter the number of your selection: """)
         try:
             group_type = int(group_type)
-        except:
-            return "That is not a valid group type selection; canceling Add Group."
+        except ValueError as reason:
+            return ("That is not a valid group type selection; canceling Add Group.", reason)
         if group_type == 1:
             type_group = 'all'
         elif group_type == 2:
@@ -1741,47 +1999,52 @@ on QSFP ports of G4 devices. \n"""
         else:
             return "That is not a valid group type selection; canceling Add Group."
         bucket_list = []
-        buckets = raw_input("How many buckets in this port group?  Must be at least 2 and no more than 16: ")
+        buckets = raw_input("How many buckets in this port group? "
+                            "Must be at least 2 and no more than 16: ")
         try:
             buckets = int(buckets)
-        except:
-            return "That is not a valid bucket number; canceling Add Group."
+        except ValueError as reason:
+            return ("That is not a valid bucket number; canceling Add Group.", reason)
         if buckets >= 2 and buckets <= 16:
             for bucket in xrange(buckets):
                 print "\nConfigure settings for bucket %s" % bucket
                 #Add check against number of ports on device
                 output = raw_input("Output on which port: ")
                 try:
-                    input_check = int(output)
+                    int(output)
                     output = 'output:' + output
-                except:
-                    return "That is not a valid port number; canceling Add Group"
+                except ValueError as reason:
+                    return ("That is not a valid port number; canceling Add Group", reason)
                 actions = output
                 if self.hardware != '4' or group_type == 3:
                     watch = raw_input("Set watch port to: ")
                     try:
-                        input_check = int(watch)
-                    except:
-                        return "That is not a valid port number; canceling Add Group"
-                push_vlan = raw_input('Push VLAN ID to outout traffic? Enter VLAN ID or leave blank for no: ').strip()
+                        int(watch)
+                    except ValueError as reason:
+                        return ("That is not a valid port number; canceling Add Group", reason)
+                push_vlan = raw_input('Push VLAN ID to outout traffic? '
+                                      'Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
                     try:
                         vlan = str(int(push_vlan) + 4096)
                         vlan = 'push_vlan:0x8100,set_field:' + vlan + '->vlan_vid,'
                         actions = vlan + actions
-                    except:
-                        return "That is not a valid VLAN ID, canceling Add Group."
+                    except ValueError as reason:
+                        return ("That is not a valid VLAN ID, canceling Add Group.", reason)
                 else:
-                    mod_vlan = raw_input('Modify VLAN ID of output traffic? Enter VLAN ID or leave blank for no: ').strip()
+                    mod_vlan = raw_input('Modify VLAN ID of output traffic? '
+                                         'Enter VLAN ID or leave blank for no: ').strip()
                     if mod_vlan != '':
                         try:
                             vlan = str(int(mod_vlan) + 4096)
                             vlan = 'set_field:' + vlan + '->vlan_vid,'
                             actions = vlan + actions
-                        except:
-                            return "That is not a valid input for VLAN ID, canceling Add Group."
+                        except ValueError as reason:
+                            return ("That is not a valid input for VLAN ID, "
+                                    "canceling Add Group.", reason)
                     else:
-                        strip_vlan = raw_input('Strip VLAN ID from output traffic?  Y or N [N]: ').lower()
+                        strip_vlan = raw_input('Strip VLAN ID from output traffic? '
+                                               'Y or N [N]: ').lower()
                         if strip_vlan == 'y' or strip_vlan == 'yes':
                             actions = 'strip_vlan,' + actions
                 if self.hardware == '4':
@@ -1789,57 +2052,72 @@ on QSFP ports of G4 devices. \n"""
                     if pop_l2 == 'y' or pop_l2 == 'yes':
                         actions = 'pop_l2,' + actions
                 if self.hardware == '4':
-                    pop_mpls = raw_input('Pop MPLS tags? In most cases you should also push L2.  Y or N [N]: ').lower()
+                    pop_mpls = raw_input('Pop MPLS tags? In most cases you should also push L2. '
+                                         'Y or N [N]: ').lower()
                     if pop_mpls == 'y' or pop_mpls == 'yes':
                         actions = 'pop_all_mpls,' + actions
                 if self.hardware == '4':
-                    push_l2 = raw_input('Push L2 information to output packets?  Y or N [N]: ').lower()
+                    push_l2 = raw_input('Push L2 information to output packets? '
+                                        'Y or N [N]: ').lower()
                     if push_l2 == 'y' or push_l2 == 'yes':
-                        print "Be sure to modify destination MAC when prompted or an error will occur."
+                        print ("Be sure to modify destination MAC when prompted, "
+                               "else an error will occur.")
                         actions = 'push_l2,' + actions
-                src_mac = raw_input('Modify source MAC address?  Enter new MAC address or leave blank for no: ').strip()
+                src_mac = raw_input('Modify source MAC address? '
+                                    'Enter new MAC address or leave blank for no: ').strip()
                 if src_mac != '':
-                    ations = 'set_field:' + src_mac + '->eth_src,' + actions
-                dst_mac = raw_input('Modify destination MAC address?  Enter new MAC address or leave blank for no: ').strip()
+                    actions = 'set_field:' + src_mac + '->eth_src,' + actions
+                dst_mac = raw_input('Modify destination MAC address? '
+                                    'Enter new MAC address or leave blank for no: ').strip()
                 if dst_mac != '':
-                    ations = 'set_field:' + dst_mac + '->eth_dst,' + actions
-                dst_ip = raw_input('Modify destination IP address?  Enter new IP address or leave blank for no: ').strip()
+                    actions = 'set_field:' + dst_mac + '->eth_dst,' + actions
+                dst_ip = raw_input('Modify destination IP address? '
+                                   'Enter new IP address or leave blank for no: ').strip()
                 if dst_ip != '':
                     try:
                         dstip = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
                         actions = 'set_field:' + dstip[0] + '->ip_dst,' + actions
-                    except:
-                        return "That is not a valid input for IP address, canceling Add Group."
+                    except TypeError as reason:
+                        return ("That is not a valid input for IP address, "
+                                "canceling Add Group.", reason)
                 if self.hardware == '4':
-                    src_udp = raw_input('Modify source UDP port?  Enter new port number or leave blank for no: ').strip()
+                    src_udp = raw_input('Modify source UDP port? '
+                                        'Enter new port number or leave blank for no: ').strip()
                     if src_udp != '':
                         try:
-                            test_input = int(src_udp)
+                            int(src_udp)
                             actions = 'set_field:' + src_udp + '->udp_src,' + actions
-                        except:
-                            return "That is not a valid input for port number; canceling Add Group."
-                dst_udp = raw_input('Modify destination UDP port?  Enter new port number or leave blank for no: ').strip()
+                        except ValueError as reason:
+                            return ("That is not a valid input for port number; "
+                                    "canceling Add Group.", reason)
+                dst_udp = raw_input('Modify destination UDP port? '
+                                    'Enter new port number or leave blank for no: ').strip()
                 if dst_udp != '':
                     try:
-                        test_input = int(dst_udp)
+                        int(dst_udp)
                         actions = 'set_field:' + dst_udp + '->udp_dst,' + actions
-                    except:
-                        return "That is not a valid input for port number; canceling Add Group."
+                    except ValueError as reason:
+                        return ("That is not a valid input for port number; "
+                                "canceling Add Group.", reason)
                 if self.hardware == '4':
-                    src_tcp = raw_input('Modify source TCP port?  Enter new port number or leave blank for no: ').strip()
+                    src_tcp = raw_input('Modify source TCP port? '
+                                        'Enter new port number or leave blank for no: ').strip()
                     if src_tcp != '':
                         try:
-                            test_input = int(src_tcp)
+                            int(src_tcp)
                             actions = 'set_field:' + src_tcp + '->tcp_src,' + actions
-                        except:
-                            return "That is not a valid input for port number; canceling Add Group."
-                dst_tcp = raw_input('Modify destination TCP port?  Enter new port number or leave blank for no: ').strip()
+                        except ValueError as reason:
+                            return ("That is not a valid input for port number; "
+                                    "canceling Add Group.", reason)
+                dst_tcp = raw_input('Modify destination TCP port? '
+                                    'Enter new port number or leave blank for no: ').strip()
                 if dst_tcp != '':
                     try:
-                        test_input = int(dst_tcp)
+                        int(dst_tcp)
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
-                    except:
-                        return "That is not a valid input for port number; canceling Add Group."
+                    except ValueError as reason:
+                        return ("That is not a valid input for port number; "
+                                "canceling Add Group.", reason)
                 if self.hardware != '4' or group_type == 3:
                     bucket_params = {'actions': actions,
                                      'watch_port': watch}
@@ -1848,57 +2126,56 @@ on QSFP ports of G4 devices. \n"""
                 bucket_list.append(bucket_params)
         else:
             return "That is not a valid bucket number; canceling Add Group."
-        params = { 'buckets': bucket_list,
-                   'group_id': name,
-                   'type': type_group,
-                   'description': description
+        params = {'buckets': bucket_list,
+                  'group_id': name,
+                  'type': type_group,
+                  'description': description
                  }
         check_params = json.dumps(params, indent=4)
         confirm = raw_input("""Configuration change summary:
                             Add Group Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.add_group(name, params)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Add a group with arguments
     def add_group(self, gid, json_app):
+        """Add a port group to the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/groups?'
         else:
             uri = 'http://' + self.address + '/rest/groups?'
         try:
-            input_check = int(gid)
-        except:
-            return "That is not a valid group ID, canceling Add Group."
+            int(gid)
+        except ValueError as reason:
+            return ("That is not a valid group ID, canceling Add Group.", reason)
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
         count = 0
         for group in json_groups['groups']:
             existing.append(json_groups['groups'][count]['group_id'])
-            count +=1
+            count += 1
         if gid in existing:
-            return "A group with this group ID already exists; use Modify Group or select a different group ID. Canceling Add Group"
+            return ("A group with this group ID already exists; "
+                    "use Modify Group or select a different group ID. Canceling Add Group")
         if type(json_app) is not dict:
             return "That is not a valid dictionary input for Add Group; canceling Add Group."
         try:
             response = requests.post(uri, json=json_app, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify a group with guided options
     def modify_group_guided(self):
+        """Interactive menu to modify a port group."""
         name = raw_input("Enter the group ID of the group you would like to modify: ")
         try:
-            input_check = int(name)
+            int(name)
         except:
             return "That is not a valid group ID, canceling Modify Group."
         existing = []
@@ -1909,12 +2186,15 @@ on QSFP ports of G4 devices. \n"""
             existing.append(json_groups['groups'][count]['group_id'])
             if json_groups['groups'][count]['group_id'] == name:
                 group_type = json_groups['groups'][count]['type']
-            count +=1
+            count += 1
         if name not in existing:
-            return "A group with this group ID does not exist; use Add Group. Canceling Modify Group"
-        description = raw_input("Enter the new group description or leave blank to retain original: ")
+            return ("A group with this group ID does not exist; "
+                    "use Add Group. Canceling Modify Group")
+        description = raw_input("Enter the new group description or "
+                                "leave blank to retain original: ")
         bucket_list = []
-        buckets = raw_input("How many buckets in this port group?  Must be at least 2 and no more than 16: ")
+        buckets = raw_input("How many buckets in this port group? "
+                            "Must be at least 2 and no more than 16: ")
         try:
             buckets = int(buckets)
         except:
@@ -1925,7 +2205,7 @@ on QSFP ports of G4 devices. \n"""
                 #Add check against number of ports on device
                 output = raw_input("Output on which port: ")
                 try:
-                    input_check = int(output)
+                    int(output)
                     output = 'output:' + output
                 except:
                     return "That is not a valid port number; canceling Modify Group"
@@ -1933,10 +2213,11 @@ on QSFP ports of G4 devices. \n"""
                 if self.hardware != '4' or group_type == 'ff':
                     watch = raw_input("Set watch port to: ")
                     try:
-                        input_check = int(watch)
+                        int(watch)
                     except:
                         return "That is not a valid port number; canceling Modify Group"
-                push_vlan = raw_input('Push VLAN ID to outout traffic? Enter VLAN ID or leave blank for no: ').strip()
+                push_vlan = raw_input('Push VLAN ID to outout traffic? '
+                                      'Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
                     try:
                         vlan = str(int(push_vlan) + 4096)
@@ -1945,7 +2226,8 @@ on QSFP ports of G4 devices. \n"""
                     except:
                         return "That is not a valid VLAN ID, canceling Modify Group."
                 else:
-                    mod_vlan = raw_input('Modify VLAN ID of output traffic? Enter VLAN ID or leave blank for no: ').strip()
+                    mod_vlan = raw_input('Modify VLAN ID of output traffic? '
+                                         'Enter VLAN ID or leave blank for no: ').strip()
                     if mod_vlan != '':
                         try:
                             vlan = str(int(mod_vlan) + 4096)
@@ -1954,7 +2236,8 @@ on QSFP ports of G4 devices. \n"""
                         except:
                             return "That is not a valid input for VLAN ID, canceling Modify Group."
                     else:
-                        strip_vlan = raw_input('Strip VLAN ID from output traffic?  Y or N [N]: ').lower()
+                        strip_vlan = raw_input('Strip VLAN ID from output traffic? '
+                                               'Y or N [N]: ').lower()
                         if strip_vlan == 'y' or strip_vlan == 'yes':
                             actions = 'strip_vlan,' + actions
                 if self.hardware == '4':
@@ -1962,21 +2245,27 @@ on QSFP ports of G4 devices. \n"""
                     if pop_l2 == 'y' or pop_l2 == 'yes':
                         actions = 'pop_l2,' + actions
                 if self.hardware == '4':
-                    pop_mpls = raw_input('Pop MPLS tags? In most cases you should also push L2.  Y or N [N]: ').lower()
+                    pop_mpls = raw_input('Pop MPLS tags? In most cases you should also push L2. '
+                                         'Y or N [N]: ').lower()
                     if pop_mpls == 'y' or pop_mpls == 'yes':
                         actions = 'pop_all_mpls,' + actions
                 if self.hardware == '4':
-                    push_l2 = raw_input('Push L2 information to output packets?  Y or N [N]: ').lower()
+                    push_l2 = raw_input('Push L2 information to output packets? '
+                                        'Y or N [N]: ').lower()
                     if push_l2 == 'y' or push_l2 == 'yes':
-                        print "Be sure to modify destination MAC when prompted or an error will occur."
+                        print ("Be sure to modify destination MAC when prompted, "
+                               "else an error will occur.")
                         actions = 'push_l2,' + actions
-                src_mac = raw_input('Modify source MAC address?  Enter new MAC address or leave blank for no: ').strip()
+                src_mac = raw_input('Modify source MAC address? '
+                                    'Enter new MAC address or leave blank for no: ').strip()
                 if src_mac != '':
-                    ations = 'set_field:' + src_mac + '->eth_src,' + actions
-                dst_mac = raw_input('Modify destination MAC address?  Enter new MAC address or leave blank for no: ').strip()
+                    actions = 'set_field:' + src_mac + '->eth_src,' + actions
+                dst_mac = raw_input('Modify destination MAC address? '
+                                    'Enter new MAC address or leave blank for no: ').strip()
                 if dst_mac != '':
-                    ations = 'set_field:' + dst_mac + '->eth_dst,' + actions
-                dst_ip = raw_input('Modify destination IP address?  Enter new IP address or leave blank for no: ').strip()
+                    actions = 'set_field:' + dst_mac + '->eth_dst,' + actions
+                dst_ip = raw_input('Modify destination IP address? '
+                                   'Enter new IP address or leave blank for no: ').strip()
                 if dst_ip != '':
                     try:
                         dstip = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
@@ -1984,35 +2273,43 @@ on QSFP ports of G4 devices. \n"""
                     except:
                         return "That is not a valid input for IP address, canceling Modify Group."
                 if self.hardware == '4':
-                    src_udp = raw_input('Modify source UDP port?  Enter new port number or leave blank for no: ').strip()
+                    src_udp = raw_input('Modify source UDP port? '
+                                        'Enter new port number or leave blank for no: ').strip()
                     if src_udp != '':
                         try:
-                            test_input = int(src_udp)
+                            int(src_udp)
                             actions = 'set_field:' + src_udp + '->udp_src,' + actions
-                        except:
-                            return "That is not a valid input for port number; canceling Modify Group."
-                dst_udp = raw_input('Modify destination UDP port?  Enter new port number or leave blank for no: ').strip()
+                        except ValueError as reason:
+                            return ("That is not a valid input for port number; "
+                                    "canceling Modify Group.", reason)
+                dst_udp = raw_input('Modify destination UDP port? '
+                                    'Enter new port number or leave blank for no: ').strip()
                 if dst_udp != '':
                     try:
-                        test_input = int(dst_udp)
+                        int(dst_udp)
                         actions = 'set_field:' + dst_udp + '->udp_dst,' + actions
-                    except:
-                        return "That is not a valid input for port number; canceling Modify Group."
+                    except ValueError as reason:
+                        return ("That is not a valid input for port number; "
+                                "canceling Modify Group.", reason)
                 if self.hardware == '4':
-                    src_tcp = raw_input('Modify source TCP port?  Enter new port number or leave blank for no: ').strip()
+                    src_tcp = raw_input('Modify source TCP port? '
+                                        'Enter new port number or leave blank for no: ').strip()
                     if src_tcp != '':
                         try:
-                            test_input = int(src_tcp)
+                            int(src_tcp)
                             actions = 'set_field:' + src_tcp + '->tcp_src,' + actions
-                        except:
-                            return "That is not a valid input for port number; canceling Modify Group."
-                dst_tcp = raw_input('Modify destination TCP port?  Enter new port number or leave blank for no: ').strip()
+                        except ValueError as reason:
+                            return ("That is not a valid input for port number; "
+                                    "canceling Modify Group.", reason)
+                dst_tcp = raw_input('Modify destination TCP port? '
+                                    'Enter new port number or leave blank for no: ').strip()
                 if dst_tcp != '':
                     try:
-                        test_input = int(dst_tcp)
+                        int(dst_tcp)
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
-                    except:
-                        return "That is not a valid input for port number; canceling Modify Group."
+                    except ValueError as reason:
+                        return ("That is not a valid input for port number; "
+                                "canceling Modify Group.", reason)
                 if self.hardware != '4' or group_type == 'ff':
                     bucket_params = {'actions': actions,
                                      'watch_port': watch}
@@ -2021,128 +2318,122 @@ on QSFP ports of G4 devices. \n"""
                 bucket_list.append(bucket_params)
         else:
             return "That is not a valid bucket number; canceling Modify Group."
-        params = { 'buckets': bucket_list,
-                   'group_id': name,
-                   'type': group_type,
-                   'description': description
-                 }
+        params = {'buckets': bucket_list,
+                  'group_id': name,
+                  'type': group_type,
+                  'description': description}
         check_params = json.dumps(params, indent=4)
         confirm = raw_input("""Configuration change summary:
                             Modified Group Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.modify_group(name, params)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Modify a group with arguments
     def modify_group(self, gid, json_app):
+        """Modify a port group on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/groups?'
         else:
             uri = 'http://' + self.address + '/rest/groups?'
         try:
-            input_check = int(gid)
-        except:
-            return "That is not a valid group ID, canceling Modify Group."
+            int(gid)
+        except ValueError as reason:
+            return ("That is not a valid group ID, canceling Modify Group.", reason)
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
         count = 0
         for group in json_groups['groups']:
             existing.append(json_groups['groups'][count]['group_id'])
-            count +=1
+            count += 1
         if gid not in existing:
-            return "A group with this group ID does not exist; use Add Group.  Canceling Modify Group"
+            return ("A group with this group ID does not exist; use Add Group. "
+                    "Canceling Modify Group.")
         if type(json_app) is not dict:
             return "That is not a valid dictionary input for Modify Group; canceling Modify Group."
         try:
             response = requests.put(uri, json=json_app, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Delete a group with guided options
     def delete_group_guided(self):
+        """Interactive menu to delete a port group."""
         name = raw_input("Enter the group ID of the group to be deleted: ")
         try:
-            input_check = int(name)
-        except:
-            return "That is not a valid group ID, canceling Delete Group."
+            int(name)
+        except ValueError as reason:
+            return ("That is not a valid group ID, canceling Delete Group.", reason)
         confirm = raw_input("""Configuration Change Summary:
                             Delete Group ID: %s
                             Confirm changes [y/n]: """ % name)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.delete_group(name)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Delete a group
     def delete_group(self, gid):
+        """Delete a port group from the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/groups?'
         else:
             uri = 'http://' + self.address + '/rest/groups?'
         try:
-            input_check = int(gid)
-        except:
-            return "That is not a valid group ID, canceling Delete Group."
+            int(gid)
+        except ValueError as reason:
+            return ("That is not a valid group ID, canceling Delete Group.", reason)
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
         count = 0
         for group in json_groups['groups']:
             existing.append(json_groups['groups'][count]['group_id'])
-            count +=1
+            count += 1
         if gid not in existing:
             return "A group with this group ID does not exist; canceling Delete Group"
         params = {'group_id': gid}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Delete all active groups
     def delete_groups_all(self):
+        """Delete all port groups from the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/groups/all?'
         else:
             uri = 'http://' + self.address + '/rest/groups/all?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Make a port save point active with guided options
     def set_port_savepoint_guided(self):
+        """Interactive menu to activate a port save point."""
         savename = raw_input('Name of port save point to make active: ')
         confirm = raw_input("""Configuration Change Summary:
                             You are about to make port save point %s active.
                             Confirm changes [y/n]: """ % savename)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_port_savepoint(savename)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Make a port save point active
     def set_port_savepoint(self, savename):
+        """Activate a port save point."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/activeportsavepoint?'
         else:
@@ -2151,28 +2442,26 @@ on QSFP ports of G4 devices. \n"""
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Make a rule save point active with guided options
     def set_rule_savepoint_guided(self):
+        """Interactive menu to activate a rule save point."""
         savename = raw_input('Name of rule save point to make active: ')
         confirm = raw_input("""Configuration Change Summary:
                             You are about to make rule save point "%s" active.
                             Confirm changes [y/n]: """ % savename)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_rule_savepoint(savename)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Make a rule save point active
     def set_rule_savepoint(self, savename):
+        """Activate a rule save point."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/activerulesavepoint?'
         else:
@@ -2181,28 +2470,26 @@ on QSFP ports of G4 devices. \n"""
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Set a save point as the default boot configuration with guided options
     def set_boot_savepoint_guided(self):
+        """Interactive menu to set a save point as default boot configuration."""
         savename = raw_input('Save point to set to default boot configuration: ')
         confirm = raw_input("""Configuration Change Summary:
                             You are about to set save point "%s" the default boot configuration.
                             Confirm changes [y/n]: """ % savename)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_boot_savepoint(savename)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Set a save point as the default boot configuration
     def set_boot_savepoint(self, savename):
+        """Set a save point as default boot configuration."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/defaultrulesavepoint?'
         else:
@@ -2211,16 +2498,16 @@ on QSFP ports of G4 devices. \n"""
         params = {'name': savename}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Export a save point from the Packetmaster with guided options.
+    #See note for method below
     def export_savepoint_guided(self):
+        """Interactive menu to download a save point from the Packetmaster."""
         rspname = raw_input('Name of rule save point to export (leave blank for none): ')
         pspname = raw_input('Name of port save point to export (leave blank for none): ')
         filename = raw_input("File name for savepoint export: ")
@@ -2229,14 +2516,14 @@ on QSFP ports of G4 devices. \n"""
                             Port Save Point: %s
                             Saved to file: %s
                             Confirm changes [y/n]: """ % (rspname, pspname, filename))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.export_savepoint(rspname, pspname, filename)
             return run
-        else:
-            return "Canceling; save points not exported.\n"
+        return "Canceling; save points not exported.\n"
 
-    #Export a save point from the Packetmaster.  This still needs worked out; Packetmaster returns empty save points
+    #This still needs worked out; Packetmaster returns empty save points
     def export_savepoint(self, rspname, pspname, filename):
+        """Download a save point from the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/export?'
         else:
@@ -2245,25 +2532,27 @@ on QSFP ports of G4 devices. \n"""
         params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
         try:
             response = requests.get(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             try:
-                with open(filename, "w") as f:
-                    f.write(r)
-            except:
-                print "Invalid filename\n"
+                with open(filename, "w") as save:
+                    save.write(content)
+            except (NameError, TypeError, IOError, OSError) as reason:
+                return ("Invalid filename.", reason)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify a port save point with guided options
     def modify_port_savepoint_guided(self):
+        """Interactive menu to modify a port save point."""
         oldname = raw_input("Name of port save point to modify: ")
         newname = raw_input("New name for port save point: ")
         desc = raw_input("Description of save point: ")
-        override = raw_input('Hit enter to save the current active ports to this save point; type "false" to not save them (This overwrites port configuration of the save point): ')
+        override = raw_input('Hit enter to save the current active ports '
+                             'to this save point; type "false" to not save '
+                             'them (This overwrites port '
+                             'configuration of the save point): ')
         if override.lower() in ('false', 'f', 'n', 'no'):
             override = False
         else:
@@ -2274,41 +2563,46 @@ on QSFP ports of G4 devices. \n"""
                             New Description: %s
                             Save Active Ports: %s
                             Confirm changes [y/n]: """ % (oldname, newname, desc, override))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.modify_port_savepoint(oldname, newname, desc, override)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Modify a port savepoint
     def modify_port_savepoint(self, oldname, newname, description, override=True):
+        """Modify a port save point."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/modportsavepoint?'
         else:
             uri = 'http://' + self.address + '/rest/savepoints/modportsavepoint?'
-        if override == False:
+        if override is False:
             override = False
         elif override.lower() in ('false', 'f', 'n', 'no'):
             override = False
         else:
             override = True
-        params = {'old_name': oldname, 'new_name': newname, 'description': desc, 'override': override}
+        params = {'old_name': oldname,
+                  'new_name': newname,
+                  'description': description,
+                  'override': override
+                 }
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify a rule save point with guided options
     def modify_rule_savepoint_guided(self):
+        """Interactive menu to modify a rule save point."""
         oldname = raw_input("Name of rule save point to modify: ")
         newname = raw_input("New name for rule save point: ")
         desc = raw_input("Description for save point: ")
-        override = raw_input('Hit enter to save the current active rules to this save point; type "false" to not save them (This overwrites rule configuration of the save point): ')
+        override = raw_input('Hit enter to save the current active rules to this save point; '
+                             'type "false" to not save them '
+                             '(This overwrites rule configuration of the save point): ')
         if override.lower() in ('false', 'f', 'n', 'no'):
             override = False
         else:
@@ -2319,14 +2613,13 @@ on QSFP ports of G4 devices. \n"""
                             New Description: %s
                             Save Active Rules: %s
                             Confirm changes [y/n]: """ % (oldname, newname, desc, override))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.modify_rule_savepoint(oldname, newname, desc, override)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Modify a rule save point with arguments
     def modify_rule_savepoint(self, oldname, newname, description, override=True):
+        """Modify a rule save point on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/modrulesavepoint?'
         else:
@@ -2337,33 +2630,34 @@ on QSFP ports of G4 devices. \n"""
             override = False
         else:
             override = True
-        params = {'old_name': oldname, 'new_name': newname, 'description': description, 'override': saverules}
+        params = {'old_name': oldname,
+                  'new_name': newname,
+                  'description': description,
+                  'override': override}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Create a port save point from current configuration using guided options
     def create_port_savepoint_guided(self):
+        """Interactive menu to create port save point from current config."""
         name = raw_input("Name for  newly created port savepoint: ")
         desc = raw_input("Description for the port save point: ")
         confirm = raw_input("""Create Port Save Point:
                             Save Point Name: %s
                             Description: %s
                             Confirm changes [y/n]: """ % (name, desc))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.create_port_savepoint(name, desc)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Create a port save point from current configuration using arguments
     def create_port_savepoint(self, name, description):
+        """Create port save point from current configuration."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/portsavepoint?'
         else:
@@ -2371,46 +2665,43 @@ on QSFP ports of G4 devices. \n"""
         params = {'name': name, 'description': description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Create a quicksave point of current configuration
     def create_quick_savepoint(self):
+        """Create a Quicksave save point from current configuration."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/quicksaverules?'
         else:
             uri = 'http://' + self.address + '/rest/savepoints/quicksaverules?'
         try:
             response = requests.put(uri, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Create a rule save point from current configuration with guided options
     def create_rule_savepoint_guided(self):
+        """Interactive menu to create rule save point from current config."""
         name = raw_input("Name for newly created rule save point: ")
         desc = raw_input("Description for the rule save point: ")
         confirm = raw_input("""Create Rule Save Point:
                             Save Point Name: %s
                             Description: %s
                             Confirm changes [y/n]: """ % (name, desc))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.create_rule_savepoint(name, desc)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Create a rule save point from current configuration using arguments
     def create_rule_savepoint(self, name, description):
+        """Create a rule save point from current configuration."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/rulesavepoint?'
         else:
@@ -2418,28 +2709,27 @@ on QSFP ports of G4 devices. \n"""
         params = {'name': name, 'description': description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Delete a port save point with guided options
     def delete_port_savepoint_guided(self):
+        """Interactive menu to delete a port save point."""
         name = raw_input("Port save point to delete: ")
         confirm = raw_input("""Delete Port Save Point Summary:
                             Save Point Name: %s
                             Confirm changes [y/n]: """ % name)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.delete_port_savepoint(name)
             return run
         else:
             return "Canceling; no changes made.\n"
 
-    #Delete a port save point with arguments
     def delete_port_savepoint(self, name):
+        """Delete a port save point from the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/portsavepoint?'
         else:
@@ -2448,28 +2738,27 @@ on QSFP ports of G4 devices. \n"""
         params = {'name': name}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Delete a rule save point with guided options
     def delete_rule_savepoint_guided(self):
+        """Interactive menu to delete a rule save point."""
         name = raw_input("Rule save point to delete:  ")
         confirm = raw_input("""Delete Rule Save Point Summary:
                             Save Point Name: %s
                             Confirm changes [y/n]: """ % name)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.delete_rule_savepoint(name)
             return run
         else:
             return "Canceling; no changes made.\n"
 
-    #Delete a rule save point with arguments
     def delete_rule_savepoint(self, name):
+        """Delete a rule save point from the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/rulesavepoint?'
         else:
@@ -2478,16 +2767,15 @@ on QSFP ports of G4 devices. \n"""
         params = {'name': name}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            # print response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Start an app with guided parameters
     def start_app_guided(self):
+        """Interactive menu to start a new app instance."""
         app = raw_input("""Select the App instance to start:
                             1 - NTP
                             2 - Arp Responder
@@ -2510,7 +2798,7 @@ on QSFP ports of G4 devices. \n"""
                                 Server 2: %s
                                 Description: %s
                                 Confirm changes [y/n]: """ % (server1, server2, description))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            if confirm.lower() in ('y', 'yes'):
                 run = self.start_app_ntp(server1, server2, description)
             else:
                 return "Canceling; no changes made.\n"
@@ -2536,7 +2824,7 @@ on QSFP ports of G4 devices. \n"""
                                 Destination IP of outgoing ARPs: %s
                                 Description: %s
                                 Confirm changes [y/n]: """ % (interval, in_port, out_port, match_mac, src_mac, dst_mac, src_ip, dst_ip, description))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            if confirm.lower() in ('y', 'yes'):
                 run = self.start_app_arpresponder(out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
             else:
                 return "Canceling; no changes made.\n"
@@ -2575,7 +2863,7 @@ on QSFP ports of G4 devices. \n"""
                                     Trap 2 Port: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, trap1, trap1_port, trap2, trap2_port, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable, trap1, trap1_port, trap2, trap2_port)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2587,7 +2875,7 @@ on QSFP ports of G4 devices. \n"""
                                     Trap Enabled: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2656,7 +2944,7 @@ on QSFP ports of G4 devices. \n"""
                                     Bypass Switch IP: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2676,7 +2964,7 @@ on QSFP ports of G4 devices. \n"""
                                     Bypass Switch IP: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2697,7 +2985,7 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination Port: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2716,7 +3004,7 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination IP: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2732,7 +3020,7 @@ on QSFP ports of G4 devices. \n"""
                                 Syslog Server Port: %s
                                 Description: %s
                                 Confirm changes [y/n]: """ % (server_ip, port, description))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            if confirm.lower() in ('y', 'yes'):
                 run = self.start_app_syslog(server_ip, port, description)
             else:
                 return "Canceling; no changes made.\n"
@@ -2758,7 +3046,7 @@ on QSFP ports of G4 devices. \n"""
                                     Check Interval: %s
                                     Description: %s
                                     Confirm changes [y/n]''' % (conn_type, bypass_ip, interval, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_bypasskeepalive(conn_type, interval, description, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2768,7 +3056,7 @@ on QSFP ports of G4 devices. \n"""
                                     Check Interval: %s
                                     Description: %s
                                     Confirm changes [y/n]''' % (conn_type, interval, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_bypasskeepalive(conn_type, interval, description)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2824,7 +3112,7 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination Port: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2842,7 +3130,7 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination IP: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -2852,8 +3140,8 @@ on QSFP ports of G4 devices. \n"""
             return "That is not a valid input for App selection; canceling Start App."
         return run
 
-    #Start NTP App
     def start_app_ntp(self, server1, server2=None, user_description=''):
+        """Start an NTP app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -2866,15 +3154,15 @@ on QSFP ports of G4 devices. \n"""
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Start ArpResponder App
     def start_app_arpresponder(self, outport, src_mac, dst_mac, src_ip, dst_ip, interval='5000', inport=None, match_srcmac=None, user_description=''):
+        """Start an ArpResponder app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -2912,15 +3200,15 @@ on QSFP ports of G4 devices. \n"""
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Start SNMP app instance
     def start_app_snmp(self, interval='5000', snmp_port='161', community='public', user_description='',trap_enable=True, trap1='1.1.1.1', trap1_port='162', trap2='', trap2_port='162'):
+        """Start an SNMP app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -2979,15 +3267,15 @@ on QSFP ports of G4 devices. \n"""
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Start app instance for bypass switch control
     def start_app_heartbeatbypass(self, bypass_port1, bypass_port2, hb_in, hb_out, conn_type='ip', interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556', bypass_ip='1.1.1.1'):
+        """Start a HeartbeatBypass app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3067,15 +3355,15 @@ on QSFP ports of G4 devices. \n"""
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Start syslog app instance
     def start_app_syslog(self, ip, port='514', user_description=''):
+        """Start a Syslog app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3097,15 +3385,15 @@ on QSFP ports of G4 devices. \n"""
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Start bypass keepalive app instance
     def start_app_bypasskeepalive(self, conn_type='ip', interval='2000', description='', bypass_ip='1.1.1.1'):
+        """Start a Bypass BypassKeepalive app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3133,15 +3421,15 @@ on QSFP ports of G4 devices. \n"""
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Start heartbeat app instance
     def start_app_heartbeat(self, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
+        """Start a Heartbeat app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3199,15 +3487,15 @@ on QSFP ports of G4 devices. \n"""
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify an app with guided parameters
     def mod_app_guided(self):
+        """Interactive menu to modify an app instance."""
         pid = raw_input("What is the PID of the app instance: ")
         try:
             app = int(pid)
@@ -3232,7 +3520,7 @@ on QSFP ports of G4 devices. \n"""
                                 Server 2: %s
                                 Description: %s
                                 Confirm changes [y/n]: """ % (server1, server2, description))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            if confirm.lower() in ('y', 'yes'):
                 run = self.mod_app_ntp(pid, server1, server2, description)
             else:
                 return "Canceling; no changes made.\n"
@@ -3258,7 +3546,7 @@ on QSFP ports of G4 devices. \n"""
                                 Destination IP of outgoing ARPs: %s
                                 Description: %s
                                 Confirm changes [y/n]: """ % (interval, in_port, out_port, match_mac, src_mac, dst_mac, src_ip, dst_ip, description))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            if confirm.lower() in ('y', 'yes'):
                 run = self.mod_app_arpresponder(pid, out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
             else:
                 return "Canceling; no changes made.\n"
@@ -3297,7 +3585,7 @@ on QSFP ports of G4 devices. \n"""
                                     Trap 2 Port: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, trap1, trap1_port, trap2, trap2_port, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_snmp(pid, interval, snmp_port, community, description, trap_enable, trap1, trap1_port, trap2, trap2_port)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3309,7 +3597,7 @@ on QSFP ports of G4 devices. \n"""
                                     Trap Enabled: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm in ('y', 'yes'):
                     run = self.mod_app_snmp(pid, interval, snmp_port, community, description, trap_enable)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3378,7 +3666,7 @@ on QSFP ports of G4 devices. \n"""
                                     Bypass Switch IP: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3398,7 +3686,7 @@ on QSFP ports of G4 devices. \n"""
                                     Bypass Switch IP: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3419,7 +3707,7 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination Port: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3438,7 +3726,7 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination IP: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3454,7 +3742,7 @@ on QSFP ports of G4 devices. \n"""
                                 Syslog Server Port: %s
                                 Description: %s
                                 Confirm changes [y/n]: """ % (server_ip, port, description))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            if confirm.lower() in ('y', 'yes'):
                 run = self.mod_app_syslog(pid, server_ip, port, description)
             else:
                 return "Canceling; no changes made.\n"
@@ -3480,7 +3768,7 @@ on QSFP ports of G4 devices. \n"""
                                     Check Interval: %s
                                     Description: %s
                                     Confirm changes [y/n]''' % (conn_type, bypass_ip, interval, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_bypasskeepalive(pid, conn_type, interval, description, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3490,7 +3778,7 @@ on QSFP ports of G4 devices. \n"""
                                     Check Interval: %s
                                     Description: %s
                                     Confirm changes [y/n]''' % (conn_type, interval, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_bypasskeepalive(pid, conn_type, interval, description)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3546,7 +3834,7 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination Port: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3564,7 +3852,7 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination IP: %S
                                     Description: %s
                                     Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
-                if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                if confirm.lower() in ('y', 'yes'):
                     run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
                 else:
                     return "Canceling; no changes made.\n"
@@ -3574,8 +3862,8 @@ on QSFP ports of G4 devices. \n"""
             return "That is not a valid input for PID; canceling Modify App."
         return run
 
-    #Modify NTP App
     def mod_app_ntp(self, pid, server1, server2=None, user_description=''):
+        """Modify an NTP app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3592,16 +3880,15 @@ on QSFP ports of G4 devices. \n"""
                   'userDescription': user_description}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify ArpResponder App
     def mod_app_arpresponder(self, pid, outport, src_mac, dst_mac, src_ip, dst_ip, interval='5000', inport=None, match_srcmac=None, user_description=''):
+        """Modify an ArpResponder app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3643,16 +3930,15 @@ on QSFP ports of G4 devices. \n"""
             params['userDescription'] = user_description
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify SNMP app instance
     def mod_app_snmp(self, pid, interval='5000', snmp_port='161', community='public', user_description='',trap_enable=True, trap1='1.1.1.1', trap1_port='162', trap2='', trap2_port='162'):
+        """Modify an SNMP app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3669,7 +3955,7 @@ on QSFP ports of G4 devices. \n"""
             input_check = int(snmp_port)
         except:
             return "That is not valid input for SNMP Port; canceling Modify SNMP."
-        if trap_enable == True or type(trap_enable) is str and trap_enable.lower() in ('true', 't', 'yes', 'y'):
+        if trap_enable or type(trap_enable) is str and trap_enable.lower() in ('true', 't', 'yes', 'y'):
             trap_enable = True
             try:
                 ip1 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap1)
@@ -3702,7 +3988,7 @@ on QSFP ports of G4 devices. \n"""
                       'trapReceiver': trap1,
                       'trapReceiver2': trap2,
                       'userDescription': user_description}
-        elif trap_enable == False or trap_enable.lower() in ('false', 'f', 'no', 'n'):
+        elif trap_enable is False or trap_enable.lower() in ('false', 'f', 'no', 'n'):
             trap_enable = False
             params = {'name': 'SNMP',
                       'description': 'Runs an SNMP Server.  The server uses [url=',
@@ -3716,16 +4002,15 @@ on QSFP ports of G4 devices. \n"""
             return "That is not a valid input for Enable Trap; canceling SNMP."
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify app instance for bypass switch control
     def mod_app_heartbeatbypass(self, pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type='ip', interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556', bypass_ip='1.1.1.1'):
+        """Modify a HeartbeatBypass app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3809,16 +4094,15 @@ on QSFP ports of G4 devices. \n"""
             params['portDst'] = dst_port
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify syslog app instance
     def mod_app_syslog(self, pid, ip, port='514', user_description=''):
+        """Modify a Syslog app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3844,16 +4128,15 @@ on QSFP ports of G4 devices. \n"""
                   'userDescription': user_description}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify bypass keepalive app instance
     def mod_app_bypasskeepalive(self, pid, conn_type='ip', interval='2000', description='', bypass_ip='1.1.1.1'):
+        """Modify a BypassKeepalive app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3885,16 +4168,15 @@ on QSFP ports of G4 devices. \n"""
             return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling Modify Bypass Keepalive."
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify heartbeat app instance
     def mod_app_heartbeat(self, pid, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
+        """Modify a Heartbeat app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -3956,30 +4238,28 @@ on QSFP ports of G4 devices. \n"""
                   'userDescription': user_description}
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Call a custom app action with guided options
     def call_app_action_guided(self):
+        """Interactive menu to call a custom app action."""
         pid = raw_input('Enter the PID of the app instance: ')
         name = raw_input('Enter the name of the custom app action: ')
         confirm = raw_input("""Call App Action Summary:
                             Process ID: %s
                             Action Name: %s
                             Confirm changes [y/n]: """ % (pid, name))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.call_app_action(pid, name)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Call a custom app action with arguments
     def call_app_action(self, pid, name):
+        """Call a custom app action."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps/action?'
         else:
@@ -3992,28 +4272,26 @@ on QSFP ports of G4 devices. \n"""
                   'action_name': name}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            #code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Stop a running app with guided options
     def kill_app_guided(self):
+        """Interactive menu to stop an active app instance."""
         pid = raw_input('What is the process ID of the app to kill: ')
         confirm = raw_input("""Kill App Summary:
                             Process ID: %s
                             Confirm changes [y/n]: """ % pid)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.kill_app(pid)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Stop a running app with arguments
     def kill_app(self, pid):
+        """Stop an active app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
@@ -4025,16 +4303,15 @@ on QSFP ports of G4 devices. \n"""
         params = {'pid': pid}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            #code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Change group hash algorithms with guided options
     def set_hash_algorithms_guided(self):
+        """Interactive menu to set group hash algorithms."""
         if self.hardware in ('4', '2'):
             macsa = raw_input('Type "true" to use MAC source address; type "false" to ignore [true]: ')
             macda = raw_input('Type "true" to use MAC destination address; type "false" to ignore [true]: ')
@@ -4054,7 +4331,7 @@ on QSFP ports of G4 devices. \n"""
                                 Use Source Port: %s
                                 Use Destination Port: %s
                                 Confirm changes [y/n]: """ % (macsa, macda, ether, ipsa, ipda, proto, src, dst))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+            if confirm.lower() in ('y', 'yes'):
                 run = self.set_hash_algorithms(macsa, macda, ether, ipsa, ipda, proto, src, dst)
             else:
                 return "Canceling; no changes made.\n"
@@ -4070,15 +4347,18 @@ on QSFP ports of G4 devices. \n"""
                                 Use IP Protocol: %s
                                 Use Source Port: %s
                                 Use Destination Port: %s
-                                Confirm changes [y/n]: """ % (ipsa, ipda, proto, src, dst))
-            if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
-                run = self.set_hash_algorithms('', '', '', ipsa, ipda, proto, src, dst)
+                                Confirm changes [y/n]: """ % (ipsa, ipda,
+                                                              proto, src, dst))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.set_hash_algorithms('', '', '', ipsa,
+                                               ipda, proto, src, dst)
             else:
                 return "Canceling; no changes made.\n"
         return run
 
-    #Change group hash algorithms with arguments
-    def set_hash_algorithms(self, macsa, macda, ether, ipsa, ipda, proto, src, dst):
+    def set_hash_algorithms(self, macsa, macda, ether,
+                            ipsa, ipda, proto, src, dst):
+        """Set group hash algorithms on the Packetmaster."""
         #EX2 has only 'ipsa', 'ipda', 'ip_protocol', 'scp_port', 'dst_port'
         if self.https:
             uri = 'https://' + self.address + '/rest/device/grouphash?'
@@ -4125,57 +4405,62 @@ on QSFP ports of G4 devices. \n"""
                       'ip_protocol': proto,
                       'src_port': src,
                       'dst_port': dst}
-        else: #May need to become 'elif self.hardware == '3.1'' with new elif statements for gen 3.  Need EX5-2 and EX12 to verify
+        else:
+            #May need to become 'elif self.hardware == '3.1'' with new
+            #elif statements for gen 3.  Need EX5-2 and EX12 to verify
             params = {'ipsa': ipsa,
                       'ipda': ipda,
                       'ip_protocol': proto,
                       'src_port': src,
                       'dst_port': dst}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Change rule mode permanence with guided options
     def set_rule_permanence_guided(self):
-        perm = raw_input('type "true" to turn on permanent rules; type "false" to turn them off [false]: ').lower()
+        """Interactive menu to set Rule Mode Permanance."""
+        perm = raw_input('type "true" to enable permanent rules; '
+                         'type "false" disable them [false]: ').lower()
         confirm = raw_input("""Set Rule Permamence Summary:
                             Permanance Enabled: %s
                             Confirm changes [y/n]: """ % perm)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_rule_permanence(perm)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Change rule mode permanence with arguments
     def set_rule_permanence(self, permanence):
+        """Set Rule Mode Permanance on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
         else:
             uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
-        if permanence in (True, 'True', 'true', 'Yes', 'yes', 'y', 't', 'T', 'Y'):
+        if type(permanence) == bool and permanence:
+            permanence = True
+        elif type(permanence) == str and permanence.lower() in ('true', 'yes',
+                                                                'y', 't'):
             permanence = True
         else:
             permanence == False
         params = {'state': permanence}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Set rule storage mode with guided options
     def set_storage_mode_guided(self):
+        """Interactive menu to set Rule Storage Mode."""
         mode = raw_input('''Select the rule storage mode:
                         1 - Simple
                         2 - IPv6
@@ -4183,24 +4468,25 @@ on QSFP ports of G4 devices. \n"""
         try:
             mode = int(mode)
         except:
-            return "That is not a valid selection; canceling set rule storage mode."
+            return ("That is not a valid selection; "
+                    "canceling set rule storage mode.")
         if mode == 1:
             mode = 'simple'
         elif mode == 2:
             mode = 'ipv6'
         else:
-            return "That is not a valid selection; canceling set rule storage mode."
+            return ("That is not a valid selection; "
+                    "canceling set rule storage mode.")
         confirm = raw_input("""Set Rule Storage Summary:
                             Rule Storage Mode: %s
                             Confirm changes [y/n]: """ % mode)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_storage_mode(mode)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Set rule storage mode
     def set_storage_mode(self, mode):
+        """Set Rule Storage Mode of the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/rulestoragemode?'
         else:
@@ -4208,25 +4494,27 @@ on QSFP ports of G4 devices. \n"""
         try:
             mode = mode.lower()
         except:
-            return "That is not a valid setting; canceling set rule storage mode."
+            return ("That is not a valid setting; "
+                    "canceling set rule storage mode.")
         if mode == 'simple':
             params = {'mode': 'simple'}
         elif mode == 'ipv6':
             params = {'mode': 'ipv6'}
         else:
-            return "That is not a valid selection; canceling set rule storage mode."
+            return ("That is not a valid selection; "
+                    "canceling set rule storage mode.")
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Add a user with guided option
     def add_user_guided(self):
+        """Interactive menu to add a user account to the Packetmaster."""
         username = raw_input('Enter a username: ').strip()
         access_level = raw_input("""Choose an access level for the user:
                                 1 - Read only
@@ -4242,15 +4530,19 @@ on QSFP ports of G4 devices. \n"""
                             Password Hidden
                             Description: %s
                             Use RADIUS AAA: %s
-                            Confirm changes [y/n]: """ % (username, access_level, description, rad))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
-            run = self.add_user(username, access_level, passwd, description, rad)
+                            Confirm changes [y/n]: """ % (username,
+                                                          access_level,
+                                                          description,
+                                                          rad))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.add_user(username, access_level,
+                                passwd, description, rad)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Add a user
-    def add_user(self, username, access_level, passwd, description='', rad=False):
+    def add_user(self, username, access_level,
+                 passwd, description='', rad=False):
+        """Add a user account to the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/users?'
         else:
@@ -4263,14 +4555,17 @@ on QSFP ports of G4 devices. \n"""
         for user in json_users:
             user_list.append(json_users[user]['username'])
         if username in user_list:
-            return "That username is already in use; use Modify User; canceling Add User."
+            return ("That username is already in use; "
+                    "use Modify User; canceling Add User.")
         try:
             access_level = int(access_level)
         except:
             return "That is not a valid user access level; canceling Add User."
         if access_level not in (1, 7, 31):
             return "That is not a valid user access level; canceling Add User."
-        if rad in (True, 'True', 'true', 'Yes', 'y', 'yes', 't', 'T', 'Y'):
+        if type(rad) == bool and rad:
+            rad = True
+        elif type(rad) == str and rad.lower() in ('true', 'y', 'yes', 't'):
             rad = True
         else:
             rad = False
@@ -4280,20 +4575,21 @@ on QSFP ports of G4 devices. \n"""
                   'description': description,
                   'radius': rad}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Modify a user with guided options
     def mod_user_guided(self):
+        """Interactive menu to modify a user account on the Packetmaster."""
         cur_name = raw_input('What is the username you would like to modify: ')
         new_name = raw_input('Enter a new username: ')
-        description = raw_input("Enter a new description; this will overwrite the old description: ")
+        description = raw_input("Enter a new description; "
+                                "this will overwrite the old description: ")
         access_level = raw_input("""Choose an access level for the user:
                                 1 - Read only
                                 7 - Write
@@ -4308,15 +4604,20 @@ on QSFP ports of G4 devices. \n"""
                             Password Hidden
                             Description: %s
                             Use RADIUS AAA: %s
-                            Confirm changes [y/n]: """ % (cur_name, new_name, access_level, description, rad))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
-            run = self.mod_user(cur_name, new_name, access_level, passwd, description, rad)
+                            Confirm changes [y/n]: """ % (cur_name,
+                                                          new_name,
+                                                          access_level,
+                                                          description,
+                                                          rad))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.mod_user(cur_name, new_name,
+                                access_level, passwd, description, rad)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Modify a user
-    def mod_user(self, cur_name, new_name, access_level, passwd, description='', rad=False ):
+    def mod_user(self, cur_name, new_name,
+                 access_level, passwd, description='', rad=False):
+        """Modify a user account on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/users?'
         else:
@@ -4327,16 +4628,21 @@ on QSFP ports of G4 devices. \n"""
         for user in json_users:
             user_list.append(json_users[user]['username'])
         if cur_name not in user_list:
-            return "That username does not exist; please use Add User.  Canceling Modify User."
+            return ("That username does not exist; "
+                    "please use Add User.  Canceling Modify User.")
         if new_name == '':
             return "That is not a valid username; canceling Modify User."
         try:
             access_level = int(access_level)
         except:
-            return "That is not a valid user access level; canceling Modify User."
+            return ("That is not a valid user access level; "
+                    "canceling Modify User.")
         if access_level not in (1, 7, 31):
-            return "That is not a valid user access level; canceling Modify User."
-        if rad in (True, 'True', 'true', 'Yes', 'y', 'yes', 't', 'Y', 'T'):
+            return ("That is not a valid user access level; "
+                    "canceling Modify User.")
+        if type(rad) == bool and rad:
+            rad = True
+        elif type(rad) == str and rad.lower() in ('true', 'y', 'yes', 't'):
             rad = True
         else:
             rad = False
@@ -4347,29 +4653,28 @@ on QSFP ports of G4 devices. \n"""
                   'description': description,
                   'radius': rad}
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.put(uri, data=params,
+                                    auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Delete a user with guided options
     def delete_user_guided(self):
+        """Interactive menu to delete a user account from the Packetmaster."""
         username = raw_input('What is the user name to delete: ')
         confirm = raw_input("""Delete User Summary:
                             Delete User: %s
                             Confirm changes [y/n]: """ % username)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.delete_user(username)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Delete a user
     def delete_user(self, username):
+        """Delete a user account from the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/users?'
         else:
@@ -4383,56 +4688,61 @@ on QSFP ports of G4 devices. \n"""
             return "That username does not exist"
         params = {'name': username}
         try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.delete(uri, data=params,
+                                       auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Turn mandatory user authentication on or off with guided options
     def set_uac_guided(self):
-        access = raw_input('type "true" to turn on UAC; type "false" to turn it off [false]: ').lower()
+        """Interactive menu to enable/disable user authentication."""
+        access = raw_input(('type "true" to turn on UAC; '
+                            'type "false" to turn it off [false]: ').lower())
         confirm = raw_input("""UAC Summary:
                             User Access Control On: %s
                             Confirm changes [y/n]: """ % access)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_uac(access)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Turn mandatory user authentication on or off with arguments
     def set_uac(self, uac):
+        """Enable/disable user authentication on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/users/uac?'
         else:
             uri = 'http://' + self.address + '/rest/users/uac?'
-        if uac in (True, 'True', 'true', 'Yes', 'yes', 't', 'y', 'T', 'Y'):
+        if type(uac) == bool and uac:
+            uac = True
+        elif type(uac) == str and uac.lower() in ('true', 'yes', 't', 'y'):
             uac = True
         else:
             uac = False
-        params = {'state': uac }
+        params = {'state': uac}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Set RADIUS settings with guided options
     def set_radius_guided(self):
-        server = raw_input('Enter the IP address of the RADIUS server: ').strip()
+        """Interactive menu to set RADIUS configuration."""
+        server = raw_input('Enter the IP address '
+                           'of the RADIUS server: ').strip()
         print "Enter the RADIUS secret."
         secret = getpass()
-        refresh = raw_input("Enter the refresh rate of the RADIUS session in seconds: ")
+        refresh = raw_input("Enter the refresh rate of the "
+                            "RADIUS session in seconds: ")
         level = raw_input('''Enter the RADIUS login level.
-        Determines the user access level that a user has logging in via RADIUS but without a local user account.
+        Determines the user access level that a user has
+        logging in via RADIUS but without a local user account.
                              0 - no access
                              1 - read access
                              7 - write access
@@ -4447,15 +4757,15 @@ on QSFP ports of G4 devices. \n"""
                             Refresh Rate: %s
                             Default RADIUS Login Level: %s
                             RADIUS Port: %s
-                            Confirm changes [y/n]: """ % (server, refresh, level, port))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+                            Confirm changes [y/n]: """ % (server, refresh,
+                                                          level, port))
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_radius(server, secret, refresh, level, port)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Set RADIUS settings with arguments
     def set_radius(self, server, secret, refresh, level, port=1812):
+        """Set RADIUS configuration."""
         if self.https:
             uri = 'https://' + self.address + '/rest/users/radius?'
         else:
@@ -4464,37 +4774,42 @@ on QSFP ports of G4 devices. \n"""
         try:
             refresh = int(refresh)
         except:
-            return "That is not a valid input for refresh rate; canceling Set Radius."
+            return ("That is not a valid input for refresh rate; "
+                    "canceling Set Radius.")
         try:
             level = int(level)
         except:
-            return "That is not a valid input for login level; canceling Set Radius."
+            return ("That is not a valid input for login level; "
+                    "canceling Set Radius.")
         if level not in (0, 1, 7, 31):
-            return "That is not a valid input for RADIUS login level; canceling Set Radius."
+            return ("That is not a valid input for RADIUS login level; "
+                    "canceling Set Radius.")
         try:
             port = int(port)
         except:
-            return "That is not a valid port input; canceling RADIUS settings call."
+            return ("That is not a valid port input; "
+                    "canceling RADIUS settings call.")
         params = {'server': server,
                   'port': port,
                   'secret': secret,
                   'radius_login_level': level,
                   'refresh_rate': refresh}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Turn HTTPS secure web interface on or off with guided options
     def set_https_guided(self):
-        enabled = raw_input('Type "true" to enable HTTPS on web interface; type "false" to turn it off [false]: ').lower()
+        """Interactive menu to enable/disable HTTPS web interface."""
+        enabled = raw_input(('Type "true" to enable HTTPS on web interface; '
+                             'type "false" to turn it off [false]: ').lower())
         if enabled == 'true':
-            print ("Please enter the SSL password")
+            print "Please enter the SSL password"
             ssl = getpass()
         else:
             enabled = False
@@ -4502,14 +4817,13 @@ on QSFP ports of G4 devices. \n"""
         confirm = raw_input("""Set HTTPS Summary:
                             HTTPS Secure Web Server On: %s
                             Confirm changes [y/n]: """ % enabled)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_https(enabled, ssl)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Turn HTTPS secure web interface on or off with arguments
     def set_https(self, enabled=False, ssl=None):
+        """Enable/disable HTTPS web interface."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/https?'
         else:
@@ -4521,29 +4835,29 @@ on QSFP ports of G4 devices. \n"""
         params = {'https_enabled': enabled,
                   'ssl_password': ssl}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = "No Response"
-            raise e
+        except ConnectionError as error:
+            content = "No Response"
+            raise error
 
-    #Turn Telnet service on or off with guided options
     def set_telnet_guided(self):
-        enabled = raw_input('Type "true" to enable Telnet; type "false" to turn it off [false]: ').lower()
+        """Interactive menu to enable/disable Telnet service."""
+        enabled = raw_input(('Type "true" to enable Telnet; '
+                             'type "false" to turn it off [false]: ').lower())
         confirm = raw_input("""Set Telnet Summary:
                             Telnet Service On: %s
                             Confirm changes [y/n]: """ % enabled)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_telnet(enabled)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Turn Telnet service on or off with arguments
     def set_telnet(self, enabled=False):
+        """Enable/disable Telnet service on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/telnet?'
         else:
@@ -4554,50 +4868,52 @@ on QSFP ports of G4 devices. \n"""
             enabled = False
         params = {'activated': enabled}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
-            return (json.dumps(data, indent=4), "Device must be rebooted for change to take effect")
-        except ConnectionError as e:
-            r = "No Response"
-            raise e
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
+            return (json.dumps(data, indent=4),
+                    "Device must be rebooted for change to take effect")
+        except ConnectionError as error:
+            content = "No Response"
+            raise error
 
-    #Delete Web Logs
     def del_web_log(self):
+        """Delete Webserver logs."""
         if self.https:
             uri = 'https://' + self.address + '/rest/weblog?'
         else:
             uri = 'http://' + self.address + '/rest/weblog?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Set DNS server settings with guided options
     def set_dns_guided(self):
+        """Interactive menu to set DNS configuration."""
         print 'You may set up to three DNS servers.'
-        dns1 = raw_input('Enter the IP address of the first DNS server or leave blank for none [none]: ').strip()
-        dns2 = raw_input('Enter the IP address of the second DNS server or leave blank for none [none]: ').strip()
-        dns3 = raw_input('Enter the IP address of the third DNS server or leave blank for none [none]: ').strip()
+        dns1 = raw_input(('Enter the IP address of the first DNS '
+                          'server or leave blank for none [none]: ').strip())
+        dns2 = raw_input(('Enter the IP address of the second DNS '
+                          'server or leave blank for none [none]: ').strip())
+        dns3 = raw_input(('Enter the IP address of the third DNS '
+                          'server or leave blank for none [none]: ').strip())
         confirm = raw_input("""Set DNS Summary:
                             DNS Server 1: %s
                             DNS Server 2: %s
                             DNS Server 3: %s
                             Confirm changes [y/n]: """ % (dns1, dns2, dns3))
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_dns(dns1, dns2, dns3)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Set DNS server settings
     def set_dns(self, dns1='', dns2='', dns3=''):
+        """Set DNS configuration."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/nameresolution?'
         else:
@@ -4611,31 +4927,31 @@ on QSFP ports of G4 devices. \n"""
             params['dns3'] = dns3
         if len(params) > 0:
             try:
-                response = requests.post(uri, data=params, auth=(self.username, self.password))
-                code = response.status_code
-                r = response.content
-                data = json.loads(r)
+                response = requests.post(uri, data=params,
+                                         auth=(self.username, self.password))
+                content = response.content
+                data = json.loads(content)
                 return json.dumps(data, indent=4)
-            except ConnectionError as e:
-                r = 'No Response'
-                raise e
+            except ConnectionError as error:
+                content = 'No Response'
+                raise error
         else:
             return 'No valid DNS server addresses given; DNS entries cleared.'
 
-    #Turn the ID LED on or off with guided options
     def set_id_led_guided(self):
-        led = raw_input('type "true" to turn the ID LED on; type "false" to turn it off [false]: ').lower()
+        """Interactive menu to enable/disable ID LED."""
+        led = raw_input(('type "true" to turn the ID LED on; '
+                         'type "false" to turn it off [false]: ').lower())
         confirm = raw_input("""Set ID LED Summary:
                             ID LED On: %s
                             Confirm changes [y/n]: """ % led)
-        if confirm in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        if confirm.lower() in ('y', 'yes'):
             run = self.set_id_led(led)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
-    #Turn the ID LED on or off with arguments
     def set_id_led(self, led):
+        """Enable/disable ID LED on the face of the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/idled?'
         else:
@@ -4647,17 +4963,17 @@ on QSFP ports of G4 devices. \n"""
             led = False
         params = {'activated': led}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            response = requests.post(uri, data=params,
+                                     auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Restart Web Server without rebooting the device
     def restart_webserver(self):
+        """Restart the Packetmaster Web Server.  Does not reboot device."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/restartwebserver?'
         else:
@@ -4665,16 +4981,15 @@ on QSFP ports of G4 devices. \n"""
 
         try:
             response = requests.post(uri, auth=(self.username, self.password))
-            code = response.status_code
-            r = response.content
-            data = json.loads(r)
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
 
-    #Reboot the Packetmaster
     def reboot(self):
+        """Reboot the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/device/reboot?'
         else:
@@ -4682,8 +4997,9 @@ on QSFP ports of G4 devices. \n"""
 
         try:
             requests.post(uri, auth=(self.username, self.password))
-            message = 'Device is rebooting...please allow 2 to 3 minutes for it to complete'
+            message = ('Device is rebooting...'
+                       'please allow 2 to 3 minutes for it to complete')
             return message
-        except ConnectionError as e:
-            r = 'No Response'
-            raise e
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error

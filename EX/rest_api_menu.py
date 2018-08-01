@@ -1,15 +1,15 @@
-#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
+#Use with firmware version 2.2.5 or later. Python2.7 Cubro Packetmaster REST API demo.
 
 #!/usr/bin/python
 
 #Import necessary Python libraries for interacting with the REST API
-import requests, json, re
 from getpass import getpass
-from requests.exceptions import ConnectionError
+import re
 from packetmasterEX_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
 
 def set_ip():
+    """Validates then sets an IP address for a Cubro PacketmasterEX device."""
     fail_count = 0
     while fail_count < 3:
         address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
@@ -17,8 +17,8 @@ def set_ip():
             ip_address = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', address)
             address = ip_address[0]
             return address
-        except:
-            print "That is not a valid IPv4 address."
+        except TypeError as reason:
+            print ("That is not a valid IPv4 address.", reason)
             fail_count += 1
     print "That is not a valid IPv4 address.  Exiting"
     exit()
@@ -35,16 +35,17 @@ if __name__ == '__main__':
         \n'''
 
     #IP address to access REST data of device
-    address = set_ip()
+    ADDRESS = set_ip()
     #Device credentials
-    username = raw_input('Enter your username: ')
-    password = getpass()
-    packetmaster = PacketmasterEX(address, username, password)
+    USERNAME = raw_input('Enter your username: ')
+    PASSWORD = getpass()
+    #Initialize Packetmaster object
+    PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
 
-    #Initial menu to check or change settings
     def topmenu():
-        global address, username, password, packetmaster
-        print 'Options for device at', address,'acting as User', username
+        """Top menu in hierarchy for device management."""
+        global ADDRESS, USERNAME, PASSWORD, PACKETMASTER
+        print 'Options for device at', ADDRESS, 'acting as User', USERNAME
         print '''
             1 - Change My working device
             2 - Change My user credentials
@@ -54,16 +55,17 @@ if __name__ == '__main__':
         option = raw_input('Enter selection number: ')
         try:
             option = int(option)
-        except:
+        except ValueError as reason:
+            print reason
             topmenu()
         if option == 1:
-            address = set_ip()
-            packetmaster = PacketmasterEX(address, username, password)
+            ADDRESS = set_ip()
+            PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
             topmenu()
         elif option == 2:
-            username = raw_input('Username: ')
-            password = getpass()
-            packetmaster = PacketmasterEX(address, username, password)
+            USERNAME = raw_input('Username: ')
+            PASSWORD = getpass()
+            PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
             topmenu()
         elif option == 3:
             manage()
@@ -75,7 +77,8 @@ if __name__ == '__main__':
             topmenu()
 
     def manage():
-        print 'Device management menu for device at', address,'acting as User', username
+        """Menu for managing Cubro PacketmasterEX device."""
+        print 'Device management menu for device at', ADDRESS, 'acting as User', USERNAME
         choice = raw_input('''
                   1 - Hardware Configuration Menu
                   2 - Rule and Port Group Configuration Menu
@@ -87,8 +90,8 @@ if __name__ == '__main__':
                  Enter the number of the selection to check: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             manage()
         if choice == 1:
             hardwareconfig()
@@ -110,7 +113,8 @@ if __name__ == '__main__':
             manage()
 
     def hardwareconfig():
-        print 'Hardware configuration menu for device at', address,'acting as User', username
+        """Menu for configuring hardware and management related settings."""
+        print 'Hardware configuration menu for device at', ADDRESS, 'acting as User', USERNAME
         choice = raw_input('''
                  1 - Model
                  2 - Serial Number
@@ -123,84 +127,97 @@ if __name__ == '__main__':
                  9 - TCAM Flows
                 10 - Memory Usage
                 11 - CCH Server Revision
-                12 - Device Label and Notes Submenu
-                13 - IP Configuration Submenu
-                14 - DNS Configuration Submenu
-                15 - Port Configuration Submenu
-                16 - Telnet service submenu
-                17 - Webserver Submenu
-                18 - Reboot Packetmaster
-                19 - Back
-                20 - Quit \n
+                12 - Device OpenFlow Datapath ID
+                13 - Set Vitrum License
+                14 - Device Label and Notes Submenu
+                15 - IP Configuration Submenu
+                16 - DNS Configuration Submenu
+                17 - Port Configuration Submenu
+                18 - Telnet service submenu
+                19 - Webserver Submenu
+                20 - Controller Submenu
+                21 - Reboot Packetmaster
+                22 - Back
+                23 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             hardwareconfig()
         if choice == 1:
-            run = packetmaster.device_model()
+            run = PACKETMASTER.device_model()
             print run
             hardwareconfig()
         elif choice == 2:
-            run = packetmaster.serial_number()
+            run = PACKETMASTER.serial_number()
             print run
             hardwareconfig()
         elif choice == 3:
-            run = packetmaster.hardware_generation()
+            run = PACKETMASTER.hardware_generation()
             print run
             hardwareconfig()
         elif choice == 4:
-            run = packetmaster.firmware_version()
+            run = PACKETMASTER.firmware_version()
             print run
             hardwareconfig()
         elif choice == 5:
-            run = packetmaster.env_info()
+            run = PACKETMASTER.env_info()
             print run
             hardwareconfig()
         elif choice == 6:
-            run = packetmaster.id_led()
+            run = PACKETMASTER.id_led()
             print run
             hardwareconfig()
         elif choice == 7:
-            run = packetmaster.set_id_led_guided()
+            run = PACKETMASTER.set_id_led_guided()
             print run
             hardwareconfig()
         elif choice == 8:
-            run = packetmaster.load_info()
+            run = PACKETMASTER.load_info()
             print run
             hardwareconfig()
         elif choice == 9:
-            run = packetmaster.tcam()
+            run = PACKETMASTER.tcam()
             print run
             hardwareconfig()
         elif choice == 10:
-            run = packetmaster.mem_free()
+            run = PACKETMASTER.mem_free()
             print run
             hardwareconfig()
         elif choice == 11:
-            run = packetmaster.server_revision()
+            run = PACKETMASTER.server_revision()
             print run
             hardwareconfig()
         elif choice == 12:
-            notesmenu()
-        elif choice == 13:
-            ipconfig()
-        elif choice == 14:
-            dns()
-        elif choice == 15:
-            portconfig()
-        elif choice == 16:
-            telnet()
-        elif choice == 17:
-            web()
-        elif choice == 18:
-            run = packetmaster.reboot()
+            run = PACKETMASTER.get_dpid()
             print run
             hardwareconfig()
+        elif choice == 13:
+            run = PACKETMASTER.set_license_guided()
+            print run
+            hardwareconfig()
+        elif choice == 14:
+            notesmenu()
+        elif choice == 15:
+            ipconfig()
+        elif choice == 16:
+            dns()
+        elif choice == 17:
+            portconfig()
+        elif choice == 18:
+            telnet()
         elif choice == 19:
-            manage()
+            web()
         elif choice == 20:
+            controller()
+        elif choice == 21:
+            run = PACKETMASTER.reboot()
+            print run
+            hardwareconfig()
+        elif choice == 22:
+            manage()
+        elif choice == 23:
             print 'Goodbye'
             exit()
         else:
@@ -208,7 +225,8 @@ if __name__ == '__main__':
             hardwareconfig()
 
     def notesmenu():
-        print 'Device label and notes menu for device at', address,'acting as User', username
+        """Submenu for device label and device notes settings."""
+        print 'Device label and notes menu for device at', ADDRESS, 'acting as User', USERNAME
         choice = raw_input('''
                  1 - Get Label and Notes
                  2 - Change Label only
@@ -218,19 +236,19 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             notesmenu()
         if choice == 1:
-            run = packetmaster.device_label()
+            run = PACKETMASTER.device_label()
             print run
             notesmenu()
         elif choice == 2:
-            run = packetmaster.set_name_guided()
+            run = PACKETMASTER.set_name_guided()
             print run
             notesmenu()
         elif choice == 3:
-            run = packetmaster.set_label_guided()
+            run = PACKETMASTER.set_label_guided()
             print run
             notesmenu()
         elif choice == 4:
@@ -240,10 +258,11 @@ if __name__ == '__main__':
             exit()
         else:
             print "That is not a valid selection."
-            notes()
+            notesmenu()
 
     def ipconfig():
-        print 'Device label and notes menu for device at', address,'acting as User', username
+        """Submenu for IP configuration settings."""
+        print 'Device label and notes menu for device at', ADDRESS, 'acting as User', USERNAME
         choice = raw_input('''
                  1 - Get current IP configuration
                  2 - Change IP configuration
@@ -252,15 +271,15 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             ipconfig()
         if choice == 1:
-            run = packetmaster.ip_config()
+            run = PACKETMASTER.ip_config()
             print run
             ipconfig()
         elif choice == 2:
-            run = packetmaster.set_ip_config_guided()
+            run = PACKETMASTER.set_ip_config_guided()
             print run
             ipconfig()
         elif choice == 3:
@@ -273,7 +292,8 @@ if __name__ == '__main__':
             ipconfig()
 
     def dns():
-        print 'DNS configuration menu for device at', address,'acting as User', username
+        """Submenu for DNS settings."""
+        print 'DNS configuration menu for device at', ADDRESS, 'acting as User', USERNAME
         choice = raw_input('''
                  1 - Get current DNS configuration
                  2 - Change DNS configuration
@@ -282,15 +302,15 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             dns()
         if choice == 1:
-            run = packetmaster.get_dns()
+            run = PACKETMASTER.get_dns()
             print run
             dns()
         elif choice == 2:
-            run = packetmaster.set_dns_guided()
+            run = PACKETMASTER.set_dns_guided()
             print run
             dns()
         elif choice == 3:
@@ -303,7 +323,9 @@ if __name__ == '__main__':
             dns()
 
     def portconfig():
-        print 'Port configuration menu for device at', address,'acting as User', username
+        """Submenu for port configuration settings."""
+        print ''' Port Configuration Menu
+        for device at %s acting as User %s''' % (ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Get current port configuration
                  2 - Get current port status
@@ -317,35 +339,35 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             portconfig()
         if choice == 1:
-            run = packetmaster.port_config()
+            run = PACKETMASTER.port_config()
             print run
             portconfig()
         elif choice == 2:
-            run = packetmaster.port_info()
+            run = PACKETMASTER.port_info()
             print run
             portconfig()
         elif choice == 3:
-            run = packetmaster.port_statistics()
+            run = PACKETMASTER.port_statistics()
             print run
             portconfig()
         elif choice == 4:
-            run = packetmaster.sfp_info()
+            run = PACKETMASTER.sfp_info()
             print run
             portconfig()
         elif choice == 5:
-            run = packetmaster.set_port_config_guided()
+            run = PACKETMASTER.set_port_config_guided()
             print run
             portconfig()
         elif choice == 6:
-            run = packetmaster.port_on_off_guided()
+            run = PACKETMASTER.port_on_off_guided()
             print run
             portconfig()
         elif choice == 7:
-            run = packetmaster.reset_port_counters()
+            run = PACKETMASTER.reset_port_counters()
             print run
             portconfig()
         elif choice == 8:
@@ -358,7 +380,9 @@ if __name__ == '__main__':
             portconfig()
 
     def web():
-        print 'Webserver menu for device at', address,'acting as User', username
+        """Submenu for Web Server settings."""
+        print ''' Webserver Menu
+        for device at %s acting as User %s ''' % (ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Web logs
                  2 - Delete web Logs
@@ -369,23 +393,23 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             web()
         if choice == 1:
-            run = packetmaster.web_log()
+            run = PACKETMASTER.web_log()
             print run
             web()
         elif choice == 2:
-            run = packetmaster.del_web_log()
+            run = PACKETMASTER.del_web_log()
             print run
             web()
         elif choice == 3:
-            run = packetmaster.restart_webserver()
+            run = PACKETMASTER.restart_webserver()
             print run
             web()
         elif choice == 4:
-            run = packetmaster.set_https_guided()
+            run = PACKETMASTER.set_https_guided()
             print run
             web()
         elif choice == 5:
@@ -398,7 +422,9 @@ if __name__ == '__main__':
             web()
 
     def telnet():
-        print 'Telnet service menu for device at', address,'acting as User', username
+        """Submneu for Telnet service settings."""
+        print ''' Telnet Service Menu
+        for device at %s acting as User %s''' % (ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Get current Telnet status
                  2 - Enable or Disable Telnet service
@@ -407,15 +433,15 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             telnet()
         if choice == 1:
-            run = packetmaster.get_telnet()
+            run = PACKETMASTER.get_telnet()
             print run
             telnet()
         elif choice == 2:
-            run = packetmaster.set_telnet_guided()
+            run = PACKETMASTER.set_telnet_guided()
             print run
             telnet()
         elif choice == 3:
@@ -427,8 +453,48 @@ if __name__ == '__main__':
             print "That is not a valid selection."
             telnet()
 
+    def controller():
+        """Submenu for Vitrum Controller settings."""
+        print '''   Controller Configuration Menu
+        for device at %s acting as User %s''' % (ADDRESS, USERNAME)
+        choice = raw_input('''
+                 1 - Get current Controller configuration
+                 2 - Configure Controller
+                 3 - Delete Controller
+                 4 - Back
+                 5 - Quit \n
+                 Enter selection number: ''')
+        try:
+            choice = int(choice)
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
+            controller()
+        if choice == 1:
+            run = PACKETMASTER.get_controller()
+            print run
+            controller()
+        elif choice == 2:
+            run = PACKETMASTER.set_controller_guided()
+            print run
+            controller()
+        elif choice == 3:
+            run = PACKETMASTER.del_controller_guided()
+            print run
+            controller()
+        elif choice == 4:
+            hardwareconfig()
+        elif choice == 5:
+            print 'Goodbye'
+            exit()
+        else:
+            print "That is not a valid selection."
+            controller()
+
+
     def ruleconfig():
-        print 'Rule and Port Group configuration menu for device at', address,'acting as User', username
+        """Menu for configuring rules/filters and port groups."""
+        print '''   Rule and Port Group configuration menu
+        for device at %s acting as User %s''' % (ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Show Rules and Rule Counters
                  2 - Add Rule
@@ -452,75 +518,75 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             ruleconfig()
         if choice == 1:
-            run = packetmaster.rules_active()
+            run = PACKETMASTER.rules_active()
             print run
             ruleconfig()
         elif choice == 2:
-            run = packetmaster.add_rule_guided()
+            run = PACKETMASTER.add_rule_guided()
             print run
             ruleconfig()
         elif choice == 3:
-            run = packetmaster.mod_rule_guided()
+            run = PACKETMASTER.mod_rule_guided()
             print run
             ruleconfig()
         elif choice == 4:
-            run = packetmaster.del_rule_guided()
+            run = PACKETMASTER.del_rule_guided()
             print run
             ruleconfig()
         elif choice == 5:
-            run = packetmaster.del_rule_all()
+            run = PACKETMASTER.del_rule_all()
             print run
             ruleconfig()
         elif choice == 6:
-            run = packetmaster.reset_rule_counters()
+            run = PACKETMASTER.reset_rule_counters()
             print run
             ruleconfig()
         elif choice == 7:
-            run = packetmaster.groups_active()
+            run = PACKETMASTER.groups_active()
             print run
             ruleconfig()
         elif choice == 8:
-            run = packetmaster.add_group_guided()
+            run = PACKETMASTER.add_group_guided()
             print run
             ruleconfig()
         elif choice == 9:
-            run = packetmaster.modify_group_guided()
+            run = PACKETMASTER.modify_group_guided()
             print run
             ruleconfig()
         elif choice == 10:
-            run = packetmaster.delete_group_guided()
+            run = PACKETMASTER.delete_group_guided()
             print run
             ruleconfig()
         elif choice == 11:
-            run = packetmaster.delete_groups_all()
+            run = PACKETMASTER.delete_groups_all()
             print run
             ruleconfig()
         elif choice == 12:
-            run = packetmaster.hash_algorithms()
+            run = PACKETMASTER.hash_algorithms()
             print run
             ruleconfig()
         elif choice == 13:
-            run = packetmaster.set_hash_algorithms_guided()
+            run = PACKETMASTER.set_hash_algorithms_guided()
             print run
             ruleconfig()
         elif choice == 14:
-            run = packetmaster.rule_permanence()
+            run = PACKETMASTER.rule_permanence()
             print run
             ruleconfig()
         elif choice == 15:
-            run = packetmaster.set_rule_permanence_guided()
+            run = PACKETMASTER.set_rule_permanence_guided()
             print run
             ruleconfig()
         elif choice == 16:
-            run = packetmaster.storage_mode()
+            run = PACKETMASTER.storage_mode()
             print run
             ruleconfig()
         elif choice == 17:
-            run = packetmaster.set_storage_mode_guided()
+            run = PACKETMASTER.set_storage_mode_guided()
             print run
             ruleconfig()
         elif choice == 18:
@@ -533,7 +599,8 @@ if __name__ == '__main__':
             ruleconfig()
 
     def appconfig():
-        print 'App configuration menu for device at', address,'acting as User', username
+        """Menu for configuring App settings."""
+        print 'App configuration menu for device at', ADDRESS, 'acting as User', USERNAME
         choice = raw_input('''
                  1 - List Apps
                  2 - List Running Apps
@@ -546,31 +613,31 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             appconfig()
         if choice == 1:
-            run = packetmaster.device_apps()
+            run = PACKETMASTER.device_apps()
             print run
             appconfig()
         elif choice == 2:
-            run = packetmaster.apps_active()
+            run = PACKETMASTER.apps_active()
             print run
             appconfig()
         elif choice == 3:
-            run = packetmaster.start_app_guided()
+            run = PACKETMASTER.start_app_guided()
             print run
             appconfig()
         elif choice == 4:
-            run = packetmaster.mod_app_guided()
+            run = PACKETMASTER.mod_app_guided()
             print run
             appconfig()
         elif choice == 5:
-            run = packetmaster.kill_app_guided()
+            run = PACKETMASTER.kill_app_guided()
             print run
             appconfig()
         elif choice == 6:
-            run = packetmaster.call_app_action_guided()
+            run = PACKETMASTER.call_app_action_guided()
             print run
             appconfig()
         elif choice == 7:
@@ -583,7 +650,8 @@ if __name__ == '__main__':
             appconfig()
 
     def saveconfig():
-        print 'Save Point configuration menu for device at', address,'acting as User', username
+        """Menu for save point configuration settings."""
+        print 'Save Point configuration menu for device at', ADDRESS, 'acting as User', USERNAME
         choice = raw_input('''
                  1 - List Save Points
                  2 - Activate a save point for ports
@@ -602,55 +670,55 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             saveconfig()
         if choice == 1:
-            run = packetmaster.save_points()
+            run = PACKETMASTER.save_points()
             print run
             saveconfig()
         elif choice == 2:
-            run = packetmaster.set_port_savepoint_guided()
+            run = PACKETMASTER.set_port_savepoint_guided()
             print run
             saveconfig()
         elif choice == 3:
-            run = packetmaster.set_rule_savepoint_guided()
+            run = PACKETMASTER.set_rule_savepoint_guided()
             print run
             saveconfig()
         elif choice == 4:
-            run = packetmaster.set_boot_savepoint_guided()
+            run = PACKETMASTER.set_boot_savepoint_guided()
             print run
             saveconfig()
         elif choice == 5:
-            run = packetmaster.export_savepoint_guided()
+            run = PACKETMASTER.export_savepoint_guided()
             print run
             saveconfig()
         elif choice == 6:
-            run = packetmaster.modify_port_savepoint_guided()
+            run = PACKETMASTER.modify_port_savepoint_guided()
             print run
             saveconfig()
         elif choice == 7:
-            run = packetmaster.modify_rule_savepoint_guided()
+            run = PACKETMASTER.modify_rule_savepoint_guided()
             print run
             saveconfig()
         elif choice == 8:
-            run = packetmaster.create_port_savepoint_guided()
+            run = PACKETMASTER.create_port_savepoint_guided()
             print run
             saveconfig()
         elif choice == 9:
-            run = packetmaster.create_quick_savepoint()
+            run = PACKETMASTER.create_quick_savepoint()
             print run
             saveconfig()
         elif choice == 10:
-            run = packetmaster.create_rule_savepoint_guided()
+            run = PACKETMASTER.create_rule_savepoint_guided()
             print run
             saveconfig()
         elif choice == 11:
-            run = packetmaster.delete_port_savepoint_guided()
+            run = PACKETMASTER.delete_port_savepoint_guided()
             print run
             saveconfig()
         elif choice == 12:
-            run = packetmaster.delete_rule_savepoint_guided()
+            run = PACKETMASTER.delete_rule_savepoint_guided()
             print run
             saveconfig()
         elif choice == 13:
@@ -663,7 +731,8 @@ if __name__ == '__main__':
             saveconfig()
 
     def userconfig():
-        print 'User configuration menu for device at', address,'acting as User', username
+        """Menu for user account related settings."""
+        print 'User configuration menu for device at', ADDRESS, 'acting as User', USERNAME
         choice = raw_input('''
                  1 - List Users
                  2 - Add User
@@ -678,39 +747,39 @@ if __name__ == '__main__':
                  Enter selection number: ''')
         try:
             choice = int(choice)
-        except:
-            print "That is not a valid selection."
+        except ValueError as reason:
+            print ("That is not a valid selection.", reason)
             userconfig()
         if choice == 1:
-            run = packetmaster.get_users()
+            run = PACKETMASTER.get_users()
             print run
             userconfig()
         elif choice == 2:
-            run = packetmaster.add_user_guided()
+            run = PACKETMASTER.add_user_guided()
             print run
             userconfig()
         elif choice == 3:
-            run = packetmaster.mod_user_guided()
+            run = PACKETMASTER.mod_user_guided()
             print run
             userconfig()
         elif choice == 4:
-            run = packetmaster.delete_user_guided()
+            run = PACKETMASTER.delete_user_guided()
             print run
             userconfig()
         elif choice == 5:
-            run = packetmaster.user_uac()
+            run = PACKETMASTER.user_uac()
             print run
             userconfig()
         elif choice == 6:
-            run = packetmaster.set_uac_guided()
+            run = PACKETMASTER.set_uac_guided()
             print run
             userconfig()
         elif choice == 7:
-            run = packetmaster.get_radius()
+            run = PACKETMASTER.get_radius()
             print run
             userconfig()
         elif choice == 8:
-            run = packetmaster.set_radius_guided()
+            run = PACKETMASTER.set_radius_guided()
             print run
             userconfig()
         elif choice == 9:

@@ -3,9 +3,8 @@
 #!/usr/bin/python
 
 #Import necessary Python libraries for interacting with the REST API
-import requests, json, re
+import re
 from getpass import getpass
-from requests.exceptions import ConnectionError
 from packetmasterEX_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
 

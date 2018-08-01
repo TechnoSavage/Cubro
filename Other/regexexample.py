@@ -1,11 +1,13 @@
+#!/usr/bin/python
+
 import re
 
-words = ''
+WORDS = ''
 
 with open('sample.txt') as source:
     for line in source:
         text = line.rstrip()
-        words += text
+        WORDS += text
 
-pattern = re.findall('(\S*abe\S*)', words)
-print pattern
+PATTERN = re.findall('(\S*abe\S*)', WORDS)
+print PATTERN
