@@ -51,7 +51,8 @@ class PacketmasterEX(object):
                 self.get_port_count()
                 self.device_model()
                 return "Connection established"
-        except:
+        except ConnectionError as fail:
+            print fail
             try:
                 self.https = True
                 gen_test = self.hardware_generation()
@@ -64,8 +65,8 @@ class PacketmasterEX(object):
                     self.get_port_count()
                     self.device_model()
                     return "Connection established"
-            except:
-                print "Unable to establish connection; check if IP address is correct."
+            except ConnectionError as fail:
+                print ("Unable to establish connection; check if IP address is correct.", fail)
 
     #This will currently return both Physical and Logical ports.
     #Find way to list Physcial ports only.
@@ -1402,7 +1403,7 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self.address + '/rest/rules?'
         else:
             uri = 'http://' + self.address + '/rest/rules?'
-        if type(params) is not dict:
+        if not isinstance(params, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
         try:
@@ -1707,7 +1708,7 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self.address + '/rest/rules?'
         else:
             uri = 'http://' + self.address + '/rest/rules?'
-        if type(params) is not dict:
+        if not isinstance(params, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
         try:
@@ -1936,7 +1937,7 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self.address + '/rest/rules?'
         else:
             uri = 'http://' + self.address + '/rest/rules?'
-        if type(params) is not dict:
+        if not isinstance(params, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
         try:
@@ -2160,7 +2161,7 @@ on QSFP ports of G4 devices. \n"""
         if gid in existing:
             return ("A group with this group ID already exists; "
                     "use Modify Group or select a different group ID. Canceling Add Group")
-        if type(json_app) is not dict:
+        if not isinstance(json_app, dict):
             return "That is not a valid dictionary input for Add Group; canceling Add Group."
         try:
             response = requests.post(uri, json=json_app, auth=(self.username, self.password))
@@ -2271,8 +2272,9 @@ on QSFP ports of G4 devices. \n"""
                     try:
                         dstip = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
                         actions = 'set_field:' + dstip[0] + '->ip_dst,' + actions
-                    except:
-                        return "That is not a valid input for IP address, canceling Modify Group."
+                    except TypeError as reason:
+                        return ("That is not a valid input for IP address, "
+                                "canceling Modify Group.", reason)
                 if self.hardware == '4':
                     src_udp = raw_input('Modify source UDP port? '
                                         'Enter new port number or leave blank for no: ').strip()
@@ -2352,7 +2354,7 @@ on QSFP ports of G4 devices. \n"""
         if gid not in existing:
             return ("A group with this group ID does not exist; use Add Group. "
                     "Canceling Modify Group.")
-        if type(json_app) is not dict:
+        if not isinstance(json_app, dict):
             return "That is not a valid dictionary input for Modify Group; canceling Modify Group."
         try:
             response = requests.put(uri, json=json_app, auth=(self.username, self.password))
@@ -2625,7 +2627,7 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self.address + '/rest/savepoints/modrulesavepoint?'
         else:
             uri = 'http://' + self.address + '/rest/savepoints/modrulesavepoint?'
-        if override == False:
+        if not override:
             override = False
         elif override.lower() in ('false', 'f', 'n', 'no'):
             override = False
@@ -2726,8 +2728,7 @@ on QSFP ports of G4 devices. \n"""
         if confirm.lower() in ('y', 'yes'):
             run = self.delete_port_savepoint(name)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
     def delete_port_savepoint(self, name):
         """Delete a port save point from the Packetmaster."""
@@ -2755,8 +2756,7 @@ on QSFP ports of G4 devices. \n"""
         if confirm.lower() in ('y', 'yes'):
             run = self.delete_rule_savepoint(name)
             return run
-        else:
-            return "Canceling; no changes made.\n"
+        return "Canceling; no changes made.\n"
 
     def delete_rule_savepoint(self, name):
         """Delete a rule save point from the Packetmaster."""
@@ -2788,8 +2788,8 @@ on QSFP ports of G4 devices. \n"""
                            Enter the number of the App selection: """)
         try:
             app = int(app)
-        except:
-            return "That is not a valid input for App selection; canceling Start App."
+        except ValueError as reason:
+            return ("That is not a valid input for App selection; canceling Start App.", reason)
         description = raw_input("Custom description for the new App instance: ")
         if app == 1:
             server1 = raw_input("Enter NTP target IP or Host Name: ")
@@ -2824,9 +2824,20 @@ on QSFP ports of G4 devices. \n"""
                                 Source IP of outgoing ARPs: %s
                                 Destination IP of outgoing ARPs: %s
                                 Description: %s
-                                Confirm changes [y/n]: """ % (interval, in_port, out_port, match_mac, src_mac, dst_mac, src_ip, dst_ip, description))
+                                Confirm changes [y/n]: """ % (interval,
+                                                              in_port,
+                                                              out_port,
+                                                              match_mac,
+                                                              src_mac,
+                                                              dst_mac,
+                                                              src_ip,
+                                                              dst_ip,
+                                                              description))
             if confirm.lower() in ('y', 'yes'):
-                run = self.start_app_arpresponder(out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
+                run = self.start_app_arpresponder(out_port, src_mac, dst_mac,
+                                                  src_ip, dst_ip, interval,
+                                                  in_port, match_mac,
+                                                  description)
             else:
                 return "Canceling; no changes made.\n"
         elif app == 3:
@@ -2839,7 +2850,8 @@ on QSFP ports of G4 devices. \n"""
             community = raw_input("Enter the SNMP community [public]: ")
             if community == '':
                 community = 'public'
-            trap_enable = raw_input("Enter SNMP traps?  Enter 'true' to enable or 'false' to keep disabled [true]: ")
+            trap_enable = raw_input("Enter SNMP traps?  Enter 'true' to enable "
+                                    "or 'false' to keep disabled [true]: ")
             if trap_enable.lower() in ('false', 'f', 'n', 'no'):
                 trap_enable = False
             else:
@@ -2849,7 +2861,8 @@ on QSFP ports of G4 devices. \n"""
                 trap1_port = raw_input('Enter port number for SNMP trap [162]: ')
                 if trap1_port == '':
                     trap1_port = '162'
-                trap2 = raw_input('Enter IP address for additional SNMP trap or leave blank for none: ')
+                trap2 = raw_input('Enter IP address for additional SNMP trap '
+                                  'or leave blank for none: ')
                 trap2_port = raw_input('Enter port number for additional SNMP trap [162]: ')
                 if trap2_port == '':
                     trap2_port = '162'
@@ -2863,9 +2876,19 @@ on QSFP ports of G4 devices. \n"""
                                     Trap 2 IP: %s
                                     Trap 2 Port: %s
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, trap1, trap1_port, trap2, trap2_port, description))
+                                    Confirm changes [y/n]: """ % (interval,
+                                                                  snmp_port,
+                                                                  community,
+                                                                  trap_enable,
+                                                                  trap1,
+                                                                  trap1_port,
+                                                                  trap2,
+                                                                  trap2_port,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable, trap1, trap1_port, trap2, trap2_port)
+                    run = self.start_app_snmp(interval, snmp_port, community,
+                                              description, trap_enable, trap1,
+                                              trap1_port, trap2, trap2_port)
                 else:
                     return "Canceling; no changes made.\n"
             else:
@@ -2875,9 +2898,14 @@ on QSFP ports of G4 devices. \n"""
                                     SNMP Community: %s
                                     Trap Enabled: %s
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, description))
+                                    Confirm changes [y/n]: """ % (interval,
+                                                                  snmp_port,
+                                                                  community,
+                                                                  trap_enable,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable)
+                    run = self.start_app_snmp(interval, snmp_port, community,
+                                              description, trap_enable)
                 else:
                     return "Canceling; no changes made.\n"
         elif app == 4:
@@ -2893,10 +2921,12 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "That is not a valid input for Connection Type; canceling HeartbeatBypass."
             bypass_port1 = raw_input("Port number of first port connected to the Bypass Switch: ")
-            bypass_port2 = raw_input("Port number of the second port connected to the Bypass Switch: ")
+            bypass_port2 = raw_input("Port number of the second port "
+                                     "connected to the Bypass Switch: ")
             hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
             hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
-            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            interval = raw_input("Check interval time in milliseconds that the "
+                                 "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
             proto = raw_input('''Protocol to use for heartbeat packets:
@@ -2915,10 +2945,12 @@ on QSFP ports of G4 devices. \n"""
                 proto = 'ICMP'
             else:
                 return "That is not a valid input for Protocol; canceling HeartbeatBypass."
-            src_mac = raw_input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+            src_mac = raw_input("Enter source MAC address for heartbeat "
+                                "packets [00:00:00:00:00:01]: ")
             if src_mac == '':
                 src_mac = '00:00:00:00:00:01'
-            dst_mac = raw_input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+            dst_mac = raw_input("Enter destination MAC address for heartbeat "
+                                "packets [00:00:00:00:00:02]: ")
             if dst_mac == '':
                 dst_mac = '00:00:00:00:00:02'
             src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
@@ -2944,9 +2976,30 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination Port: %s
                                     Bypass Switch IP: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip, description))
+                                    Confirm changes [y/n]: """ % (bypass_port1,
+                                                                  bypass_port2,
+                                                                  hb_in, hb_out,
+                                                                  conn_type,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  src_port,
+                                                                  dst_port,
+                                                                  bypass_ip,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
+                    run = self.start_app_heartbeatbypass(bypass_port1,
+                                                         bypass_port2,
+                                                         hb_in, hb_out,
+                                                         conn_type, interval,
+                                                         description, proto,
+                                                         src_mac, dst_mac,
+                                                         src_ip, dst_ip,
+                                                         src_port, dst_port,
+                                                         bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'IP' and proto == 'ICMP':
@@ -2964,9 +3017,27 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination IP: %S
                                     Bypass Switch IP: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip, description))
+                                    Confirm changes [y/n]: """ % (bypass_port1,
+                                                                  bypass_port2,
+                                                                  hb_in,
+                                                                  hb_out,
+                                                                  conn_type,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  bypass_ip,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
+                    run = self.start_app_heartbeatbypass(bypass_port1,
+                                                         bypass_port2, hb_in,
+                                                         hb_out, conn_type,
+                                                         interval, description,
+                                                         proto, src_mac,
+                                                         dst_mac, src_ip,
+                                                         dst_ip, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'UDP':
@@ -2985,9 +3056,29 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Source Port: %S
                                     Heartbeat Destination Port: %s
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
+                                    Confirm changes [y/n]: """ % (bypass_port1,
+                                                                  bypass_port2,
+                                                                  hb_in,
+                                                                  hb_out,
+                                                                  conn_type,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  src_port,
+                                                                  dst_port,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                    run = self.start_app_heartbeatbypass(bypass_port1,
+                                                         bypass_port2, hb_in,
+                                                         hb_out, conn_type,
+                                                         interval, description,
+                                                         proto, src_mac,
+                                                         dst_mac, src_ip,
+                                                         dst_ip, src_port,
+                                                         dst_port)
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'ICMP':
@@ -3004,9 +3095,26 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Source IP: %s
                                     Heartbeat Destination IP: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
+                                    Confirm changes [y/n]: """ % (bypass_port1,
+                                                                  bypass_port2,
+                                                                  hb_in,
+                                                                  hb_out,
+                                                                  conn_type,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                    run = self.start_app_heartbeatbypass(bypass_port1,
+                                                         bypass_port2, hb_in,
+                                                         hb_out, conn_type,
+                                                         interval, description,
+                                                         proto, src_mac,
+                                                         dst_mac, src_ip,
+                                                         dst_ip)
                 else:
                     return "Canceling; no changes made.\n"
             else:
@@ -3037,7 +3145,8 @@ on QSFP ports of G4 devices. \n"""
                 conn_type = 'RS232'
             else:
                 return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
-            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            interval = raw_input("Check interval time in milliseconds that the "
+                                 "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
             if conn_type == 'IP':
@@ -3046,9 +3155,13 @@ on QSFP ports of G4 devices. \n"""
                                     Bypass Switch IP: %s
                                     Check Interval: %s
                                     Description: %s
-                                    Confirm changes [y/n]''' % (conn_type, bypass_ip, interval, description))
+                                    Confirm changes [y/n]''' % (conn_type,
+                                                                bypass_ip,
+                                                                interval,
+                                                                description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_bypasskeepalive(conn_type, interval, description, bypass_ip)
+                    run = self.start_app_bypasskeepalive(conn_type, interval,
+                                                         description, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
             else:
@@ -3066,7 +3179,8 @@ on QSFP ports of G4 devices. \n"""
             act_comm = raw_input("Command to run when heartbeat packets are detected: ")
             hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
             deact_comm = raw_input("Command to run when heartbeat packets are not detected: ")
-            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            interval = raw_input("Check interval time in milliseconds that the "
+                                 "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
             proto = raw_input('''Protocol to use for heartbeat packets:
@@ -3085,10 +3199,12 @@ on QSFP ports of G4 devices. \n"""
                 proto = 'ICMP'
             else:
                 return "That is not a valid input for Protocol; canceling Heartbeat."
-            src_mac = raw_input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+            src_mac = raw_input("Enter source MAC address for heartbeat "
+                                "packets [00:00:00:00:00:01]: ")
             if src_mac == '':
                 src_mac = '00:00:00:00:00:01'
-            dst_mac = raw_input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+            dst_mac = raw_input("Enter destination MAC address for heartbeat "
+                                "packets [00:00:00:00:00:02]: ")
             if dst_mac == '':
                 dst_mac = '00:00:00:00:00:02'
             src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
@@ -3112,9 +3228,25 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Source Port: %s
                                     Heartbeat Destination Port: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
+                                    Confirm changes [y/n]: """ % (hb_in,
+                                                                  act_comm,
+                                                                  hb_out,
+                                                                  deact_comm,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  src_port,
+                                                                  dst_port,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                    run = self.start_app_heartbeat(hb_in, act_comm, hb_out,
+                                                   deact_comm, interval,
+                                                   description, proto, src_mac,
+                                                   dst_mac, src_ip, dst_ip,
+                                                   src_port, dst_port)
                 else:
                     return "Canceling; no changes made.\n"
             elif proto == 'ICMP':
@@ -3130,9 +3262,22 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Source IP: %s
                                     Heartbeat Destination IP: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
+                                    Confirm changes [y/n]: """ % (hb_in,
+                                                                  act_comm,
+                                                                  hb_out,
+                                                                  deact_comm,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                    run = self.start_app_heartbeat(hb_in, act_comm, hb_out,
+                                                   deact_comm, interval,
+                                                   description, proto, src_mac,
+                                                   dst_mac, src_ip, dst_ip)
                 else:
                     return "Canceling; no changes made.\n"
             else:
@@ -3154,7 +3299,6 @@ on QSFP ports of G4 devices. \n"""
                   'userDescription': user_description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
             content = response.content
             data = json.loads(content)
             return json.dumps(data, indent=4)
@@ -3162,7 +3306,9 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def start_app_arpresponder(self, outport, src_mac, dst_mac, src_ip, dst_ip, interval='5000', inport=None, match_srcmac=None, user_description=''):
+    def start_app_arpresponder(self, outport, src_mac, dst_mac, src_ip, dst_ip,
+                               interval='5000', inport=None, match_srcmac=None,
+                               user_description=''):
         """Start an ArpResponder app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
@@ -3170,14 +3316,16 @@ on QSFP ports of G4 devices. \n"""
             uri = 'http://' + self.address + '/rest/apps?'
         try:
             input_check = int(interval)
-        except:
-            return "That is not an valid input for interval (number in milliseconds); canceling start ArpResponder."
+        except ValueError as reason:
+            return ("That is not an valid input for interval "
+                    "(number in milliseconds); canceling start ArpResponder.", reason)
         try:
             input_check = int(outport)
             if input_check > self.ports:
                 return "Physical port does not exist on device."
-        except:
-            return "That is not an valid input for output port; canceling start ArpResponder."
+        except ValueError as reason:
+            return ("That is not an valid input for output port; "
+                    "canceling start ArpResponder.", reason)
         params = {'name': 'ArpResponder',
                   'description': 'Responds to an arbotrary packet with an ARP response',
                   'interval': interval,
@@ -3191,8 +3339,9 @@ on QSFP ports of G4 devices. \n"""
                 input_check = int(inport)
                 if input_check > self.ports:
                     return "Physical port does not exist on device."
-            except:
-                return "That is not a valid input for input port; canceling ArpResponder."
+            except ValueError as reason:
+                return ("That is not a valid input for input port; "
+                        "canceling ArpResponder.", reason)
             params['inPort'] = inport
         if match_srcmac:
             params['matchMacSrc'] = match_srcmac
@@ -3200,7 +3349,6 @@ on QSFP ports of G4 devices. \n"""
             params['userDescription'] = user_description
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
             content = response.content
             data = json.loads(content)
             return json.dumps(data, indent=4)
@@ -3208,41 +3356,44 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def start_app_snmp(self, interval='5000', snmp_port='161', community='public', user_description='',trap_enable=True, trap1='1.1.1.1', trap1_port='162', trap2='', trap2_port='162'):
+    def start_app_snmp(self, interval='5000', snmp_port='161',
+                       community='public', user_description='',
+                       trap_enable=True, trap1='1.1.1.1', trap1_port='162',
+                       trap2='', trap2_port='162'):
         """Start an SNMP app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(interval)
-        except:
-            return "That is not valid input for Check Interval; canceling SNMP."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not valid input for Check Interval; canceling SNMP.", reason)
         try:
-            input_check = int(snmp_port)
-        except:
-            return "That is not valid input for SNMP Port; canceling SNMP."
-        if trap_enable == True or type(trap_enable) is str and trap_enable.lower() in ('true', 't', 'yes', 'y'):
+            int(snmp_port)
+        except ValueError as reason:
+            return ("That is not valid input for SNMP Port; canceling SNMP.", reason)
+        if trap_enable or type(trap_enable) is str and trap_enable.lower() in ('true', 't', 'yes', 'y'):
             trap_enable = True
             try:
                 ip1 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap1)
                 trap1 = ip1[0]
-            except:
-                return "That is not a valid IP address for Trap 1; canceling SNMP."
+            except TypeError as reason:
+                return ("That is not a valid IP address for Trap 1; canceling SNMP.", reason)
             try:
-                input_check = int(trap1_port)
-            except:
-                return "That is not valid input for Trap Port 1; canceling SNMP."
+                int(trap1_port)
+            except ValueError as reason:
+                return ("That is not valid input for Trap Port 1; canceling SNMP.", reason)
             if trap2 != '':
                 try:
                     ip2 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap2)
                     trap2 = ip2[0]
-                except:
-                    return "That is not a valid IP address for Trap 2; canceling SNMP."
+                except TypeError as reason:
+                    return ("That is not a valid IP address for Trap 2; canceling SNMP.", reason)
             try:
-                input_check = int(trap2_port)
-            except:
-                return "That is not valid input for Trap Port 2; canceling SNMP."
+                int(trap2_port)
+            except ValueError as reason:
+                return ("That is not valid input for Trap Port 2; canceling SNMP.", reason)
             params = {'name': 'SNMP',
                       'description': 'Runs an SNMP Server.  The server uses [url=',
                       'interval': interval,
@@ -3254,7 +3405,7 @@ on QSFP ports of G4 devices. \n"""
                       'trapReceiver': trap1,
                       'trapReceiver2': trap2,
                       'userDescription': user_description}
-        elif trap_enable == False or trap_enable.lower() in ('false', 'f', 'no', 'n'):
+        elif trap_enable or trap_enable.lower() in ('false', 'f', 'no', 'n'):
             trap_enable = False
             params = {'name': 'SNMP',
                       'description': 'Runs an SNMP Server.  The server uses [url=',
@@ -3267,7 +3418,6 @@ on QSFP ports of G4 devices. \n"""
             return "That is not a valid input for Enable Trap; canceling SNMP."
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
             content = response.content
             data = json.loads(content)
             return json.dumps(data, indent=4)
@@ -3275,47 +3425,61 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def start_app_heartbeatbypass(self, bypass_port1, bypass_port2, hb_in, hb_out, conn_type='ip', interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556', bypass_ip='1.1.1.1'):
+    def start_app_heartbeatbypass(self, bypass_port1, bypass_port2, hb_in,
+                                  hb_out, conn_type='ip', interval='2000',
+                                  user_description='', proto='udp',
+                                  src_mac='00:00:00:00:00:01',
+                                  dst_mac='00:00:00:00:00:02',
+                                  src_ip='0.0.0.1', dst_ip='0.0.0.2',
+                                  src_port='5555', dst_port='5556',
+                                  bypass_ip='1.1.1.1'):
         """Start a HeartbeatBypass app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(bypass_port1)
-        except:
-            return "That is not a valid port number for Bypass Port 1; canceling HeartbeatBypass."
+            int(bypass_port1)
+        except ValueError as reason:
+            return ("That is not a valid port number for Bypass Port 1; "
+                    "canceling HeartbeatBypass.", reason)
         try:
-            input_check = int(bypass_port2)
-        except:
-            return "That is not a valid port number for Bypass Port 2; canceling HeartbeatBypass."
+            int(bypass_port2)
+        except ValueError as reason:
+            return ("That is not a valid port number for Bypass Port 2; "
+                    "canceling HeartbeatBypass.", reason)
         try:
-            input_check = int(hb_in)
-        except:
-            return "That is not a valid port number for Heartbeat In Port; canceling HeartbeatBypass."
+            int(hb_in)
+        except ValueError as reason:
+            return ("That is not a valid port number for Heartbeat In Port; "
+                    "canceling HeartbeatBypass.", reason)
         try:
-            input_check = int(hb_out)
-        except:
-            return "That is not a valid port number for Heartbeat Out Port; canceling HeartbeatBypass."
+            int(hb_out)
+        except ValueError as reason:
+            return ("That is not a valid port number for Heartbeat Out Port; "
+                    "canceling HeartbeatBypass.", reason)
         try:
-            input_check = int(interval)
-        except:
-            return "That is not a valid input for Check Interval; canceling HeartbeatBypass."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not a valid input for Check Interval; "
+                    "canceling HeartbeatBypass.", reason)
         if proto.upper() in ('UDP', 'ICMP'):
             proto = proto.upper()
         else:
-            return "That is not a valid input for Protocol; must be UDP or ICMP.  Canceling HeartbeatBypass."
+            return ("That is not a valid input for Protocol; "
+                    "must be UDP or ICMP.  Canceling HeartbeatBypass.")
         #MAC address regex check
         try:
             src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
             src_ip = src_ip_check[0]
-        except:
-            return "That is not a valid input for Source IP; canceling HeartbeatBypass."
+        except TypeError as reason:
+            return ("That is not a valid input for Source IP; canceling HeartbeatBypass.", reason)
         try:
             dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
             dst_ip = dst_ip_check[0]
-        except:
-            return "That is not a valid input for Destination IP; canceling HeartbeatBypass."
+        except TypeError as reason:
+            return ("That is not a valid input for Destination IP; "
+                    "canceling HeartbeatBypass.", reason)
         params = {'bypassPort1': bypass_port1,
                   'bypassPort2': bypass_port2,
                   'connectionType': conn_type,
@@ -3332,30 +3496,34 @@ on QSFP ports of G4 devices. \n"""
                   'userDescription': user_description}
         if conn_type.upper() in ('IP', 'RS232'):
             params['connectionType'] = conn_type.upper()
-            if conn_type == 'RS232' and self.hardware_generation =='4':
-                return "Controlling a Bypass Switch with RS232 is not supported on Gen 4 hardware; please use IP instead."
+            if conn_type == 'RS232' and self.hardware_generation == '4':
+                return ("Controlling a Bypass Switch with RS232 is not "
+                        "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
                     params['bypassIP'] = ip_check[0]
-                except:
-                    return "That is not a valid input for Bypass Switch IP; canceling HeartbeatBypass."
+                except TypeError as reason:
+                    return ("That is not a valid input for Bypass Switch IP; "
+                            "canceling HeartbeatBypass.", reason)
         else:
-            return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling HeartbeatBypass."
+            return ("That is not a valid input for Connection Type; "
+                    "must be IP or RS232.  Canceling HeartbeatBypass.")
         if proto == 'UDP':
             try:
-                input_check = int(src_port)
-            except:
-                return "That is not a valid input for Source Port; canceling HeartbeatBypass."
+                int(src_port)
+            except ValueError as reason:
+                return ("That is not a valid input for Source Port; "
+                        "canceling HeartbeatBypass.", reason)
             params['portSrc'] = src_port
             try:
-                input_check = int(dst_port)
-            except:
-                return "That is not a valid input for Destination Port; canceling HeartbeatBypass."
+                int(dst_port)
+            except ValueError as reason:
+                return ("That is not a valid input for Destination Port; "
+                        "canceling HeartbeatBypass.", reason)
             params['portDst'] = dst_port
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
             content = response.content
             data = json.loads(content)
             return json.dumps(data, indent=4)
@@ -3363,21 +3531,21 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def start_app_syslog(self, ip, port='514', user_description=''):
+    def start_app_syslog(self, server_ip, port='514', user_description=''):
         """Start a Syslog app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', ip)
+            ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', server_ip)
             server = ip_check[0]
-        except:
-            return "That is not a valid server IP address; canceling Syslog."
+        except TypeError as reason:
+            return ("That is not a valid server IP address; canceling Syslog.", reason)
         try:
-            input_check = int(port)
-        except:
-            return "That is not a valid input for port number; canceling Syslog."
+            int(port)
+        except ValueError as reason:
+            return ("That is not a valid input for port number; canceling Syslog.", reason)
         params = {'description': 'Logs syslog data to a remote server',
                   'name': 'Syslog',
                   'port': port,
@@ -3385,7 +3553,6 @@ on QSFP ports of G4 devices. \n"""
                   'userDescription': user_description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
             content = response.content
             data = json.loads(content)
             return json.dumps(data, indent=4)
@@ -3393,35 +3560,39 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def start_app_bypasskeepalive(self, conn_type='ip', interval='2000', description='', bypass_ip='1.1.1.1'):
+    def start_app_bypasskeepalive(self, conn_type='ip', interval='2000',
+                                  description='', bypass_ip='1.1.1.1'):
         """Start a Bypass BypassKeepalive app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(interval)
-        except:
-            return "That is not a valid input for Check Interval; canceling Bypass Keepalive."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not a valid input for Check Interval; "
+                    "canceling Bypass Keepalive.", reason)
         params = {'description': 'This app is used to control a Cubro Bypass Switch device.',
                   'interval': interval,
                   'userDescription': description,
                   'name': 'BypassKeepalive'}
         if conn_type.upper() in ('IP', 'RS232'):
             params['connectionType'] = conn_type.upper()
-            if conn_type == 'RS232' and self.hardware_generation =='4':
-                return "Controlling a Bypass Switch with RS232 is not supported on Gen 4 hardware; please use IP instead."
+            if conn_type == 'RS232' and self.hardware_generation == '4':
+                return ("Controlling a Bypass Switch with RS232 is not "
+                        "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
                     params['bypassIP'] = ip_check[0]
-                except:
-                    return "That is not a valid input for Bypass Switch IP; canceling Bypass Keepalive."
+                except TypeError as reason:
+                    return ("That is not a valid input for Bypass Switch IP; "
+                            "canceling Bypass Keepalive.", reason)
         else:
-            return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling Bypass Keepalive."
+            return ("That is not a valid input for Connection Type; "
+                    "must be IP or RS232.  Canceling Bypass Keepalive.")
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
             content = response.content
             data = json.loads(content)
             return json.dumps(data, indent=4)
@@ -3429,47 +3600,55 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def start_app_heartbeat(self, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
+    def start_app_heartbeat(self, hb_in, act_comm, hb_out, deact_comm,
+                            interval='2000', user_description='', proto='udp',
+                            src_mac='00:00:00:00:00:01',
+                            dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1',
+                            dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
         """Start a Heartbeat app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(hb_in)
-        except:
-            return "That is not a valid port number for Heartbeat In Port; canceling Heartbeat."
+            int(hb_in)
+        except ValueError as reason:
+            return ("That is not a valid port number for Heartbeat In Port; "
+                    "canceling Heartbeat.", reason)
         try:
-            input_check = int(hb_out)
-        except:
-            return "That is not a valid port number for Heartbeat Out Port; canceling Heartbeat."
+            int(hb_out)
+        except ValueError as reason:
+            return ("That is not a valid port number for Heartbeat Out Port; "
+                    "canceling Heartbeat.", reason)
         try:
-            input_check = int(interval)
-        except:
-            return "That is not a valid input for Check Interval; canceling Heartbeat."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not a valid input for Check Interval; "
+                    "canceling Heartbeat.", reason)
         if proto.upper() in ('UDP', 'ICMP'):
             proto = proto.upper()
         else:
-            return "That is not a valid input for Protocol; must be UDP or ICMP.  Canceling Heartbeat."
+            return ("That is not a valid input for Protocol; "
+                    "must be UDP or ICMP.  Canceling Heartbeat.")
         #MAC address regex check
         try:
             src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
             src_ip = src_ip_check[0]
-        except:
-            return "That is not a valid input for Source IP; canceling Heartbeat."
+        except TypeError as reason:
+            return ("That is not a valid input for Source IP; canceling Heartbeat.", reason)
         try:
             dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
             dst_ip = dst_ip_check[0]
-        except:
-            return "That is not a valid input for Destination IP; canceling Heartbeat."
+        except TypeError as reason:
+            return ("That is not a valid input for Destination IP; canceling Heartbeat.", reason)
         try:
-            input_check = int(src_port)
-        except:
-            return "That is not a valid input for Source Port; canceling Heartbeat."
+            int(src_port)
+        except ValueError as reason:
+            return ("That is not a valid input for Source Port; canceling Heartbeat.", reason)
         try:
-            input_check = int(dst_port)
-        except:
-            return "That is not a valid input for Destination Port; canceling Heartbeat."
+            int(dst_port)
+        except ValueError as reason:
+            return ("That is not a valid input for Destination Port; canceling Heartbeat.", reason)
         params = {'activateCommand': act_comm,
                   'deactivateCommand': deact_comm,
                   'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
@@ -3487,7 +3666,6 @@ on QSFP ports of G4 devices. \n"""
                   'userDescription': user_description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
-            code = response.status_code
             content = response.content
             data = json.loads(content)
             return json.dumps(data, indent=4)
