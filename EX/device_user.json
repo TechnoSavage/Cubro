@@ -6,6 +6,8 @@
   "users": [
     {"username": "Bob", "passwd": "dangerous"},
     {"username": "George", "passwd": "washington"},
-    {"username": "Jim", "passwd": "jimmyboy"}
+    {"username": "Jim", "passwd": "jimmyboy"},
+    {"username": "Frank", "passwd": "furter"},
+    {"username": "Todd", "passwd": "tank"}
             ]
 }

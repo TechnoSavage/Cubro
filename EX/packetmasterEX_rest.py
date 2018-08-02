@@ -2176,8 +2176,8 @@ on QSFP ports of G4 devices. \n"""
         name = raw_input("Enter the group ID of the group you would like to modify: ")
         try:
             int(name)
-        except:
-            return "That is not a valid group ID, canceling Modify Group."
+        except ValueError as reason:
+            return ("That is not a valid group ID, canceling Modify Group.", reason)
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
@@ -2197,8 +2197,8 @@ on QSFP ports of G4 devices. \n"""
                             "Must be at least 2 and no more than 16: ")
         try:
             buckets = int(buckets)
-        except:
-            return "That is not a valid bucket number; canceling Modify Group."
+        except ValueError as reason:
+            return ("That is not a valid bucket number; canceling Modify Group.", reason)
         if buckets >= 2 and buckets <= 16:
             for bucket in xrange(buckets):
                 print "\nConfigure settings for bucket %s" % bucket
@@ -2207,15 +2207,15 @@ on QSFP ports of G4 devices. \n"""
                 try:
                     int(output)
                     output = 'output:' + output
-                except:
-                    return "That is not a valid port number; canceling Modify Group"
+                except ValueError as reason:
+                    return ("That is not a valid port number; canceling Modify Group", reason)
                 actions = output
                 if self.hardware != '4' or group_type == 'ff':
                     watch = raw_input("Set watch port to: ")
                     try:
                         int(watch)
-                    except:
-                        return "That is not a valid port number; canceling Modify Group"
+                    except ValueError as reason:
+                        return ("That is not a valid port number; canceling Modify Group", reason)
                 push_vlan = raw_input('Push VLAN ID to outout traffic? '
                                       'Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
@@ -2223,8 +2223,8 @@ on QSFP ports of G4 devices. \n"""
                         vlan = str(int(push_vlan) + 4096)
                         vlan = 'push_vlan:0x8100,set_field:' + vlan + '->vlan_vid,'
                         actions = vlan + actions
-                    except:
-                        return "That is not a valid VLAN ID, canceling Modify Group."
+                    except ValueError as reason:
+                        return ("That is not a valid VLAN ID, canceling Modify Group.", reason)
                 else:
                     mod_vlan = raw_input('Modify VLAN ID of output traffic? '
                                          'Enter VLAN ID or leave blank for no: ').strip()
@@ -2233,8 +2233,9 @@ on QSFP ports of G4 devices. \n"""
                             vlan = str(int(mod_vlan) + 4096)
                             vlan = 'set_field:' + vlan + '->vlan_vid,'
                             actions = vlan + actions
-                        except:
-                            return "That is not a valid input for VLAN ID, canceling Modify Group."
+                        except ValueError as reason:
+                            return ("That is not a valid input for VLAN ID, "
+                                    "canceling Modify Group.", reason)
                     else:
                         strip_vlan = raw_input('Strip VLAN ID from output traffic? '
                                                'Y or N [N]: ').lower()
