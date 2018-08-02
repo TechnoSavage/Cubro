@@ -5,7 +5,7 @@
 #Import necessary Python libraries for interacting with the REST API
 import re
 from getpass import getpass
-from packetmasterEX_rest import PacketmasterEX
+from packetmaster_ex_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
 
 def set_ip():

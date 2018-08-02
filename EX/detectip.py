@@ -12,7 +12,7 @@ rule parameters. """
 import json
 import time
 from getpass import getpass
-from packetmasterEX_rest import PacketmasterEX
+from packetmaster_ex_rest import PacketmasterEX
 
 #Function to query for the existence of the specified IP address on Packetmaster 'A' (detector)
 def query(detector, blocker, address):

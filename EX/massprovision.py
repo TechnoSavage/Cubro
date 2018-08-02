@@ -6,7 +6,7 @@
 #Import necessary Python libraries
 import json, time, sys, re
 from getpass import getpass
-from packetmasterEX_rest import PacketmasterEX
+from packetmaster_ex_rest import PacketmasterEX
 
 def usage():
     print """Usage:

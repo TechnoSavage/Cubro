@@ -13,7 +13,7 @@
 import json
 import time
 from getpass import getpass
-from packetmasterEX_rest import PacketmasterEX
+from packetmaster_ex_rest import PacketmasterEX
 
 def query(packetmaster, interface, priority1, priority2, limit):
     """ Function that repeatedly queries flow statisctics and parses the JSON

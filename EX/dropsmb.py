@@ -8,7 +8,7 @@
 import time
 from getpass import getpass
 from datetime import datetime
-from packetmasterEX_rest import PacketmasterEX
+from packetmaster_ex_rest import PacketmasterEX
 
 #Check system time
 def checktime(packetmaster, drop_time, interface, duration):

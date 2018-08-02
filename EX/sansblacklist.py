@@ -6,7 +6,7 @@ from getpass import getpass
 import re
 import requests
 from requests.exceptions import ConnectionError
-from packetmasterEX_rest import PacketmasterEX
+from packetmaster_ex_rest import PacketmasterEX
 
 def createblacklist(match, packet_master, interface):
     """Apply the IP rule filters on Packetmaster based on blacklist."""

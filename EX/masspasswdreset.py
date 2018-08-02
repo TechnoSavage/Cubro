@@ -12,7 +12,7 @@ import json
 import sys
 import string
 import random
-from packetmasterEX_rest import PacketmasterEX
+from packetmaster_ex_rest import PacketmasterEX
 
 def usage():
     """ Display usage and help. """

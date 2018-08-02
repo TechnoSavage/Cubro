@@ -1,5 +1,5 @@
-#Packetmaster EX device class for REST API interaction,
-#Use with firmware version 2.2.5 or newer and up to G4 NPB.
+""" Packetmaster EX device class for REST API interaction,
+    Use with firmware version 2.2.5 or newer and up to G4 NPB. """
 
 from getpass import getpass
 import json
@@ -3678,8 +3678,8 @@ on QSFP ports of G4 devices. \n"""
         pid = raw_input("What is the PID of the app instance: ")
         try:
             app = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling modify app."
+        except ValueError as reason:
+            return ("That is not a valid input for PID; canceling modify app.", reason)
         active = self.apps_active()
         active = json.loads(active)
         for app in active:
@@ -3724,9 +3724,20 @@ on QSFP ports of G4 devices. \n"""
                                 Source IP of outgoing ARPs: %s
                                 Destination IP of outgoing ARPs: %s
                                 Description: %s
-                                Confirm changes [y/n]: """ % (interval, in_port, out_port, match_mac, src_mac, dst_mac, src_ip, dst_ip, description))
+                                Confirm changes [y/n]: """ % (interval,
+                                                              in_port,
+                                                              out_port,
+                                                              match_mac,
+                                                              src_mac,
+                                                              dst_mac,
+                                                              src_ip,
+                                                              dst_ip,
+                                                              description))
             if confirm.lower() in ('y', 'yes'):
-                run = self.mod_app_arpresponder(pid, out_port, src_mac, dst_mac, src_ip, dst_ip, interval, in_port, match_mac, description)
+                run = self.mod_app_arpresponder(pid, out_port, src_mac,
+                                                dst_mac, src_ip, dst_ip,
+                                                interval, in_port, match_mac,
+                                                description)
             else:
                 return "Canceling; no changes made.\n"
         elif instance == 'SNMP':
@@ -3739,7 +3750,8 @@ on QSFP ports of G4 devices. \n"""
             community = raw_input("Enter the SNMP community [public]: ")
             if community == '':
                 community = 'public'
-            trap_enable = raw_input("Enter SNMP traps?  Enter 'true' to enable or 'false' to keep disabled [true]: ")
+            trap_enable = raw_input("Enter SNMP traps?  Enter 'true' to "
+                                    "enable or 'false' to keep disabled [true]: ")
             if trap_enable.lower() in ('false', 'f', 'n', 'no'):
                 trap_enable = False
             else:
@@ -3749,7 +3761,8 @@ on QSFP ports of G4 devices. \n"""
                 trap1_port = raw_input('Enter port number for SNMP trap [162]: ')
                 if trap1_port == '':
                     trap1_port = '162'
-                trap2 = raw_input('Enter IP address for additional SNMP trap or leave blank for none: ')
+                trap2 = raw_input('Enter IP address for additional SNMP trap '
+                                  'or leave blank for none: ')
                 trap2_port = raw_input('Enter port number for additional SNMP trap [162]: ')
                 if trap2_port == '':
                     trap2_port = '162'
@@ -3763,9 +3776,20 @@ on QSFP ports of G4 devices. \n"""
                                     Trap 2 IP: %s
                                     Trap 2 Port: %s
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, trap1, trap1_port, trap2, trap2_port, description))
+                                    Confirm changes [y/n]: """ % (interval,
+                                                                  snmp_port,
+                                                                  community,
+                                                                  trap_enable,
+                                                                  trap1,
+                                                                  trap1_port,
+                                                                  trap2,
+                                                                  trap2_port,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_snmp(pid, interval, snmp_port, community, description, trap_enable, trap1, trap1_port, trap2, trap2_port)
+                    run = self.mod_app_snmp(pid, interval, snmp_port,
+                                            community, description,
+                                            trap_enable, trap1, trap1_port,
+                                            trap2, trap2_port)
                 else:
                     return "Canceling; no changes made.\n"
             else:
@@ -3775,9 +3799,14 @@ on QSFP ports of G4 devices. \n"""
                                     SNMP Community: %s
                                     Trap Enabled: %s
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (interval, snmp_port, community, trap_enable, description))
+                                    Confirm changes [y/n]: """ % (interval,
+                                                                  snmp_port,
+                                                                  community,
+                                                                  trap_enable,
+                                                                  description))
                 if confirm in ('y', 'yes'):
-                    run = self.mod_app_snmp(pid, interval, snmp_port, community, description, trap_enable)
+                    run = self.mod_app_snmp(pid, interval, snmp_port,
+                                            community, description, trap_enable)
                 else:
                     return "Canceling; no changes made.\n"
         elif instance == 'HeartbeatBypass':
@@ -3791,12 +3820,15 @@ on QSFP ports of G4 devices. \n"""
             elif int(conn_type) == 2:
                 conn_type = 'RS232'
             else:
-                return "That is not a valid input for Connection Type; canceling Modify HeartbeatBypass."
+                return ("That is not a valid input for Connection Type; "
+                        "canceling Modify HeartbeatBypass.")
             bypass_port1 = raw_input("Port number of first port connected to the Bypass Switch: ")
-            bypass_port2 = raw_input("Port number of the second port connected to the Bypass Switch: ")
+            bypass_port2 = raw_input("Port number of the second port "
+                                     "connected to the Bypass Switch: ")
             hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
             hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
-            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            interval = raw_input("Check interval time in milliseconds that the "
+                                 "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
             proto = raw_input('''Protocol to use for heartbeat packets:
@@ -3815,10 +3847,12 @@ on QSFP ports of G4 devices. \n"""
                 proto = 'ICMP'
             else:
                 return "That is not a valid input for Protocol; canceling modify HeartbeatBypass."
-            src_mac = raw_input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+            src_mac = raw_input("Enter source MAC address for "
+                                "heartbeat packets [00:00:00:00:00:01]: ")
             if src_mac == '':
                 src_mac = '00:00:00:00:00:01'
-            dst_mac = raw_input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+            dst_mac = raw_input("Enter destination MAC address for "
+                                "heartbeat packets [00:00:00:00:00:02]: ")
             if dst_mac == '':
                 dst_mac = '00:00:00:00:00:02'
             src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
@@ -3844,9 +3878,30 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination Port: %s
                                     Bypass Switch IP: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip, description))
+                                    Confirm changes [y/n]: """ % (bypass_port1,
+                                                                  bypass_port2,
+                                                                  hb_in,
+                                                                  hb_out,
+                                                                  conn_type,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  src_port,
+                                                                  dst_port,
+                                                                  bypass_ip,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, bypass_ip)
+                    run = self.mod_app_heartbeatbypass(pid, bypass_port1,
+                                                       bypass_port2, hb_in,
+                                                       hb_out, conn_type,
+                                                       interval, description,
+                                                       proto, src_mac, dst_mac,
+                                                       src_ip, dst_ip,
+                                                       src_port, dst_port,
+                                                       bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'IP' and proto == 'ICMP':
@@ -3864,9 +3919,26 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Destination IP: %S
                                     Bypass Switch IP: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip, description))
+                                    Confirm changes [y/n]: """ % (bypass_port1,
+                                                                  bypass_port2,
+                                                                  hb_in,
+                                                                  hb_out,
+                                                                  conn_type,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  bypass_ip,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
+                    run = self.mod_app_heartbeatbypass(pid, bypass_port1,
+                                                       bypass_port2, hb_in,
+                                                       hb_out, conn_type,
+                                                       interval, description,
+                                                       proto, src_mac, dst_mac,
+                                                       src_ip, dst_ip, bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'UDP':
@@ -3885,9 +3957,28 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Source Port: %S
                                     Heartbeat Destination Port: %s
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
+                                    Confirm changes [y/n]: """ % (bypass_port1,
+                                                                  bypass_port2,
+                                                                  hb_in,
+                                                                  hb_out,
+                                                                  conn_type,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  src_port,
+                                                                  dst_port,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                    run = self.mod_app_heartbeatbypass(pid, bypass_port1,
+                                                       bypass_port2, hb_in,
+                                                       hb_out, conn_type,
+                                                       interval, description,
+                                                       proto, src_mac, dst_mac,
+                                                       src_ip, dst_ip, src_port,
+                                                       dst_port)
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'ICMP':
@@ -3904,9 +3995,25 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Source IP: %s
                                     Heartbeat Destination IP: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
+                                    Confirm changes [y/n]: """ % (bypass_port1,
+                                                                  bypass_port2,
+                                                                  hb_in,
+                                                                  hb_out,
+                                                                  conn_type,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                    run = self.mod_app_heartbeatbypass(pid, bypass_port1,
+                                                       bypass_port2, hb_in,
+                                                       hb_out, conn_type,
+                                                       interval, description,
+                                                       proto, src_mac, dst_mac,
+                                                       src_ip, dst_ip)
                 else:
                     return "Canceling; no changes made.\n"
             else:
@@ -3937,7 +4044,8 @@ on QSFP ports of G4 devices. \n"""
                 conn_type = 'RS232'
             else:
                 return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
-            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            interval = raw_input("Check interval time in milliseconds that the "
+                                 "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
             if conn_type == 'IP':
@@ -3946,9 +4054,14 @@ on QSFP ports of G4 devices. \n"""
                                     Bypass Switch IP: %s
                                     Check Interval: %s
                                     Description: %s
-                                    Confirm changes [y/n]''' % (conn_type, bypass_ip, interval, description))
+                                    Confirm changes [y/n]''' % (conn_type,
+                                                                bypass_ip,
+                                                                interval,
+                                                                description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_bypasskeepalive(pid, conn_type, interval, description, bypass_ip)
+                    run = self.mod_app_bypasskeepalive(pid, conn_type,
+                                                       interval, description,
+                                                       bypass_ip)
                 else:
                     return "Canceling; no changes made.\n"
             else:
@@ -3966,7 +4079,8 @@ on QSFP ports of G4 devices. \n"""
             act_comm = raw_input("Command to run when heartbeat packets are detected: ")
             hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
             deact_comm = raw_input("Command to run when heartbeat packets are not detected: ")
-            interval = raw_input("Check interval time in milliseconds that the App should check for heartbeat packets [2000]: ")
+            interval = raw_input("Check interval time in milliseconds that the "
+                                 "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
             proto = raw_input('''Protocol to use for heartbeat packets:
@@ -3985,10 +4099,12 @@ on QSFP ports of G4 devices. \n"""
                 proto = 'ICMP'
             else:
                 return "That is not a valid input for Protocol; canceling Modify Heartbeat."
-            src_mac = raw_input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+            src_mac = raw_input("Enter source MAC address for "
+                                "heartbeat packets [00:00:00:00:00:01]: ")
             if src_mac == '':
                 src_mac = '00:00:00:00:00:01'
-            dst_mac = raw_input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+            dst_mac = raw_input("Enter destination MAC address for "
+                                "heartbeat packets [00:00:00:00:00:02]: ")
             if dst_mac == '':
                 dst_mac = '00:00:00:00:00:02'
             src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
@@ -4012,9 +4128,25 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Source Port: %s
                                     Heartbeat Destination Port: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, description))
+                                    Confirm changes [y/n]: """ % (hb_in,
+                                                                  act_comm,
+                                                                  hb_out,
+                                                                  deact_comm,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  src_port,
+                                                                  dst_port,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                    run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out,
+                                                 deact_comm, interval,
+                                                 description, proto, src_mac,
+                                                 dst_mac, src_ip, dst_ip,
+                                                 src_port, dst_port)
                 else:
                     return "Canceling; no changes made.\n"
             elif proto == 'ICMP':
@@ -4030,9 +4162,22 @@ on QSFP ports of G4 devices. \n"""
                                     Heartbeat Source IP: %s
                                     Heartbeat Destination IP: %S
                                     Description: %s
-                                    Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval, proto, src_mac, dst_mac, src_ip, dst_ip, description))
+                                    Confirm changes [y/n]: """ % (hb_in,
+                                                                  act_comm,
+                                                                  hb_out,
+                                                                  deact_comm,
+                                                                  interval,
+                                                                  proto,
+                                                                  src_mac,
+                                                                  dst_mac,
+                                                                  src_ip,
+                                                                  dst_ip,
+                                                                  description))
                 if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval, description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                    run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out,
+                                                 deact_comm, interval,
+                                                 description, proto, src_mac,
+                                                 dst_mac, src_ip, dst_ip)
                 else:
                     return "Canceling; no changes made.\n"
             else:
@@ -4048,9 +4193,9 @@ on QSFP ports of G4 devices. \n"""
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Modify NTP."
+            int(pid)
+        except ValueError as reason:
+            return ("That is not a valid input for PID; canceling Modify NTP.", reason)
         params = {'name': 'NTP',
                   'description': 'Syncs time with remote NTP servers.',
                   'pid': pid,
@@ -4066,26 +4211,30 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def mod_app_arpresponder(self, pid, outport, src_mac, dst_mac, src_ip, dst_ip, interval='5000', inport=None, match_srcmac=None, user_description=''):
+    def mod_app_arpresponder(self, pid, outport, src_mac, dst_mac, src_ip,
+                             dst_ip, interval='5000', inport=None,
+                             match_srcmac=None, user_description=''):
         """Modify an ArpResponder app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Modify ArpResponder."
+            int(pid)
+        except ValueError as reason:
+            return ("That is not a valid input for PID; canceling Modify ArpResponder.", reason)
         try:
-            input_check = int(interval)
-        except:
-            return "That is not an valid input for interval (number in milliseconds); canceling Modify ArpResponder."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not an valid input for interval "
+                    "(number in milliseconds); canceling Modify ArpResponder.", reason)
         try:
             input_check = int(outport)
             if input_check > self.ports:
                 return "Physical port does not exist on device."
-        except:
-            return "That is not an valid input for output port; canceling Modify ArpResponder."
+        except ValueError as reason:
+            return ("That is not an valid input for output port; "
+                    "canceling Modify ArpResponder.", reason)
         params = {'name': 'ArpResponder',
                   'description': 'Responds to an arbotrary packet with an ARP response',
                   'pid': pid,
@@ -4100,8 +4249,9 @@ on QSFP ports of G4 devices. \n"""
                 input_check = int(inport)
                 if input_check > self.ports:
                     return "Physical port does not exist on device."
-            except:
-                return "That is not a valid input for input port; canceling ArpResponder."
+            except ValueError as reason:
+                return ("That is not a valid input for input port; "
+                        "canceling ArpResponder.", reason)
             params['inPort'] = inport
         if match_srcmac:
             params['matchMacSrc'] = match_srcmac
@@ -4116,45 +4266,49 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def mod_app_snmp(self, pid, interval='5000', snmp_port='161', community='public', user_description='',trap_enable=True, trap1='1.1.1.1', trap1_port='162', trap2='', trap2_port='162'):
+    def mod_app_snmp(self, pid, interval='5000', snmp_port='161',
+                     community='public', user_description='', trap_enable=True,
+                     trap1='1.1.1.1', trap1_port='162', trap2='',
+                     trap2_port='162'):
         """Modify an SNMP app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Modify SNMP."
+            int(pid)
+        except ValueError as reason:
+            return ("That is not a valid input for PID; canceling Modify SNMP.", reason)
         try:
-            input_check = int(interval)
-        except:
-            return "That is not valid input for Check Interval; canceling Modify SNMP."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not valid input for Check Interval; canceling Modify SNMP.", reason)
         try:
-            input_check = int(snmp_port)
-        except:
-            return "That is not valid input for SNMP Port; canceling Modify SNMP."
-        if trap_enable or type(trap_enable) is str and trap_enable.lower() in ('true', 't', 'yes', 'y'):
+            int(snmp_port)
+        except ValueError as reason:
+            return ("That is not valid input for SNMP Port; canceling Modify SNMP.", reason)
+        if trap_enable or isinstance(trap_enable, str) and trap_enable.lower() in ('true', 't', 'yes', 'y'):
             trap_enable = True
             try:
                 ip1 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap1)
                 trap1 = ip1[0]
-            except:
-                return "That is not a valid IP address for Trap 1; canceling Modify SNMP."
+            except TypeError as reason:
+                return ("That is not a valid IP address for Trap 1; canceling Modify SNMP.", reason)
             try:
-                input_check = int(trap1_port)
-            except:
-                return "That is not valid input for Trap Port 1; canceling Modify SNMP."
+                int(trap1_port)
+            except ValueError as reason:
+                return ("That is not valid input for Trap Port 1; canceling Modify SNMP.", reason)
             if trap2 != '':
                 try:
                     ip2 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap2)
                     trap2 = ip2[0]
-                except:
-                    return "That is not a valid IP address for Trap 2; canceling Modify SNMP."
+                except TypeError as reason:
+                    return ("That is not a valid IP address for Trap 2; "
+                            "canceling Modify SNMP.", reason)
             try:
-                input_check = int(trap2_port)
-            except:
-                return "That is not valid input for Trap Port 2; canceling Modify SNMP."
+                int(trap2_port)
+            except ValueError as reason:
+                return ("That is not valid input for Trap Port 2; canceling Modify SNMP.", reason)
             params = {'name': 'SNMP',
                       'description': 'Runs an SNMP Server.  The server uses [url=',
                       'pid': pid,
@@ -4188,51 +4342,65 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def mod_app_heartbeatbypass(self, pid, bypass_port1, bypass_port2, hb_in, hb_out, conn_type='ip', interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556', bypass_ip='1.1.1.1'):
+    def mod_app_heartbeatbypass(self, pid, bypass_port1, bypass_port2, hb_in,
+                                hb_out, conn_type='ip', interval='2000',
+                                user_description='', proto='udp',
+                                src_mac='00:00:00:00:00:01',
+                                dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1',
+                                dst_ip='0.0.0.2', src_port='5555',
+                                dst_port='5556', bypass_ip='1.1.1.1'):
         """Modify a HeartbeatBypass app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Modify HeartbeatBypass."
+            int(pid)
+        except ValueError as reason:
+            return ("That is not a valid input for PID; canceling Modify HeartbeatBypass.", reason)
         try:
-            input_check = int(bypass_port1)
-        except:
-            return "That is not a valid port number for Bypass Port 1; canceling Modify HeartbeatBypass."
+            int(bypass_port1)
+        except ValueError as reason:
+            return ("That is not a valid port number for Bypass Port 1; "
+                    "canceling Modify HeartbeatBypass.", reason)
         try:
-            input_check = int(bypass_port2)
-        except:
-            return "That is not a valid port number for Bypass Port 2; canceling Modify HeartbeatBypass."
+            int(bypass_port2)
+        except ValueError as reason:
+            return ("That is not a valid port number for Bypass Port 2; "
+                    "canceling Modify HeartbeatBypass.", reason)
         try:
-            input_check = int(hb_in)
-        except:
-            return "That is not a valid port number for Heartbeat In Port; canceling Modify HeartbeatBypass."
+            int(hb_in)
+        except ValueError as reason:
+            return ("That is not a valid port number for Heartbeat In Port; "
+                    "canceling Modify HeartbeatBypass.", reason)
         try:
-            input_check = int(hb_out)
-        except:
-            return "That is not a valid port number for Heartbeat Out Port; canceling Modify HeartbeatBypass."
+            int(hb_out)
+        except ValueError as reason:
+            return ("That is not a valid port number for Heartbeat Out Port; "
+                    "canceling Modify HeartbeatBypass.", reason)
         try:
-            input_check = int(interval)
-        except:
-            return "That is not a valid input for Check Interval; canceling Modify HeartbeatBypass."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not a valid input for Check Interval; "
+                    "canceling Modify HeartbeatBypass.", reason)
         if proto.upper() in ('UDP', 'ICMP'):
             proto = proto.upper()
         else:
-            return "That is not a valid input for Protocol; must be UDP or ICMP.  Canceling Modify HeartbeatBypass."
+            return ("That is not a valid input for Protocol; must be UDP or "
+                    "ICMP.  Canceling Modify HeartbeatBypass.")
         #MAC address regex check
         try:
             src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
             src_ip = src_ip_check[0]
-        except:
-            return "That is not a valid input for Source IP; canceling Modify HeartbeatBypass."
+        except TypeError as reason:
+            return ("That is not a valid input for Source IP; "
+                    "canceling Modify HeartbeatBypass.", reason)
         try:
             dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
             dst_ip = dst_ip_check[0]
-        except:
-            return "That is not a valid input for Destination IP; canceling Modify HeartbeatBypass."
+        except TypeError as reason:
+            return ("That is not a valid input for Destination IP; "
+                    "canceling Modify HeartbeatBypass.", reason)
         params = {'bypassPort1': bypass_port1,
                   'bypassPort2': bypass_port2,
                   'connectionType': conn_type,
@@ -4250,26 +4418,31 @@ on QSFP ports of G4 devices. \n"""
                   'userDescription': user_description}
         if conn_type.upper() in ('IP', 'RS232'):
             params['connectionType'] = conn_type.upper()
-            if conn_type == 'RS232' and self.hardware_generation =='4':
-                return "Controlling a Bypass Switch with RS232 is not supported on Gen 4 hardware; please use IP instead."
+            if conn_type == 'RS232' and self.hardware_generation == '4':
+                return ("Controlling a Bypass Switch with RS232 is not "
+                        "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
                     params['bypassIP'] = ip_check[0]
-                except:
-                    return "That is not a valid input for Bypass Switch IP; canceling Modify HeartbeatBypass."
+                except TypeError as reason:
+                    return ("That is not a valid input for Bypass Switch IP; "
+                            "canceling Modify HeartbeatBypass.", reason)
         else:
-            return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling Modify HeartbeatBypass."
+            return ("That is not a valid input for Connection Type; must be "
+                    "IP or RS232.  Canceling Modify HeartbeatBypass.")
         if proto == 'UDP':
             try:
-                input_check = int(src_port)
-            except:
-                return "That is not a valid input for Source Port; canceling Modify HeartbeatBypass."
+                int(src_port)
+            except ValueError as reason:
+                return ("That is not a valid input for Source Port; "
+                        "canceling Modify HeartbeatBypass.", reason)
             params['portSrc'] = src_port
             try:
-                input_check = int(dst_port)
-            except:
-                return "That is not a valid input for Destination Port; canceling Modify HeartbeatBypass."
+                int(dst_port)
+            except ValueError as reason:
+                return ("That is not a valid input for Destination Port; "
+                        "canceling Modify HeartbeatBypass.", reason)
             params['portDst'] = dst_port
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
@@ -4280,25 +4453,25 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def mod_app_syslog(self, pid, ip, port='514', user_description=''):
+    def mod_app_syslog(self, pid, server_ip, port='514', user_description=''):
         """Modify a Syslog app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Modify Syslog."
+            int(pid)
+        except ValueError as reason:
+            return ("That is not a valid input for PID; canceling Modify Syslog.", reason)
         try:
-            ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', ip)
+            ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', server_ip)
             server = ip_check[0]
-        except:
-            return "That is not a valid server IP address; canceling Modify Syslog."
+        except TypeError as reason:
+            return ("That is not a valid server IP address; canceling Modify Syslog.", reason)
         try:
-            input_check = int(port)
-        except:
-            return "That is not a valid input for port number; canceling Modify Syslog."
+            int(port)
+        except ValueError as reason:
+            return ("That is not a valid input for port number; canceling Modify Syslog.", reason)
         params = {'description': 'Logs syslog data to a remote server',
                   'name': 'Syslog',
                   'pid': pid,
@@ -4314,20 +4487,22 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def mod_app_bypasskeepalive(self, pid, conn_type='ip', interval='2000', description='', bypass_ip='1.1.1.1'):
+    def mod_app_bypasskeepalive(self, pid, conn_type='ip', interval='2000',
+                                description='', bypass_ip='1.1.1.1'):
         """Modify a BypassKeepalive app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Modify Bypass Keepalive."
+            int(pid)
+        except ValueError as reason:
+            return ("That is not a valid input for PID; canceling Modify Bypass Keepalive.", reason)
         try:
-            input_check = int(interval)
-        except:
-            return "That is not a valid input for Check Interval; canceling Bypass Keepalive."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not a valid input for Check Interval; "
+                    "canceling Bypass Keepalive.", reason)
         params = {'pid': pid,
                   'description': 'This app is used to control a Cubro Bypass Switch device.',
                   'interval': interval,
@@ -4335,16 +4510,19 @@ on QSFP ports of G4 devices. \n"""
                   'name': 'BypassKeepalive'}
         if conn_type.upper() in ('IP', 'RS232'):
             params['connectionType'] = conn_type.upper()
-            if conn_type == 'RS232' and self.hardware_generation =='4':
-                return "Controlling a Bypass Switch with RS232 is not supported on Gen 4 hardware; please use IP instead."
+            if conn_type == 'RS232' and self.hardware_generation == '4':
+                return ("Controlling a Bypass Switch with RS232 is not "
+                        "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
                     params['bypassIP'] = ip_check[0]
-                except:
-                    return "That is not a valid input for Bypass Switch IP; canceling Modify Bypass Keepalive."
+                except TypeError as reason:
+                    return ("That is not a valid input for Bypass Switch IP; "
+                            "canceling Modify Bypass Keepalive.", reason)
         else:
-            return "That is not a valid input for Connection Type; must be IP or RS232.  Canceling Modify Bypass Keepalive."
+            return ("That is not a valid input for Connection Type; "
+                    "must be IP or RS232.  Canceling Modify Bypass Keepalive.")
         try:
             response = requests.put(uri, data=params, auth=(self.username, self.password))
             content = response.content
@@ -4354,51 +4532,64 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def mod_app_heartbeat(self, pid, hb_in, act_comm, hb_out, deact_comm, interval='2000', user_description='', proto='udp', src_mac='00:00:00:00:00:01', dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1', dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
+    def mod_app_heartbeat(self, pid, hb_in, act_comm, hb_out, deact_comm,
+                          interval='2000', user_description='', proto='udp',
+                          src_mac='00:00:00:00:00:01',
+                          dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1',
+                          dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
         """Modify a Heartbeat app instance."""
         if self.https:
             uri = 'https://' + self.address + '/rest/apps?'
         else:
             uri = 'http://' + self.address + '/rest/apps?'
         try:
-            input_check = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Modify Heartbeat."
+            int(pid)
+        except ValueError as reason:
+            return ("That is not a valid input for PID; "
+                    "canceling Modify Heartbeat.", reason)
         try:
-            input_check = int(hb_in)
-        except:
-            return "That is not a valid port number for Heartbeat In Port; canceling Modify Heartbeat."
+            int(hb_in)
+        except ValueError as reason:
+            return ("That is not a valid port number for Heartbeat In Port; "
+                    "canceling Modify Heartbeat.", reason)
         try:
-            input_check = int(hb_out)
-        except:
-            return "That is not a valid port number for Heartbeat Out Port; canceling Modify Heartbeat."
+            int(hb_out)
+        except ValueError as reason:
+            return ("That is not a valid port number for Heartbeat Out Port; "
+                    "canceling Modify Heartbeat.", reason)
         try:
-            input_check = int(interval)
-        except:
-            return "That is not a valid input for Check Interval; canceling Modify Heartbeat."
+            int(interval)
+        except ValueError as reason:
+            return ("That is not a valid input for Check Interval; "
+                    "canceling Modify Heartbeat.", reason)
         if proto.upper() in ('UDP', 'ICMP'):
             proto = proto.upper()
         else:
-            return "That is not a valid input for Protocol; must be UDP or ICMP.  Canceling Modify Heartbeat."
+            return ("That is not a valid input for Protocol; "
+                    "must be UDP or ICMP.  Canceling Modify Heartbeat.")
         #MAC address regex check
         try:
             src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
             src_ip = src_ip_check[0]
-        except:
-            return "That is not a valid input for Source IP; canceling Modify Heartbeat."
+        except TypeError as reason:
+            return ("That is not a valid input for Source IP; "
+                    "canceling Modify Heartbeat.", reason)
         try:
             dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
             dst_ip = dst_ip_check[0]
-        except:
-            return "That is not a valid input for Destination IP; canceling Modify Heartbeat."
+        except TypeError as reason:
+            return ("That is not a valid input for Destination IP; "
+                    "canceling Modify Heartbeat.", reason)
         try:
-            input_check = int(src_port)
-        except:
-            return "That is not a valid input for Source Port; canceling Modify Heartbeat."
+            int(src_port)
+        except ValueError as reason:
+            return ("That is not a valid input for Source Port; "
+                    "canceling Modify Heartbeat.", reason)
         try:
-            input_check = int(dst_port)
-        except:
-            return "That is not a valid input for Destination Port; canceling Modify Heartbeat."
+            int(dst_port)
+        except ValueError as reason:
+            return ("That is not a valid input for Destination Port; "
+                    "canceling Modify Heartbeat.", reason)
         params = {'activateCommand': act_comm,
                   'deactivateCommand': deact_comm,
                   'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
@@ -4445,8 +4636,8 @@ on QSFP ports of G4 devices. \n"""
             uri = 'http://' + self.address + '/rest/apps/action?'
         try:
             pid = int(pid)
-        except:
-            return "That is not a valid PID; canceling Call App Action."
+        except ValueError as reason:
+            return ("That is not a valid PID; canceling Call App Action.", reason)
         params = {'pid': pid,
                   'action_name': name}
         try:
@@ -4477,8 +4668,8 @@ on QSFP ports of G4 devices. \n"""
             uri = 'http://' + self.address + '/rest/apps?'
         try:
             pid = int(pid)
-        except:
-            return "That is not a valid input for PID; canceling Kill App."
+        except ValueError as reason:
+            return ("That is not a valid input for PID; canceling Kill App.", reason)
         params = {'pid': pid}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
@@ -4492,11 +4683,16 @@ on QSFP ports of G4 devices. \n"""
     def set_hash_algorithms_guided(self):
         """Interactive menu to set group hash algorithms."""
         if self.hardware in ('4', '2'):
-            macsa = raw_input('Type "true" to use MAC source address; type "false" to ignore [true]: ')
-            macda = raw_input('Type "true" to use MAC destination address; type "false" to ignore [true]: ')
-            ether = raw_input('Type "true" to use ether type; type "false" to ignore [true]: ')
-            ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ')
-            ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ')
+            macsa = raw_input('Type "true" to use MAC source address; '
+                              'type "false" to ignore [true]: ')
+            macda = raw_input('Type "true" to use MAC destination address; '
+                              'type "false" to ignore [true]: ')
+            ether = raw_input('Type "true" to use ether type; type '
+                              '"false" to ignore [true]: ')
+            ipsa = raw_input('Type "true" to use IP source address; '
+                             'type "false" to ignore [true]: ')
+            ipda = raw_input('Type "true" to use IP destination address; '
+                             'type "false" to ignore [true]: ')
             proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
             src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
             dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
@@ -4509,14 +4705,23 @@ on QSFP ports of G4 devices. \n"""
                                 Use IP Protocol: %s
                                 Use Source Port: %s
                                 Use Destination Port: %s
-                                Confirm changes [y/n]: """ % (macsa, macda, ether, ipsa, ipda, proto, src, dst))
+                                Confirm changes [y/n]: """ % (macsa,
+                                                              macda,
+                                                              ether,
+                                                              ipsa,
+                                                              ipda,
+                                                              proto,
+                                                              src,
+                                                              dst))
             if confirm.lower() in ('y', 'yes'):
                 run = self.set_hash_algorithms(macsa, macda, ether, ipsa, ipda, proto, src, dst)
             else:
                 return "Canceling; no changes made.\n"
         else:
-            ipsa = raw_input('Type "true" to use IP source address; type "false" to ignore [true]: ')
-            ipda = raw_input('Type "true" to use IP destination address; type "false" to ignore [true]: ')
+            ipsa = raw_input('Type "true" to use IP source address; '
+                             'type "false" to ignore [true]: ')
+            ipda = raw_input('Type "true" to use IP destination address; '
+                             'type "false" to ignore [true]: ')
             proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
             src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
             dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
@@ -4526,8 +4731,11 @@ on QSFP ports of G4 devices. \n"""
                                 Use IP Protocol: %s
                                 Use Source Port: %s
                                 Use Destination Port: %s
-                                Confirm changes [y/n]: """ % (ipsa, ipda,
-                                                              proto, src, dst))
+                                Confirm changes [y/n]: """ % (ipsa,
+                                                              ipda,
+                                                              proto,
+                                                              src,
+                                                              dst))
             if confirm.lower() in ('y', 'yes'):
                 run = self.set_hash_algorithms('', '', '', ipsa,
                                                ipda, proto, src, dst)
@@ -4620,13 +4828,13 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
         else:
             uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
-        if type(permanence) == bool and permanence:
+        if isinstance(permanence, bool) and permanence:
             permanence = True
-        elif type(permanence) == str and permanence.lower() in ('true', 'yes',
-                                                                'y', 't'):
+        elif isinstance(permanence, str) and permanence.lower() in ('true', 'yes',
+                                                                    'y', 't'):
             permanence = True
         else:
-            permanence == False
+            permanence = False
         params = {'state': permanence}
         try:
             response = requests.post(uri, data=params,
@@ -4646,9 +4854,9 @@ on QSFP ports of G4 devices. \n"""
                         Enter the number of your selection: ''')
         try:
             mode = int(mode)
-        except:
+        except ValueError as reason:
             return ("That is not a valid selection; "
-                    "canceling set rule storage mode.")
+                    "canceling set rule storage mode.", reason)
         if mode == 1:
             mode = 'simple'
         elif mode == 2:
@@ -4672,9 +4880,9 @@ on QSFP ports of G4 devices. \n"""
             uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
         try:
             mode = mode.lower()
-        except:
+        except AttributeError as reason:
             return ("That is not a valid setting; "
-                    "canceling set rule storage mode.")
+                    "canceling set rule storage mode.", reason)
         if mode == 'simple':
             params = {'mode': 'simple'}
         elif mode == 'ipv6':
@@ -4738,13 +4946,13 @@ on QSFP ports of G4 devices. \n"""
                     "use Modify User; canceling Add User.")
         try:
             access_level = int(access_level)
-        except:
-            return "That is not a valid user access level; canceling Add User."
+        except ValueError as reason:
+            return ("That is not a valid user access level; canceling Add User.", reason)
         if access_level not in (1, 7, 31):
             return "That is not a valid user access level; canceling Add User."
-        if type(rad) == bool and rad:
+        if isinstance(rad, bool) and rad:
             rad = True
-        elif type(rad) == str and rad.lower() in ('true', 'y', 'yes', 't'):
+        elif isinstance(rad, str) and rad.lower() in ('true', 'y', 'yes', 't'):
             rad = True
         else:
             rad = False
@@ -4813,15 +5021,15 @@ on QSFP ports of G4 devices. \n"""
             return "That is not a valid username; canceling Modify User."
         try:
             access_level = int(access_level)
-        except:
+        except ValueError as reason:
             return ("That is not a valid user access level; "
-                    "canceling Modify User.")
+                    "canceling Modify User.", reason)
         if access_level not in (1, 7, 31):
             return ("That is not a valid user access level; "
                     "canceling Modify User.")
-        if type(rad) == bool and rad:
+        if isinstance(rad, bool) and rad:
             rad = True
-        elif type(rad) == str and rad.lower() in ('true', 'y', 'yes', 't'):
+        elif isinstance(rad, str) and rad.lower() in ('true', 'y', 'yes', 't'):
             rad = True
         else:
             rad = False
@@ -4894,9 +5102,9 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self.address + '/rest/users/uac?'
         else:
             uri = 'http://' + self.address + '/rest/users/uac?'
-        if type(uac) == bool and uac:
+        if isinstance(uac, bool) and uac:
             uac = True
-        elif type(uac) == str and uac.lower() in ('true', 'yes', 't', 'y'):
+        elif isinstance(uac, str) and uac.lower() in ('true', 'yes', 't', 'y'):
             uac = True
         else:
             uac = False
@@ -4952,22 +5160,22 @@ on QSFP ports of G4 devices. \n"""
         server = server.strip()
         try:
             refresh = int(refresh)
-        except:
+        except ValueError as reason:
             return ("That is not a valid input for refresh rate; "
-                    "canceling Set Radius.")
+                    "canceling Set Radius.", reason)
         try:
             level = int(level)
-        except:
+        except ValueError as reason:
             return ("That is not a valid input for login level; "
-                    "canceling Set Radius.")
+                    "canceling Set Radius.", reason)
         if level not in (0, 1, 7, 31):
             return ("That is not a valid input for RADIUS login level; "
                     "canceling Set Radius.")
         try:
             port = int(port)
-        except:
+        except ValueError as reason:
             return ("That is not a valid port input; "
-                    "canceling RADIUS settings call.")
+                    "canceling RADIUS settings call.", reason)
         params = {'server': server,
                   'port': port,
                   'secret': secret,
@@ -5007,7 +5215,7 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self.address + '/rest/device/https?'
         else:
             uri = 'http://' + self.address + '/rest/device/https?'
-        if enabled.lower() == 'true' or enabled == True:
+        if enabled.lower() == 'true' or enabled is True:
             enabled = True
         else:
             enabled = False
@@ -5041,7 +5249,7 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self.address + '/rest/device/telnet?'
         else:
             uri = 'http://' + self.address + '/rest/device/telnet?'
-        if enabled.lower() == 'true' or enabled == True:
+        if enabled.lower() == 'true' or enabled is True:
             enabled = True
         else:
             enabled = False
@@ -5136,7 +5344,7 @@ on QSFP ports of G4 devices. \n"""
         else:
             uri = 'http://' + self.address + '/rest/device/idled?'
         led = led.lower()
-        if led == 'true' or led == True:
+        if led == 'true' or led is True:
             led = True
         else:
             led = False
@@ -5180,5 +5388,4 @@ on QSFP ports of G4 devices. \n"""
                        'please allow 2 to 3 minutes for it to complete')
             return message
         except ConnectionError as error:
-            content = 'No Response'
             raise error

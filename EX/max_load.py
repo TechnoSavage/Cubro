@@ -7,7 +7,7 @@
 #Import necessary Python libraries for interacting with the REST API
 import json, time, pickle, yaml
 from getpass import getpass
-from packetmasterEX_rest import PacketmasterEX
+from packetmaster_ex_rest import PacketmasterEX
 
 def query(packetmaster):
     stats = packetmaster.port_statistics()
