@@ -1,7 +1,9 @@
-#Use with firmware version 2.1.0.x or later. Python2.7 Cubro Packetmaster Blacklist REST API demo.
-#Import necessary Python libraries for interacting with the REST API
-
 #!/usr/bin/python
+
+""" Use with firmware version 2.2.5 or later. Python2.7
+Cubro Packetmaster Blacklist REST API demo. """
+
+#Import necessary Python libraries for interacting with the REST API.
 from getpass import getpass
 import re
 import requests

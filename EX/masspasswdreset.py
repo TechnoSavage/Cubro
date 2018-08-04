@@ -156,14 +156,14 @@ if __name__ == '__main__':
                 admin_user = item["admin"]
                 admin_password = item["passwd"]
                 run = rand_reset(ip_address, admin_user, admin_password)
-                if run["conn"] == True:
+                if run["conn"]:
                     SUCCESS.append(ip_address)
                 else:
                     FAILED.append(ip_address)
                 try:
                     USER_LIST.append(run["users"])
-                except:
-                    pass
+                except (NameError, KeyError) as reason:
+                    print reason
         OUTPUT_FILE["Successfully Changed"] = SUCCESS
         OUTPUT_FILE["Failed to connect"] = FAILED
         OUTPUT_FILE["New User Passwords"] = USER_LIST
@@ -184,7 +184,7 @@ if __name__ == '__main__':
                 admin_user = item["admin"]
                 admin_password = item["passwd"]
                 run = file_reset(ip_address, admin_user, admin_password, USER_LIST)
-                if run["conn"] == True:
+                if run["conn"]:
                     SUCCESS.append(ip_address)
                 else:
                     FAILED.append(ip_address)
@@ -207,14 +207,14 @@ if __name__ == '__main__':
                 admin_user = item["admin"]
                 admin_password = item["passwd"]
                 run = admin_reset(ip_address, admin_user, admin_password)
-                if run["conn"] == True:
+                if run["conn"]:
                     SUCCESS.append(ip_address)
                 else:
                     FAILED.append(ip_address)
                 try:
                     USER_LIST.append(run["users"])
-                except:
-                    pass
+                except (NameError, KeyError) as reason:
+                    print reason
         OUTPUT_FILE["Successfully Changed"] = SUCCESS
         OUTPUT_FILE["Failed to connect"] = FAILED
         OUTPUT_FILE["New User Passwords"] = USER_LIST

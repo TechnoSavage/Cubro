@@ -1,19 +1,24 @@
-#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
-#This script will generate a report at 12am daily showing the peak traffic load on a per
-#port basis
-
 #!/usr/bin/python
 
+""" Use with firmware version 2.1.x.x or later. Python2.7 Cubro
+Packetmaster REST API demo. This script will generate a report at 12am daily
+showing the peak traffic load on a per port basis. """
+
 #Import necessary Python libraries for interacting with the REST API
-import json, time, pickle, yaml
 from getpass import getpass
+import json
+import time
+import pickle
+import yaml
 from packetmaster_ex_rest import PacketmasterEX
 
 def query(packetmaster):
+    """ Query the Packetmaster for current port statistics. """
     stats = packetmaster.port_statistics()
     return stats
 
 def parse(stats):
+    """ Create a JSON formatted data table from Packetmaster port stats."""
     table = {}
     data = json.loads(stats)
     for item in data:
@@ -25,6 +30,8 @@ def parse(stats):
     return table
 
 def compare(table, current):
+    """ Compare previously saved port stat data to new data and replace lower
+        values with higher ones. """
     for item in table:
         portnum = item["portnum"]
         if portnum not in current:
@@ -40,49 +47,50 @@ def compare(table, current):
     return current
 
 def write_file(choice, current):
+    """ Write the data held in 'current' to a file of type 'choice'. """
     report = current #make filename the date
     if choice == 1:
-        f = open(report + '.pkl', "rb")
-        a = pickle.load(f)
+        save_file = open(report + '.pkl', "rb")
+        pickle.load(save_file)
     elif choice == 2:
-        with open(report + '.json') as f:
-            a = json.load(f)
+        with open(report + '.json') as save_file:
+            json.load(save_file)
     elif choice == 3:
-        with open(report + '.yml') as f:
-            a = yaml.load(f)
+        with open(report + '.yml') as save_file:
+            yaml.load(save_file)
     else:
         print "Something went horribly wrong"
         exit()
 
 if __name__ == '__main__':
     #Device credentials
-    address = raw_input('Enter IP address of Packetmaster: ')
-    username = raw_input('Enter your username: ')
-    password = getpass()
-    packetmaster = PacketmasterEX(address, username, password)
+    ADDRESS = raw_input('Enter IP address of Packetmaster: ')
+    USERNAME = raw_input('Enter your username: ')
+    PASSWORD = getpass()
+    PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
     print '''Save data in which format?
 	1 - Pickle
 	2 - JSON
 	3 - YAML \n'''
-	option = raw_input("Enter the number of your selection: ")
-	if int(option) >=1 and int(option) <=3:
-		choice = int(option)
-	else:
-		print "That is not a valid choice; defaulting to Pickle"
-		choice = 1
-    current = {}
-    marker = False
+    OPTION = raw_input("Enter the number of your selection: ")
+    if int(OPTION) >= 1 and int(OPTION) <= 3:
+        CHOICE = int(OPTION)
+    else:
+        print "That is not a valid choice; defaulting to Pickle"
+        CHOICE = 1
+    CURRENT = {}
+    MARKER = False
 
     while True:
-        stats = query(packetmaster)
-        table = parse(stats)
-        current = compare(table, current)
-        if time == "12:00" and marker == False:
-            write_file(choice, current)
-            marker = True
-        elif time == "12:00" and marker == True:
+        STATS = query(PACKETMASTER)
+        TABLE = parse(STATS)
+        CURRENT = compare(TABLE, CURRENT)
+        if time == "12:00" and not MARKER:
+            write_file(CHOICE, CURRENT)
+            MARKER = True
+        elif time == "12:00" and MARKER:
             pass
-        elif time != "12:00" and marker == True:
-            marker = False
+        elif time != "12:00" and MARKER:
+            MARKER = False
         else:
             pass

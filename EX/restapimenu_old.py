@@ -1,6 +1,8 @@
-#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
-
 #!/usr/bin/python
+
+""" Use with firmware version 2.2.5 or later. Python2.7
+Cubro Packetmaster REST API demo. Menu driven interface for interacting with
+a Cubro Packetmaster via the REST API. """
 
 #Import necessary Python libraries for interacting with the REST API
 import re
@@ -9,6 +11,7 @@ from packetmaster_ex_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
 
 def set_ip():
+    """ Establish Packetmaster can be reached and set Administrative parameters. """
     fail_count = 0
     while fail_count < 3:
         address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
@@ -16,8 +19,8 @@ def set_ip():
             ip_address = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', address)
             address = ip_address[0]
             return address
-        except:
-            print "That is not a valid IPv4 address."
+        except TypeError as reason:
+            print ("That is not a valid IPv4 address.", reason)
             fail_count += 1
     print "That is not a valid IPv4 address.  Exiting"
     exit()
@@ -30,15 +33,16 @@ if __name__ == '__main__':
         the Cubro REST API. \n'''
 
     #IP address to access REST data of device
-    address = set_ip()
+    ADDRESS = set_ip()
     #Device credentials
-    username = raw_input('Enter your username: ')
-    password = getpass()
-    packetmaster = PacketmasterEX(address, username, password)
+    USERNAME = raw_input('Enter your username: ')
+    PASSWORD = getpass()
+    PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
     #Initial menu to check or change settings
     def topmenu():
-        global address, username, password, packetmaster
-        print 'Options for device at', address,'acting as User', username
+        """ Top level menu for interacting with Packetmaster. """
+        global ADDRESS, USERNAME, PASSWORD, PACKETMASTER
+        print 'Options for device at', ADDRESS, 'acting as User', USERNAME
         print '''
             1 - Change My working device
             2 - Change My user credentials
@@ -49,16 +53,17 @@ if __name__ == '__main__':
         option = raw_input('Enter the number of the action you would like to perform: ')
         try:
             option = int(option)
-        except:
+        except ValueError as reason:
+            print reason
             topmenu()
         if option == 1:
-            address = set_ip()
-            packetmaster = PacketmasterEX(address, username, password)
+            ADDRESS = set_ip()
+            PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
             topmenu()
         elif option == 2:
-            username = raw_input('Enter your username: ')
-            password = getpass()
-            packetmaster = PacketmasterEX(address, username, password)
+            USERNAME = raw_input('Enter your username: ')
+            PASSWORD = getpass()
+            PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
             topmenu()
         elif option == 3:
             checkmenu()
@@ -73,7 +78,8 @@ if __name__ == '__main__':
 
     #Check settings menu
     def checkmenu():
-        print 'Check settings for device at', address,'acting as User', username
+        """ Menu for querying and checking Packetmaster settings and data. """
+        print 'Check settings for device at', ADDRESS, 'acting as User', USERNAME
         print '''
                   1 - Software Version
                   2 - IP Configuration
@@ -109,126 +115,127 @@ if __name__ == '__main__':
         choice = raw_input('Enter the number of the selection to check: ')
         try:
             choice = int(choice)
-        except:
+        except ValueError as reason:
+            print reason
             checkmenu()
         if choice == 1:
-            version = packetmaster.firmware_version()
+            version = PACKETMASTER.firmware_version()
             print version
             topmenu()
         elif choice == 2:
-            ip = packetmaster.ip_config()
-            print ip
+            ip_address = PACKETMASTER.ip_config()
+            print ip_address
             topmenu()
         elif choice == 3:
-            model = packetmaster.device_model()
+            model = PACKETMASTER.device_model()
             print model
             topmenu()
         elif choice == 4:
-            label = packetmaster.device_label()
+            label = PACKETMASTER.device_label()
             print label
             topmenu()
         elif choice == 5:
-            serial = packetmaster.serial_number()
+            serial = PACKETMASTER.serial_number()
             print serial
             topmenu()
         elif choice == 6:
-            gen = packetmaster.hardware_generation()
+            gen = PACKETMASTER.hardware_generation()
             print gen
             topmenu()
         elif choice == 7:
-            config = packetmaster.port_config()
+            config = PACKETMASTER.port_config()
             print config
             topmenu()
         elif choice == 8:
-            info = packetmaster.port_info()
+            info = PACKETMASTER.port_info()
             print info
             topmenu()
         elif choice == 9:
-            stat = packetmaster.port_statistics()
+            stat = PACKETMASTER.port_statistics()
             print stat
             topmenu()
         elif choice == 10:
-            sfp = packetmaster.sfp_info()
+            sfp = PACKETMASTER.sfp_info()
             print sfp
             topmenu()
         elif choice == 11:
-            rules_active = packetmaster.rules_active()
+            rules_active = PACKETMASTER.rules_active()
             print rules_active
             topmenu()
         elif choice == 12:
-            groups_active = packetmaster.groups_active()
+            groups_active = PACKETMASTER.groups_active()
             print groups_active
             topmenu()
         elif choice == 13:
-            apps = packetmaster.device_apps()
+            apps = PACKETMASTER.device_apps()
             print apps
             topmenu()
         elif choice == 14:
-            appsrun = packetmaster.apps_active()
+            appsrun = PACKETMASTER.apps_active()
             print appsrun
             topmenu()
         elif choice == 15:
-            saves = packetmaster.save_points()
+            saves = PACKETMASTER.save_points()
             print saves
             topmenu()
         elif choice == 16:
-            hashes = packetmaster.hash_algorithms()
+            hashes = PACKETMASTER.hash_algorithms()
             print hashes
             topmenu()
         elif choice == 17:
-            perm = packetmaster.rule_permanence()
+            perm = PACKETMASTER.rule_permanence()
             print perm
             topmenu()
         elif choice == 18:
-            storage = packetmaster.storage_mode()
+            storage = PACKETMASTER.storage_mode()
             print storage
             topmenu()
         elif choice == 19:
-            env = packetmaster.env_info()
+            env = PACKETMASTER.env_info()
             print env
             topmenu()
         elif choice == 20:
-            led = packetmaster.id_led()
+            led = PACKETMASTER.id_led()
             print led
             topmenu()
         elif choice == 21:
-            load = packetmaster.load_info()
+            load = PACKETMASTER.load_info()
             print load
             topmenu()
         elif choice == 22:
-            tcam = packetmaster.tcam()
+            tcam = PACKETMASTER.tcam()
             print tcam
             topmenu()
         elif choice == 23:
-            memory = packetmaster.mem_free()
+            memory = PACKETMASTER.mem_free()
             print memory
             topmenu()
         elif choice == 24:
-            server = packetmaster.server_revision()
+            server = PACKETMASTER.server_revision()
             print server
             topmenu()
         elif choice == 25:
-            log = packetmaster.web_log()
+            log = PACKETMASTER.web_log()
             print log
             topmenu()
         elif choice == 26:
-            users = packetmaster.get_users()
+            users = PACKETMASTER.get_users()
             print users
             topmenu()
         elif choice == 27:
-            access = packetmaster.user_uac()
+            access = PACKETMASTER.user_uac()
             print access
             topmenu()
         elif choice == 28:
-            radius = packetmaster.get_radius()
+            radius = PACKETMASTER.get_radius()
             print radius
             topmenu()
         elif choice == 29:
-            dns = packetmaster.get_dns()
+            dns = PACKETMASTER.get_dns()
             print dns
             topmenu()
         elif choice == 30:
-            telnet = packetmaster.get_telnet()
+            telnet = PACKETMASTER.get_telnet()
             print telnet
             topmenu()
         elif choice == 31:
@@ -239,7 +246,8 @@ if __name__ == '__main__':
 
     #Change settings menu
     def changemenu():
-        print 'Change settings for device at', address,'acting as User', username
+        """ Menu for changing Packetmaster settings. """
+        print 'Change settings for device at', ADDRESS, 'acting as User', USERNAME
         print '''
                  1 - Change IP Configuration
                  2 - Change Device Name + Notes
@@ -289,182 +297,183 @@ if __name__ == '__main__':
         change = raw_input('Enter the number of the setting you would like to change: ')
         try:
             change = int(change)
-        except:
+        except ValueError as reason:
+            print reason
             changemenu()
         if change == 1:
-            ipchange = packetmaster.set_ip_config_guided()
+            ipchange = PACKETMASTER.set_ip_config_guided()
             print ipchange
             topmenu()
         elif change == 2:
-            namechange = packetmaster.set_label_guided()
+            namechange = PACKETMASTER.set_label_guided()
             print namechange
             topmenu()
         elif change == 3:
-            configchange = packetmaster.set_port_config_guided()
+            configchange = PACKETMASTER.set_port_config_guided()
             print configchange
             topmenu()
         elif change == 4:
-            onoff = packetmaster.port_on_off_guided()
+            onoff = PACKETMASTER.port_on_off_guided()
             print onoff
             topmenu()
         elif change == 5:
-            countersdelete = packetmaster.reset_port_counters()
+            countersdelete = PACKETMASTER.reset_port_counters()
             print countersdelete
             topmenu()
         elif change == 6:
-            rulereset = packetmaster.reset_rule_counters()
+            rulereset = PACKETMASTER.reset_rule_counters()
             print rulereset
             topmenu()
         elif change == 7:
-            ruleadd = packetmaster.add_rule_guided()
+            ruleadd = PACKETMASTER.add_rule_guided()
             print ruleadd
             topmenu()
         elif change == 8:
-            modrule = packetmaster.mod_rule_guided()
+            modrule = PACKETMASTER.mod_rule_guided()
             print modrule
             topmenu()
         elif change == 9:
-            ruledelete = packetmaster.del_rule_guided()
+            ruledelete = PACKETMASTER.del_rule_guided()
             print ruledelete
             topmenu()
         elif change == 10:
-            allruledelete = packetmaster.del_rule_all()
+            allruledelete = PACKETMASTER.del_rule_all()
             print allruledelete
             topmenu()
         elif change == 11:
-            groupadd = packetmaster.add_group_guided()
+            groupadd = PACKETMASTER.add_group_guided()
             print groupadd
             topmenu()
         elif change == 12:
-            modgroup = packetmaster.modify_group_guided()
+            modgroup = PACKETMASTER.modify_group_guided()
             print modgroup
             topmenu()
         elif change == 13:
-            delgroup = packetmaster.delete_group_guided()
+            delgroup = PACKETMASTER.delete_group_guided()
             print delgroup
             topmenu()
         elif change == 14:
-            delete_groups = packetmaster.delete_groups_all()
+            delete_groups = PACKETMASTER.delete_groups_all()
             print delete_groups
             topmenu()
         elif change == 15:
-            hashes = packetmaster.set_hash_algorithms_guided()
+            hashes = PACKETMASTER.set_hash_algorithms_guided()
             print hashes
             topmenu()
         elif change == 16:
-            portspactive = packetmaster.set_port_savepoint_guided()
+            portspactive = PACKETMASTER.set_port_savepoint_guided()
             print portspactive
             topmenu()
         elif change == 17:
-            rulespactive = packetmaster.set_rule_savepoint_guided()
+            rulespactive = PACKETMASTER.set_rule_savepoint_guided()
             print rulespactive
             topmenu()
         elif change == 18:
-            spset = packetmaster.set_boot_savepoint_guided()
+            spset = PACKETMASTER.set_boot_savepoint_guided()
             print spset
             topmenu()
         elif change == 19:
-            spexport = packetmaster.export_savepoint_guided()
+            spexport = PACKETMASTER.export_savepoint_guided()
             print spexport
             topmenu()
         elif change == 20:
-            portspmod = packetmaster.modify_port_savepoint_guided()
+            portspmod = PACKETMASTER.modify_port_savepoint_guided()
             print portspmod
             topmenu()
         elif change == 21:
-            rulepsmod = packetmaster.modify_rule_savepoint_guided()
+            rulepsmod = PACKETMASTER.modify_rule_savepoint_guided()
             print rulepsmod
             topmenu()
         elif change == 22:
-            portspcreate = packetmaster.create_port_savepoint_guided()
+            portspcreate = PACKETMASTER.create_port_savepoint_guided()
             print portspcreate
             topmenu()
         elif change == 23:
-            quickcreate = packetmaster.create_quick_savepoint()
+            quickcreate = PACKETMASTER.create_quick_savepoint()
             print quickcreate
             topmenu()
         elif change == 24:
-            rulespcreate = packetmaster.create_rule_savepoint_guided()
+            rulespcreate = PACKETMASTER.create_rule_savepoint_guided()
             print rulespcreate
             topmenu()
         elif change == 25:
-            portspdelete = packetmaster.delete_port_savepoint_guided()
+            portspdelete = PACKETMASTER.delete_port_savepoint_guided()
             print portspdelete
             topmenu()
         elif change == 26:
-            rulespdelete = packetmaster.delete_rule_savepoint_guided()
+            rulespdelete = PACKETMASTER.delete_rule_savepoint_guided()
             print rulespdelete
             topmenu()
         elif change == 27:
-            startapp = packetmaster.start_app_guided()
+            startapp = PACKETMASTER.start_app_guided()
             print startapp
             topmenu()
         elif change == 28:
-            modapp = packetmaster.mod_app_guided()
+            modapp = PACKETMASTER.mod_app_guided()
             print modapp
             topmenu()
         elif change == 29:
-            killapp = packetmaster.kill_app_guided()
+            killapp = PACKETMASTER.kill_app_guided()
             print killapp
             topmenu()
         elif change == 30:
-            action = packetmaster.call_app_action_guided()
+            action = PACKETMASTER.call_app_action_guided()
             print action
             topmenu()
         elif change == 31:
-            ruleperm = packetmaster.set_rule_permanence_guided()
+            ruleperm = PACKETMASTER.set_rule_permanence_guided()
             print ruleperm
             topmenu()
         elif change == 32:
-            storagemode = packetmaster.set_storage_mode_guided()
+            storagemode = PACKETMASTER.set_storage_mode_guided()
             print storagemode
             topmenu()
         elif change == 33:
-            logdelete = packetmaster.del_web_log()
+            logdelete = PACKETMASTER.del_web_log()
             print logdelete
             topmenu()
         elif change == 34:
-            adduser = packetmaster.add_user_guided()
+            adduser = PACKETMASTER.add_user_guided()
             print adduser
             topmenu()
         elif change == 35:
-            moduser = packetmaster.mod_user_guided()
+            moduser = PACKETMASTER.mod_user_guided()
             print moduser
             topmenu()
         elif change == 36:
-            deluser = packetmaster.delete_user_guided()
+            deluser = PACKETMASTER.delete_user_guided()
             print deluser
             topmenu()
         elif change == 37:
-            changeaccess = packetmaster.set_uac_guided()
+            changeaccess = PACKETMASTER.set_uac_guided()
             print changeaccess
             topmenu()
         elif change == 38:
-            setradius = packetmaster.set_radius_guided()
+            setradius = PACKETMASTER.set_radius_guided()
             print setradius
             topmenu()
         elif change == 39:
-            secure = packetmaster.set_https_guided()
+            secure = PACKETMASTER.set_https_guided()
             print secure
             topmenu()
         elif change == 40:
-            settelnet = packetmaster.set_telnet_guided()
+            settelnet = PACKETMASTER.set_telnet_guided()
             print settelnet
             topmenu()
         elif change == 41:
-            setdns = packetmaster.set_dns_guided()
+            setdns = PACKETMASTER.set_dns_guided()
             print setdns
             topmenu()
         elif change == 42:
-            led = packetmaster.set_id_led_guided()
+            led = PACKETMASTER.set_id_led_guided()
             print led
             topmenu()
         elif change == 43:
-            restartweb = packetmaster.restart_webserver()
+            restartweb = PACKETMASTER.restart_webserver()
             print restartweb
             topmenu()
         elif change == 44:
-            restart = packetmaster.reboot()
+            restart = PACKETMASTER.reboot()
             print restart
             topmenu()
         elif change == 45:

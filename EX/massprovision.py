@@ -1,14 +1,18 @@
-#Use with firmware version 2.1.x.x or later. Python2.7 Cubro Packetmaster REST API demo.
-#Shows conceptually how the ReST API can  be used to mass provision a set of devices.
-
 #!/usr/bin/python
 
+""" Use with firmware version 2.2.5 or later. Python2.7
+Cubro Packetmaster REST API demo. Shows conceptually how the ReST API can
+be used to mass provision a set of devices."""
+
 #Import necessary Python libraries
-import json, time, sys, re
+import json
+import sys
+import re
 from getpass import getpass
 from packetmaster_ex_rest import PacketmasterEX
 
 def usage():
+    """ Display usage and help. """
     print """Usage:
              -f, --filename FILE   Provide a JSON formatted text file of device IPs and admin credentials
                                    that the configuration should be applied to.
@@ -25,11 +29,14 @@ def usage():
              -u, --username   Tells the script to prompt for an admin username and password for the
                               IP addresses passed to -l option.
 
-             This script will apply a preset baseline configuration to each Packetmaster IP address provided."""
+             This script will apply a preset baseline configuration to each
+             Packetmaster IP address provided."""
 
-def apply_config(device_ip, admin_user=None, admin_password=None):
-    ex = PacketmasterEX(device_ip, admin_user, admin_password)
-    #Enter ReST API calls for configuration below this line.  See packetmasterEX_rest object class for methods.
+def apply_config(device_ip, admin_username=None, password=None):
+    """ Applies all 'PacketmasterEX' method calls listed to Packetmaster device.
+        See packetmaster_ex_rest object class for methods. """
+    ex = PacketmasterEX(device_ip, admin_username, password)
+    #Enter ReST API calls for configuration below this line.
     ex.set_port_config('1', '10G', 'full', False, False, False)
     ex.set_port_config('2', '10G', 'full', False, False, False)
     ex.set_port_config('3', '10G', 'full', False, False, False)
@@ -53,14 +60,15 @@ def apply_config(device_ip, admin_user=None, admin_password=None):
     ex.add_user('Jim', '7', 'Jimminy Cricket', 'Security Guy', False)
     ex.set_dns('9.9.9.9', '149.112.112.112')
     ex.set_uac('t')
+    return "Configuration Applied."
 
 if __name__ == '__main__':
     if len(sys.argv) == 3 and str(sys.argv[1]) in ('-f', '--filename'):
-        filename = sys.argv[2]
-        device_list = []
-        with open(filename) as f:
-            device_file = json.load(f)
-            for item in device_file["packetmaster"]:
+        FILENAME = sys.argv[2]
+        DEVICE_LIST = []
+        with open(FILENAME) as f:
+            DEVICE_FILE = json.load(f)
+            for item in DEVICE_FILE["packetmaster"]:
                 ip = item["ip"]
                 admin_user = item["admin"]
                 admin_password = item["passwd"]
@@ -68,16 +76,15 @@ if __name__ == '__main__':
                 print run
     elif len(sys.argv) > 1 and str(sys.argv[1]) in ('-l', '--list'):
         if '-u' in sys.argv or '--username' in sys.argv:
-            admin_user = raw_input("Administrator Username: ")
-            admin_pass = getpass()
-        ip_list = sys.argv[2:]
-        for item in ip_list:
+            ADMIN_USER = raw_input("Administrator Username: ")
+            ADMIN_PASS = getpass()
+        IP_LIST = sys.argv[2:]
+        for item in IP_LIST:
             address = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', item)
-            if len(address) > 0:
-                if admin_user:
-                    run = apply_config(address[0], admin_user, admin_pass)
-                else:
-                    run = apply_config(address[0])
-                print run
+            if ADMIN_USER:
+                run = apply_config(address[0], ADMIN_USER, ADMIN_PASS)
+            else:
+                run = apply_config(address[0])
+            print run
     else:
         usage()

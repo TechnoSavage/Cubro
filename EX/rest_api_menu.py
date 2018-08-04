@@ -1,6 +1,8 @@
-#Use with firmware version 2.2.5 or later. Python2.7 Cubro Packetmaster REST API demo.
-
 #!/usr/bin/python
+
+""" Use with firmware version 2.2.5 or later. Python2.7
+Cubro Packetmaster REST API demo. Menu driven interface for interacting with
+a Cubro Packetmaster via the REST API. """
 
 #Import necessary Python libraries for interacting with the REST API
 from getpass import getpass
