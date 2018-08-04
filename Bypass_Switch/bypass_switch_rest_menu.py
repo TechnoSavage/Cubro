@@ -1,8 +1,11 @@
-#Python2.7 Cubro Copper Bypass Switch REST API demo.
-
 #!/usr/bin/python
 
+""" Python2.7 Cubro Copper Bypass Switch REST API demo. Menu driven interface
+for interacting with a Cubro Bypass Switch via the REST API."""
+
+
 #Import necessary libraries
+import re
 from bypassswitch_rest import BypassSwitch
 
 def set_ip():
@@ -14,8 +17,8 @@ def set_ip():
             ip_address = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', address)
             address = ip_address[0]
             return address
-        except:
-            print "That is not a valid IPv4 address."
+        except TypeError as reason:
+            print ("That is not a valid IPv4 address.", reason)
             fail_count += 1
     print "That is not a valid IPv4 address.  Exiting"
     exit()
@@ -24,13 +27,13 @@ if __name__ == '__main__':
     #Print welcome statement
     print 'Welcome to the Cubro Bypass Switch REST Demo\n'
     #Define IP address of the Bypass Switch
-    address = set_ip()
-    bypass = BypassSwitch(address)
+    ADDRESS = set_ip()
+    BYPASS = BypassSwitch(ADDRESS)
 
     def menu():
         """Menu for Bypass Switch management options."""
-        global address, bypass
-        print '\nWorking with Bypass Switch at %s \n' % address
+        global ADDRESS, BYPASS
+        print '\nWorking with Bypass Switch at %s \n' % ADDRESS
         print '''Make Selection:
                 1 - Engage Bypass
                 2 - Disengage Bypass
@@ -41,24 +44,24 @@ if __name__ == '__main__':
         choice = raw_input('Enter the number of your selection: ')
         #Evaluate user selection
         if int(choice) == 1:
-            on = bypass.engage()
-            print on
+            active = BYPASS.engage()
+            print active
             menu()
         elif int(choice) == 2:
-            off = bypass.disengage()
-            print off
+            inactive = BYPASS.disengage()
+            print inactive
             menu()
         elif int(choice) == 3:
-            timeout = bypass.timeout()
+            timeout = BYPASS.timeout()
             print timeout
             menu()
         elif int(choice) == 4:
-            mgmt = bypass.set_config_guided()
+            mgmt = BYPASS.set_config_guided()
             print mgmt
             menu()
         elif int(choice) == 5:
-            address = set_ip()
-            bypass = BypassSwitch(address)
+            ADDRESS = set_ip()
+            BYPASS = BypassSwitch(ADDRESS)
             menu()
         elif int(choice) == 6:
             print 'Goodbye'

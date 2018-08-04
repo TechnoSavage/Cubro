@@ -1,4 +1,4 @@
-#Bypass Switch device class for REST API interaction
+""" Bypass Switch device class for REST API interaction. """
 
 import requests
 from requests.exceptions import ConnectionError
