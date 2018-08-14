@@ -95,23 +95,18 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             manage()
-        if choice == 1:
-            hardwareconfig()
-        elif choice == 2:
-            ruleconfig()
-        elif choice == 3:
-            appconfig()
-        elif choice == 4:
-            saveconfig()
-        elif choice == 5:
-            userconfig()
-        elif choice == 6:
-            topmenu()
-        elif choice == 7:
-            print 'Goodbye'
-            exit()
-        else:
-            print "That is not a valid selection."
+        menus = {1: hardwareconfig,
+                 2: ruleconfig,
+                 3: appconfig,
+                 4: saveconfig,
+                 5: userconfig,
+                 6: topmenu,
+                 7: exit}
+        try:
+            select = menus[choice]
+            select()
+        except KeyError as reason:
+            print ("That is not a valid selection.", reason)
             manage()
 
     def hardwareconfig():
@@ -147,81 +142,37 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             hardwareconfig()
-        if choice == 1:
-            run = PACKETMASTER.device_model()
-            print run
-            hardwareconfig()
-        elif choice == 2:
-            run = PACKETMASTER.serial_number()
-            print run
-            hardwareconfig()
-        elif choice == 3:
-            run = PACKETMASTER.hardware_generation()
-            print run
-            hardwareconfig()
-        elif choice == 4:
-            run = PACKETMASTER.firmware_version()
-            print run
-            hardwareconfig()
-        elif choice == 5:
-            run = PACKETMASTER.env_info()
-            print run
-            hardwareconfig()
-        elif choice == 6:
-            run = PACKETMASTER.id_led()
-            print run
-            hardwareconfig()
-        elif choice == 7:
-            run = PACKETMASTER.set_id_led_guided()
-            print run
-            hardwareconfig()
-        elif choice == 8:
-            run = PACKETMASTER.load_info()
-            print run
-            hardwareconfig()
-        elif choice == 9:
-            run = PACKETMASTER.tcam()
-            print run
-            hardwareconfig()
-        elif choice == 10:
-            run = PACKETMASTER.mem_free()
-            print run
-            hardwareconfig()
-        elif choice == 11:
-            run = PACKETMASTER.server_revision()
-            print run
-            hardwareconfig()
-        elif choice == 12:
-            run = PACKETMASTER.get_dpid()
-            print run
-            hardwareconfig()
-        elif choice == 13:
-            run = PACKETMASTER.set_license_guided()
-            print run
-            hardwareconfig()
-        elif choice == 14:
-            notesmenu()
-        elif choice == 15:
-            ipconfig()
-        elif choice == 16:
-            dns()
-        elif choice == 17:
-            portconfig()
-        elif choice == 18:
-            telnet()
-        elif choice == 19:
-            web()
-        elif choice == 20:
-            controller()
-        elif choice == 21:
-            run = PACKETMASTER.reboot()
-            print run
-            hardwareconfig()
-        elif choice == 22:
-            manage()
-        elif choice == 23:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.device_model,
+                   2: PACKETMASTER.serial_number,
+                   3: PACKETMASTER.hardware_generation,
+                   4: PACKETMASTER.firmware_version,
+                   5: PACKETMASTER.env_info,
+                   6: PACKETMASTER.id_led,
+                   7: PACKETMASTER.set_id_led_guided,
+                   8: PACKETMASTER.load_info,
+                   9: PACKETMASTER.tcam,
+                   10: PACKETMASTER.mem_free,
+                   11: PACKETMASTER.server_revision,
+                   12: PACKETMASTER.get_dpid,
+                   13: PACKETMASTER.set_license_guided,
+                   14: notesmenu,
+                   15: ipconfig,
+                   16: dns,
+                   17: portconfig,
+                   18: telnet,
+                   19: web,
+                   20: controller,
+                   21: PACKETMASTER.reboot,
+                   22: manage,
+                   23: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                hardwareconfig()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             hardwareconfig()
@@ -241,23 +192,19 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             notesmenu()
-        if choice == 1:
-            run = PACKETMASTER.device_label()
-            print run
-            notesmenu()
-        elif choice == 2:
-            run = PACKETMASTER.set_name_guided()
-            print run
-            notesmenu()
-        elif choice == 3:
-            run = PACKETMASTER.set_label_guided()
-            print run
-            notesmenu()
-        elif choice == 4:
-            hardwareconfig()
-        elif choice == 5:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.device_label,
+                   2: PACKETMASTER.set_name_guided,
+                   3: PACKETMASTER.set_label_guided,
+                   4: hardwareconfig,
+                   5: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                notesmenu()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             notesmenu()
@@ -276,19 +223,18 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             ipconfig()
-        if choice == 1:
-            run = PACKETMASTER.ip_config()
-            print run
-            ipconfig()
-        elif choice == 2:
-            run = PACKETMASTER.set_ip_config_guided()
-            print run
-            ipconfig()
-        elif choice == 3:
-            hardwareconfig()
-        elif choice == 4:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.ip_config,
+                   2: PACKETMASTER.set_ip_config_guided,
+                   3: hardwareconfig,
+                   4: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                ipconfig()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             ipconfig()
@@ -307,19 +253,18 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             dns()
-        if choice == 1:
-            run = PACKETMASTER.get_dns()
-            print run
-            dns()
-        elif choice == 2:
-            run = PACKETMASTER.set_dns_guided()
-            print run
-            dns()
-        elif choice == 3:
-            hardwareconfig()
-        elif choice == 4:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.get_dns,
+                   2: PACKETMASTER.set_dns_guided,
+                   3: hardwareconfig,
+                   4: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                dns()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             dns()
@@ -344,39 +289,23 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             portconfig()
-        if choice == 1:
-            run = PACKETMASTER.port_config()
-            print run
-            portconfig()
-        elif choice == 2:
-            run = PACKETMASTER.port_info()
-            print run
-            portconfig()
-        elif choice == 3:
-            run = PACKETMASTER.port_statistics()
-            print run
-            portconfig()
-        elif choice == 4:
-            run = PACKETMASTER.sfp_info()
-            print run
-            portconfig()
-        elif choice == 5:
-            run = PACKETMASTER.set_port_config_guided()
-            print run
-            portconfig()
-        elif choice == 6:
-            run = PACKETMASTER.port_on_off_guided()
-            print run
-            portconfig()
-        elif choice == 7:
-            run = PACKETMASTER.reset_port_counters()
-            print run
-            portconfig()
-        elif choice == 8:
-            hardwareconfig()
-        elif choice == 9:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.port_config,
+                   2: PACKETMASTER.port_info,
+                   3: PACKETMASTER.port_statistics,
+                   4: PACKETMASTER.sfp_info,
+                   5: PACKETMASTER.set_port_config_guided,
+                   6: PACKETMASTER.port_on_off_guided,
+                   7: PACKETMASTER.reset_port_counters,
+                   8: hardwareconfig,
+                   9: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                portconfig()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             portconfig()
@@ -398,27 +327,20 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             web()
-        if choice == 1:
-            run = PACKETMASTER.web_log()
-            print run
-            web()
-        elif choice == 2:
-            run = PACKETMASTER.del_web_log()
-            print run
-            web()
-        elif choice == 3:
-            run = PACKETMASTER.restart_webserver()
-            print run
-            web()
-        elif choice == 4:
-            run = PACKETMASTER.set_https_guided()
-            print run
-            web()
-        elif choice == 5:
-            hardwareconfig()
-        elif choice == 6:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.web_log,
+                   2: PACKETMASTER.del_web_log,
+                   3: PACKETMASTER.restart_webserver,
+                   4: PACKETMASTER.set_https_guided,
+                   5: hardwareconfig,
+                   6: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                web()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             web()
@@ -438,19 +360,18 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             telnet()
-        if choice == 1:
-            run = PACKETMASTER.get_telnet()
-            print run
-            telnet()
-        elif choice == 2:
-            run = PACKETMASTER.set_telnet_guided()
-            print run
-            telnet()
-        elif choice == 3:
-            hardwareconfig()
-        elif choice == 4:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.get_telnet,
+                   2: PACKETMASTER.set_telnet_guided,
+                   3: hardwareconfig,
+                   4: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                telnet()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             telnet()
@@ -471,27 +392,22 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             controller()
-        if choice == 1:
-            run = PACKETMASTER.get_controller()
-            print run
-            controller()
-        elif choice == 2:
-            run = PACKETMASTER.set_controller_guided()
-            print run
-            controller()
-        elif choice == 3:
-            run = PACKETMASTER.del_controller_guided()
-            print run
-            controller()
-        elif choice == 4:
-            hardwareconfig()
-        elif choice == 5:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.get_controller,
+                   2: PACKETMASTER.set_controller_guided,
+                   3: PACKETMASTER.del_controller_guided,
+                   4: hardwareconfig,
+                   5: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                controller()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             controller()
-
 
     def ruleconfig():
         """Menu for configuring rules/filters and port groups."""
@@ -523,79 +439,33 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             ruleconfig()
-        if choice == 1:
-            run = PACKETMASTER.rules_active()
-            print run
-            ruleconfig()
-        elif choice == 2:
-            run = PACKETMASTER.add_rule_guided()
-            print run
-            ruleconfig()
-        elif choice == 3:
-            run = PACKETMASTER.mod_rule_guided()
-            print run
-            ruleconfig()
-        elif choice == 4:
-            run = PACKETMASTER.del_rule_guided()
-            print run
-            ruleconfig()
-        elif choice == 5:
-            run = PACKETMASTER.del_rule_all()
-            print run
-            ruleconfig()
-        elif choice == 6:
-            run = PACKETMASTER.reset_rule_counters()
-            print run
-            ruleconfig()
-        elif choice == 7:
-            run = PACKETMASTER.groups_active()
-            print run
-            ruleconfig()
-        elif choice == 8:
-            run = PACKETMASTER.add_group_guided()
-            print run
-            ruleconfig()
-        elif choice == 9:
-            run = PACKETMASTER.modify_group_guided()
-            print run
-            ruleconfig()
-        elif choice == 10:
-            run = PACKETMASTER.delete_group_guided()
-            print run
-            ruleconfig()
-        elif choice == 11:
-            run = PACKETMASTER.delete_groups_all()
-            print run
-            ruleconfig()
-        elif choice == 12:
-            run = PACKETMASTER.hash_algorithms()
-            print run
-            ruleconfig()
-        elif choice == 13:
-            run = PACKETMASTER.set_hash_algorithms_guided()
-            print run
-            ruleconfig()
-        elif choice == 14:
-            run = PACKETMASTER.rule_permanence()
-            print run
-            ruleconfig()
-        elif choice == 15:
-            run = PACKETMASTER.set_rule_permanence_guided()
-            print run
-            ruleconfig()
-        elif choice == 16:
-            run = PACKETMASTER.storage_mode()
-            print run
-            ruleconfig()
-        elif choice == 17:
-            run = PACKETMASTER.set_storage_mode_guided()
-            print run
-            ruleconfig()
-        elif choice == 18:
-            manage()
-        elif choice == 19:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.rules_active,
+                   2: PACKETMASTER.add_rule_guided,
+                   3: PACKETMASTER.mod_rule_guided,
+                   4: PACKETMASTER.del_rule_guided,
+                   5: PACKETMASTER.del_rule_all,
+                   6: PACKETMASTER.reset_rule_counters,
+                   7: PACKETMASTER.groups_active,
+                   8: PACKETMASTER.add_group_guided,
+                   9: PACKETMASTER.mod_group_guided,
+                   10: PACKETMASTER.delete_group_guided,
+                   11: PACKETMASTER.delete_groups_all,
+                   12: PACKETMASTER.hash_algorithms,
+                   13: PACKETMASTER.set_hash_algorithms_guided,
+                   14: PACKETMASTER.rule_permanence,
+                   15: PACKETMASTER.set_rule_permanence_guided,
+                   16: PACKETMASTER.storage_mode,
+                   17: PACKETMASTER.set_storage_mode_guided,
+                   18: manage,
+                   19: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                ruleconfig()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             ruleconfig()
@@ -618,35 +488,22 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             appconfig()
-        if choice == 1:
-            run = PACKETMASTER.device_apps()
-            print run
-            appconfig()
-        elif choice == 2:
-            run = PACKETMASTER.apps_active()
-            print run
-            appconfig()
-        elif choice == 3:
-            run = PACKETMASTER.start_app_guided()
-            print run
-            appconfig()
-        elif choice == 4:
-            run = PACKETMASTER.mod_app_guided()
-            print run
-            appconfig()
-        elif choice == 5:
-            run = PACKETMASTER.kill_app_guided()
-            print run
-            appconfig()
-        elif choice == 6:
-            run = PACKETMASTER.call_app_action_guided()
-            print run
-            appconfig()
-        elif choice == 7:
-            manage()
-        elif choice == 8:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.device_apps,
+                   2: PACKETMASTER.apps_active,
+                   3: PACKETMASTER.start_app_guided,
+                   4: PACKETMASTER.mod_app_guided,
+                   5: PACKETMASTER.kill_app_guided,
+                   6: PACKETMASTER.call_app_action_guided,
+                   7: manage,
+                   8: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                appconfig()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             appconfig()
@@ -675,59 +532,28 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             saveconfig()
-        if choice == 1:
-            run = PACKETMASTER.save_points()
-            print run
-            saveconfig()
-        elif choice == 2:
-            run = PACKETMASTER.set_port_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 3:
-            run = PACKETMASTER.set_rule_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 4:
-            run = PACKETMASTER.set_boot_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 5:
-            run = PACKETMASTER.export_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 6:
-            run = PACKETMASTER.modify_port_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 7:
-            run = PACKETMASTER.modify_rule_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 8:
-            run = PACKETMASTER.create_port_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 9:
-            run = PACKETMASTER.create_quick_savepoint()
-            print run
-            saveconfig()
-        elif choice == 10:
-            run = PACKETMASTER.create_rule_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 11:
-            run = PACKETMASTER.delete_port_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 12:
-            run = PACKETMASTER.delete_rule_savepoint_guided()
-            print run
-            saveconfig()
-        elif choice == 13:
-            manage()
-        elif choice == 14:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.save_points,
+                   2: PACKETMASTER.set_port_savepoint_guided,
+                   3: PACKETMASTER.set_rule_savepoint_guided,
+                   4: PACKETMASTER.set_boot_savepoint_guided,
+                   5: PACKETMASTER.export_savepoint_guided,
+                   6: PACKETMASTER.mod_port_savepoint_guided,
+                   7: PACKETMASTER.mod_rule_savepoint_guided,
+                   8: PACKETMASTER.create_port_savepoint_guided,
+                   9: PACKETMASTER.create_quick_savepoint,
+                   10: PACKETMASTER.create_rule_savepoint_guided,
+                   11: PACKETMASTER.delete_port_savepoint_guided,
+                   12: PACKETMASTER.delete_rule_savepoint_guided,
+                   13: manage,
+                   14: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                saveconfig()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             saveconfig()
@@ -752,43 +578,24 @@ if __name__ == '__main__':
         except ValueError as reason:
             print ("That is not a valid selection.", reason)
             userconfig()
-        if choice == 1:
-            run = PACKETMASTER.get_users()
-            print run
-            userconfig()
-        elif choice == 2:
-            run = PACKETMASTER.add_user_guided()
-            print run
-            userconfig()
-        elif choice == 3:
-            run = PACKETMASTER.mod_user_guided()
-            print run
-            userconfig()
-        elif choice == 4:
-            run = PACKETMASTER.delete_user_guided()
-            print run
-            userconfig()
-        elif choice == 5:
-            run = PACKETMASTER.user_uac()
-            print run
-            userconfig()
-        elif choice == 6:
-            run = PACKETMASTER.set_uac_guided()
-            print run
-            userconfig()
-        elif choice == 7:
-            run = PACKETMASTER.get_radius()
-            print run
-            userconfig()
-        elif choice == 8:
-            run = PACKETMASTER.set_radius_guided()
-            print run
-            userconfig()
-        elif choice == 9:
-            manage()
-        elif choice == 10:
-            print 'Goodbye'
-            exit()
+        execute = {1: PACKETMASTER.get_users,
+                   2: PACKETMASTER.add_user_guided,
+                   3: PACKETMASTER.mod_user_guided,
+                   4: PACKETMASTER.delete_user_guided,
+                   5: PACKETMASTER.user_uac,
+                   6: PACKETMASTER.set_uac_guided,
+                   7: PACKETMASTER.get_radius,
+                   8: PACKETMASTER.set_radius_guided,
+                   9: manage,
+                   10: exit}
+        if choice in execute:
+            try:
+                select = execute[choice]
+                run = select()
+                print run
+                userconfig()
+            except KeyError as reason:
+                print reason
         else:
             print "That is not a valid selection."
             userconfig()

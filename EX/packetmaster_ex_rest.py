@@ -2172,7 +2172,7 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def modify_group_guided(self):
+    def mod_group_guided(self):
         """Interactive menu to modify a port group."""
         name = raw_input("Enter the group ID of the group you would like to modify: ")
         try:
@@ -2330,11 +2330,11 @@ on QSFP ports of G4 devices. \n"""
                             Modified Group Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
         if confirm.lower() in ('y', 'yes'):
-            run = self.modify_group(name, params)
+            run = self.mod_group(name, params)
             return run
         return "Canceling; no changes made.\n"
 
-    def modify_group(self, gid, json_app):
+    def mod_group(self, gid, json_app):
         """Modify a port group on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/groups?'
@@ -2547,7 +2547,7 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def modify_port_savepoint_guided(self):
+    def mod_port_savepoint_guided(self):
         """Interactive menu to modify a port save point."""
         oldname = raw_input("Name of port save point to modify: ")
         newname = raw_input("New name for port save point: ")
@@ -2567,11 +2567,11 @@ on QSFP ports of G4 devices. \n"""
                             Save Active Ports: %s
                             Confirm changes [y/n]: """ % (oldname, newname, desc, override))
         if confirm.lower() in ('y', 'yes'):
-            run = self.modify_port_savepoint(oldname, newname, desc, override)
+            run = self.mod_port_savepoint(oldname, newname, desc, override)
             return run
         return "Canceling; no changes made.\n"
 
-    def modify_port_savepoint(self, oldname, newname, description, override=True):
+    def mod_port_savepoint(self, oldname, newname, description, override=True):
         """Modify a port save point."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/modportsavepoint?'
@@ -2598,7 +2598,7 @@ on QSFP ports of G4 devices. \n"""
             content = 'No Response'
             raise error
 
-    def modify_rule_savepoint_guided(self):
+    def mod_rule_savepoint_guided(self):
         """Interactive menu to modify a rule save point."""
         oldname = raw_input("Name of rule save point to modify: ")
         newname = raw_input("New name for rule save point: ")
@@ -2617,11 +2617,11 @@ on QSFP ports of G4 devices. \n"""
                             Save Active Rules: %s
                             Confirm changes [y/n]: """ % (oldname, newname, desc, override))
         if confirm.lower() in ('y', 'yes'):
-            run = self.modify_rule_savepoint(oldname, newname, desc, override)
+            run = self.mod_rule_savepoint(oldname, newname, desc, override)
             return run
         return "Canceling; no changes made.\n"
 
-    def modify_rule_savepoint(self, oldname, newname, description, override=True):
+    def mod_rule_savepoint(self, oldname, newname, description, override=True):
         """Modify a rule save point on the Packetmaster."""
         if self.https:
             uri = 'https://' + self.address + '/rest/savepoints/modrulesavepoint?'
