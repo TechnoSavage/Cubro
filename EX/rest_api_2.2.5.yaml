@@ -35,7 +35,7 @@ info:
     \ methods PUT/DELETE there is the possibility of using POST together with the\
     \ HTTP header `X-HTTP-Method-Override:<METHOD>` (where `<METHOD>` stands for the\
     \ PUT/DELETE to represent) instead."
-  version: '2.2.2 (rev.: 1-WRXWfg)'
+  version: '2.2.5 (rev.: 1-WpQuYw)'
   contact:
     email: support@cubro.net
   license:
@@ -209,6 +209,87 @@ paths:
           description: Error state.
           schema:
             $ref: '#/definitions/Error'
+  /device/controller:
+    delete:
+      summary: Deletes the given controller.
+      description: "Deletes the given controller.\nUser level has to be higher or\
+        \ equal to SUPER."
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: connection
+        in: query
+        description: Connection type of the controller. Either "tcp" or "ssl"
+        type: string
+      - name: ip
+        in: query
+        description: IP address of the controller.
+        type: string
+      - name: port
+        in: query
+        description: TCP port of the controller.
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Returns the configured controller
+      description: Returns the configured controller details
+      responses:
+        '200':
+          description: Configured controller details
+          schema:
+            type: object
+            properties:
+              connection:
+                description: tcp or ssl
+                type: string
+              ip:
+                type: string
+              port:
+                type: integer
+              role:
+                type: string
+              status:
+                type: string
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Adds the given controller.
+      description: "Adds the given controller.\nUser level has to be higher or equal\
+        \ to SUPER."
+      security:
+      - Super_Rights_Required: []
+      parameters:
+      - name: connection
+        in: query
+        description: Connection type of the controller. Either "tcp" or "ssl"
+        type: string
+      - name: ip
+        in: query
+        description: IP address of the controller.
+        type: string
+      - name: port
+        in: query
+        description: TCP port of the controller.
+        type: string
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
   /device/customident:
     get:
       summary: Returns the device label and notes
@@ -251,6 +332,22 @@ paths:
           description: Result state.
           schema:
             $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
+  /device/dpid:
+    get:
+      summary: Returns the device Openflow Datapath ID
+      description: Returns the device Datapath ID.
+      responses:
+        '200':
+          description: Datapath ID.
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
         default:
           description: Error state.
           schema:
@@ -925,6 +1022,41 @@ paths:
           description: Error state.
           schema:
             $ref: '#/definitions/Error'
+  /device/setlicense:
+    post:
+      summary: Adds a license for this device
+      description: Adds and validates a license for this device
+      parameters:
+      - name: id
+        in: query
+        description: ID of the license
+        required: true
+        type: boolean
+      - name: validUntil
+        in: query
+        description: date until the license is valid. Is not verified here. E.g. "2019-09-07"
+        required: true
+        type: boolean
+      - name: serialNumber
+        in: query
+        description: Serial number of the device. Needs to be the same as the serial
+          number on this device
+        required: true
+        type: boolean
+      - name: signature
+        in: query
+        description: base64(md5(id+";"+serialNumber+";"+validUntil+";"+signature))
+        required: true
+        type: boolean
+      responses:
+        '200':
+          description: Result state.
+          schema:
+            $ref: '#/definitions/Result'
+        default:
+          description: Error state.
+          schema:
+            $ref: '#/definitions/Error'
   /device/telnet:
     get:
       summary: Gets the device ID LED status
@@ -1170,7 +1302,8 @@ paths:
   /ports/info:
     get:
       summary: Returns status of the ports
-      description: Returns status and other information about the ports.
+      description: Returns status and other information about the ports. Don't use
+        if performance is a concern!
       responses:
         '200':
           description: Port info.

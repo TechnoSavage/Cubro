@@ -69,7 +69,7 @@ class PacketmasterEX(object):
                 print ("Unable to establish connection; check if IP address is correct.", fail)
 
     #This will currently return both Physical and Logical ports.
-    #Find way to list Physcial ports only.
+    #Find way to list Physical ports only.
     def get_port_count(self):
         """Return the number of ports on the device."""
         if self.https:
@@ -101,6 +101,21 @@ class PacketmasterEX(object):
             content = response.content
             data = json.loads(content)
             self.firmware = data['version']
+            return json.dumps(data, indent=4)
+        except ConnectionError as error:
+            content = 'No Response'
+            raise error
+
+    def api_level(self):
+        """Return API level of Packetmaster."""
+        if self.https:
+            uri = 'https://' + self.address + '/rest/device/apilevel?'
+        else:
+            uri = 'http://' + self.address + '/rest/device/apilevel?'
+        try:
+            response = requests.get(uri, auth=(self.username, self.password))
+            content = response.content
+            data = json.loads(content)
             return json.dumps(data, indent=4)
         except ConnectionError as error:
             content = 'No Response'

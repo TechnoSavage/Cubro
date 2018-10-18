@@ -117,25 +117,26 @@ if __name__ == '__main__':
                  2 - Serial Number
                  3 - Hardware Generation
                  4 - Firmware version
-                 5 - Temperature and Fans
-                 6 - ID LED Status
-                 7 - ID LED on/off
-                 8 - OS and CPU Load Averages
-                 9 - TCAM Flows
-                10 - Memory Usage
-                11 - CCH Server Revision
-                12 - Device OpenFlow Datapath ID
-                13 - Set Vitrum License
-                14 - Device Label and Notes Submenu
-                15 - IP Configuration Submenu
-                16 - DNS Configuration Submenu
-                17 - Port Configuration Submenu
-                18 - Telnet service submenu
-                19 - Webserver Submenu
-                20 - Controller Submenu
-                21 - Reboot Packetmaster
-                22 - Back
-                23 - Quit \n
+                 5 - API Level
+                 6 - Temperature and Fans
+                 7 - ID LED Status
+                 8 - ID LED on/off
+                 9 - OS and CPU Load Averages
+                10 - TCAM Flows
+                11 - Memory Usage
+                12 - CCH Server Revision
+                13 - Device OpenFlow Datapath ID
+                14 - Set Vitrum License
+                15 - Device Label and Notes Submenu
+                16 - IP Configuration Submenu
+                17 - DNS Configuration Submenu
+                18 - Port Configuration Submenu
+                19 - Telnet service submenu
+                20 - Webserver Submenu
+                21 - Controller Submenu
+                22 - Reboot Packetmaster
+                23 - Back
+                24 - Quit \n
                  Enter selection number: ''')
         try:
             choice = int(choice)
@@ -146,25 +147,26 @@ if __name__ == '__main__':
                    2: PACKETMASTER.serial_number,
                    3: PACKETMASTER.hardware_generation,
                    4: PACKETMASTER.firmware_version,
-                   5: PACKETMASTER.env_info,
-                   6: PACKETMASTER.id_led,
-                   7: PACKETMASTER.set_id_led_guided,
-                   8: PACKETMASTER.load_info,
-                   9: PACKETMASTER.tcam,
-                   10: PACKETMASTER.mem_free,
-                   11: PACKETMASTER.server_revision,
-                   12: PACKETMASTER.get_dpid,
-                   13: PACKETMASTER.set_license_guided,
-                   14: notesmenu,
-                   15: ipconfig,
-                   16: dns,
-                   17: portconfig,
-                   18: telnet,
-                   19: web,
-                   20: controller,
-                   21: PACKETMASTER.reboot,
-                   22: manage,
-                   23: exit}
+                   5: PACKETMASTER.api_level,
+                   6: PACKETMASTER.env_info,
+                   7: PACKETMASTER.id_led,
+                   8: PACKETMASTER.set_id_led_guided,
+                   9: PACKETMASTER.load_info,
+                   10: PACKETMASTER.tcam,
+                   11: PACKETMASTER.mem_free,
+                   12: PACKETMASTER.server_revision,
+                   13: PACKETMASTER.get_dpid,
+                   14: PACKETMASTER.set_license_guided,
+                   15: notesmenu,
+                   16: ipconfig,
+                   17: dns,
+                   18: portconfig,
+                   19: telnet,
+                   20: web,
+                   21: controller,
+                   22: PACKETMASTER.reboot,
+                   23: manage,
+                   24: exit}
         if choice in execute:
             try:
                 select = execute[choice]
