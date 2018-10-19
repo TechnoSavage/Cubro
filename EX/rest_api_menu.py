@@ -47,7 +47,7 @@ if __name__ == '__main__':
     def topmenu():
         """Top menu in hierarchy for device management."""
         global ADDRESS, USERNAME, PASSWORD, PACKETMASTER
-        print 'Options for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '\nOptions for %s at %s acting as user %s' % (PACKETMASTER.model, ADDRESS, USERNAME)
         print '''
             1 - Change My working device
             2 - Change My user credentials
@@ -80,7 +80,8 @@ if __name__ == '__main__':
 
     def manage():
         """Menu for managing Cubro PacketmasterEX device."""
-        print 'Device management menu for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '''\n%s at %s acting as user %s
+\nDevice Management Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                   1 - Hardware Configuration Menu
                   2 - Rule and Port Group Configuration Menu
@@ -111,7 +112,8 @@ if __name__ == '__main__':
 
     def hardwareconfig():
         """Menu for configuring hardware and management related settings."""
-        print 'Hardware configuration menu for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '''\n%s at %s acting as user %s
+\nHardware Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Model
                  2 - Serial Number
@@ -181,7 +183,8 @@ if __name__ == '__main__':
 
     def notesmenu():
         """Submenu for device label and device notes settings."""
-        print 'Device label and notes menu for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '''\n%s at %s acting as user %s
+\nDevice Label and Notes Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Get Label and Notes
                  2 - Change Label only
@@ -213,7 +216,8 @@ if __name__ == '__main__':
 
     def ipconfig():
         """Submenu for IP configuration settings."""
-        print 'Device label and notes menu for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '''\n%s at %s acting as user %s
+\nIP Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Get current IP configuration
                  2 - Change IP configuration
@@ -243,7 +247,8 @@ if __name__ == '__main__':
 
     def dns():
         """Submenu for DNS settings."""
-        print 'DNS configuration menu for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '''\n%s at %s acting as user %s
+\nDNS Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Get current DNS configuration
                  2 - Change DNS configuration
@@ -273,8 +278,8 @@ if __name__ == '__main__':
 
     def portconfig():
         """Submenu for port configuration settings."""
-        print ''' Port Configuration Menu
-        for %s at %s acting as User %s''' % (PACKETMASTER.model, ADDRESS, USERNAME)
+        print '''\n%s at %s acting as user %s
+\nPort Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Get current port configuration
                  2 - Get current port status
@@ -314,8 +319,8 @@ if __name__ == '__main__':
 
     def web():
         """Submenu for Web Server settings."""
-        print ''' Webserver Menu
-        for %s at %s acting as User %s ''' % (PACKETMASTER.model, ADDRESS, USERNAME)
+        print '''\n%s at %s acting as user %s
+\nWebserver Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Web logs
                  2 - Delete web Logs
@@ -349,8 +354,8 @@ if __name__ == '__main__':
 
     def telnet():
         """Submneu for Telnet service settings."""
-        print ''' Telnet Service Menu
-        for %s at %s acting as User %s''' % (PACKETMASTER.model, ADDRESS, USERNAME)
+        print '''\n%s at %s acting as user %s
+\nTelnet Service Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Get current Telnet status
                  2 - Enable or Disable Telnet service
@@ -380,8 +385,8 @@ if __name__ == '__main__':
 
     def controller():
         """Submenu for Vitrum Controller settings."""
-        print '''   Controller Configuration Menu
-        for %s at %s acting as User %s''' % (PACKETMASTER.model, ADDRESS, USERNAME)
+        print '''\n%s at %s acting as user %s
+\nController Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Get current Controller configuration
                  2 - Configure Controller
@@ -413,8 +418,8 @@ if __name__ == '__main__':
 
     def ruleconfig():
         """Menu for configuring rules/filters and port groups."""
-        print '''   Rule and Port Group configuration menu
-        for %s at %s acting as User %s''' % (PACKETMASTER.model, ADDRESS, USERNAME)
+        print '''\n%s at %s acting as user %s
+\nRule and Port Group Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - Show Rules and Rule Counters
                  2 - Add Rule
@@ -474,7 +479,8 @@ if __name__ == '__main__':
 
     def appconfig():
         """Menu for configuring App settings."""
-        print 'App configuration menu for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '''\n%s at %s acting as user %s
+\nApp Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - List Apps
                  2 - List Running Apps
@@ -512,7 +518,8 @@ if __name__ == '__main__':
 
     def saveconfig():
         """Menu for save point configuration settings."""
-        print 'Save Point configuration menu for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '''\n%s at %s acting as user %s
+\nSave Point Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - List Save Points
                  2 - Activate a save point for ports
@@ -562,7 +569,8 @@ if __name__ == '__main__':
 
     def userconfig():
         """Menu for user account related settings."""
-        print 'User configuration menu for', PACKETMASTER.model, 'at', ADDRESS, 'acting as User', USERNAME
+        print '''\n%s at %s acting as user %s
+\nUser Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
         choice = raw_input('''
                  1 - List Users
                  2 - Add User
