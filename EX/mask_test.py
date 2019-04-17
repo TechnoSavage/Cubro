@@ -16,11 +16,11 @@ def rules(ip, user=None, passwd=None):
     ''' Add rules for port mask test.'''
     uri = 'http://' + ip + '/rest/rules?'
     for n in range(1000, 2000):
-        params = {'priority': 32768,
+        params = {'name': 'test' + str(n),
+                  'priority': 32768,
                   'in_port': '1',
-                  'match[vlan]': 'neg_match',
                   'match[protocol]': 'tcp',
-                  'match[nw_src]': '',
+                  'match[nw_src]': '131.151.32.129',
                   'match[tcp_src]': n,
                   'actions': 'output:4'}
         try:
@@ -32,9 +32,9 @@ def rules(ip, user=None, passwd=None):
             content = 'No Response'
             raise error
 
-if __name__ == "__main__":
-    if len(argv) == 0:
+if __name__ == '__main__':
+    if len(argv) <= 0:
         usage()
     else:
-        IP, USER, PASSWD = argv
+        IP, USER, PASSWD = (argv[1], argv[2], argv[3])
         rules(IP, USER, PASSWD)
