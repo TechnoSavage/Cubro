@@ -6,6 +6,7 @@ import json
 import re
 import requests
 from requests.exceptions import ConnectionError
+import input_check
 
 
 #TO-DO Add code to handle case and verify input in all areas where needed
@@ -24,10 +25,10 @@ class PacketmasterEX(object):
 
 
     def __init__(self, address, username=None, password=None):
-        self.address = address
+        self._address = address
         self.username = username
         self.password = password
-        self.https = False
+        self.__https = False
         conn_test = self.conn_test()
         print conn_test
 
@@ -54,7 +55,7 @@ class PacketmasterEX(object):
         except ConnectionError as fail:
             print fail
             try:
-                self.https = True
+                self.__https = True
                 gen_test = self.hardware_generation()
                 data = json.loads(gen_test)
                 for item in data:
@@ -72,10 +73,10 @@ class PacketmasterEX(object):
     #Find way to list Physical ports only.
     def get_port_count(self):
         """Return the number of ports on the device."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/ports/config?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/ports/config?'
         else:
-            uri = 'http://' + self.address + '/rest/ports/config?'
+            uri = 'http://' + self._address + '/rest/ports/config?'
         ports = list()
         try:
             response = requests.get(uri, auth=(self.username, self.password))
@@ -92,10 +93,10 @@ class PacketmasterEX(object):
 
     def firmware_version(self):
         """Return firmware version of Packetmaster and set as property."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/imageversion?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/imageversion?'
         else:
-            uri = 'http://' + self.address + '/rest/device/imageversion?'
+            uri = 'http://' + self._address + '/rest/device/imageversion?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -108,10 +109,10 @@ class PacketmasterEX(object):
 
     def api_level(self):
         """Return API level of Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/apilevel?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/apilevel?'
         else:
-            uri = 'http://' + self.address + '/rest/device/apilevel?'
+            uri = 'http://' + self._address + '/rest/device/apilevel?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -123,10 +124,10 @@ class PacketmasterEX(object):
 
     def ip_config(self):
         """Return IP config of device and set netmask and gateway properties."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/ipconfig?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/ipconfig?'
         else:
-            uri = 'http://' + self.address + '/rest/device/ipconfig?'
+            uri = 'http://' + self._address + '/rest/device/ipconfig?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -140,10 +141,10 @@ class PacketmasterEX(object):
 
     def device_model(self):
         """Return model of Packetmaster and set model property."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/model?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/model?'
         else:
-            uri = 'http://' + self.address + '/rest/device/model?'
+            uri = 'http://' + self._address + '/rest/device/model?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -157,10 +158,10 @@ class PacketmasterEX(object):
 
     def device_name(self):
         """Return name of Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/name?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/name?'
         else:
-            uri = 'http://' + self.address + '/rest/device/name?'
+            uri = 'http://' + self._address + '/rest/device/name?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -173,10 +174,10 @@ class PacketmasterEX(object):
 
     def device_label(self):
         """Return name and notes of Packetmaster and set them as properties."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/customident?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/customident?'
         else:
-            uri = 'http://' + self.address + '/rest/device/customident?'
+            uri = 'http://' + self._address + '/rest/device/customident?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -190,10 +191,10 @@ class PacketmasterEX(object):
 
     def hardware_generation(self):
         """Return hardware generation of Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/generation?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/generation?'
         else:
-            uri = 'http://' + self.address + '/rest/device/generation?'
+            uri = 'http://' + self._address + '/rest/device/generation?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -205,10 +206,10 @@ class PacketmasterEX(object):
 
     def serial_number(self):
         """Return serial number of Packetmaster and set as property."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/serialno?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/serialno?'
         else:
-            uri = 'http://' + self.address + '/rest/device/serialno?'
+            uri = 'http://' + self._address + '/rest/device/serialno?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -221,10 +222,10 @@ class PacketmasterEX(object):
 
     def port_config(self):
         """Return port configuration of Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/ports/config?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/ports/config?'
         else:
-            uri = 'http://' + self.address + '/rest/ports/config?'
+            uri = 'http://' + self._address + '/rest/ports/config?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -236,10 +237,10 @@ class PacketmasterEX(object):
 
     def port_info(self):
         """Return port information of Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/ports/info?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/ports/info?'
         else:
-            uri = 'http://' + self.address + '/rest/ports/info?'
+            uri = 'http://' + self._address + '/rest/ports/info?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -251,10 +252,10 @@ class PacketmasterEX(object):
 
     def port_statistics(self):
         """Return port counters of Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/ports/stats?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/ports/stats?'
         else:
-            uri = 'http://' + self.address + '/rest/ports/stats?'
+            uri = 'http://' + self._address + '/rest/ports/stats?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -266,10 +267,10 @@ class PacketmasterEX(object):
 
     def sfp_info(self):
         """Return SFP information of any installed transceivers."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/ports/sfpstatus?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/ports/sfpstatus?'
         else:
-            uri = 'http://' + self.address + '/rest/ports/sfpstatus?'
+            uri = 'http://' + self._address + '/rest/ports/sfpstatus?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -282,10 +283,10 @@ class PacketmasterEX(object):
 
     def rules_active(self):
         """Return any active rules/filters on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/rules/all?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/rules/all?'
         else:
-            uri = 'http://' + self.address + '/rest/rules/all?'
+            uri = 'http://' + self._address + '/rest/rules/all?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -297,10 +298,10 @@ class PacketmasterEX(object):
 
     def groups_active(self):
         """Return any active port groups on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/groups/all?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/groups/all?'
         else:
-            uri = 'http://' + self.address + '/rest/groups/all?'
+            uri = 'http://' + self._address + '/rest/groups/all?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -312,10 +313,10 @@ class PacketmasterEX(object):
 
     def device_apps(self):
         """Return all Apps on Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -327,10 +328,10 @@ class PacketmasterEX(object):
 
     def apps_active(self):
         """Return any running Apps on Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps/running?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps/running?'
         else:
-            uri = 'http://' + self.address + '/rest/apps/running?'
+            uri = 'http://' + self._address + '/rest/apps/running?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -342,10 +343,10 @@ class PacketmasterEX(object):
 
     def hash_algorithms(self):
         """Return load balancing hash algorithm configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/grouphash?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/grouphash?'
         else:
-            uri = 'http://' + self.address + '/rest/device/grouphash?'
+            uri = 'http://' + self._address + '/rest/device/grouphash?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -357,10 +358,10 @@ class PacketmasterEX(object):
 
     def rule_permanence(self):
         """Return state of Rule Permanance setting."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/permanentrulesmode?'
         else:
-            uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
+            uri = 'http://' + self._address + '/rest/device/permanentrulesmode?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -372,10 +373,10 @@ class PacketmasterEX(object):
 
     def storage_mode(self):
         """Return setting of Rule Storage Mode."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/rulestoragemode?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/rulestoragemode?'
         else:
-            uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
+            uri = 'http://' + self._address + '/rest/device/rulestoragemode?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -387,10 +388,10 @@ class PacketmasterEX(object):
 
     def env_info(self):
         """Return environmental information of Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/environment?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/environment?'
         else:
-            uri = 'http://' + self.address + '/rest/device/environment?'
+            uri = 'http://' + self._address + '/rest/device/environment?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -402,10 +403,10 @@ class PacketmasterEX(object):
 
     def id_led(self):
         """Return status of ID LED setting."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/idled?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/idled?'
         else:
-            uri = 'http://' + self.address + '/rest/device/idled?'
+            uri = 'http://' + self._address + '/rest/device/idled?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -417,10 +418,10 @@ class PacketmasterEX(object):
 
     def load_info(self):
         """Return load information."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/loadaverage?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/loadaverage?'
         else:
-            uri = 'http://' + self.address + '/rest/device/loadaverage?'
+            uri = 'http://' + self._address + '/rest/device/loadaverage?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -432,10 +433,10 @@ class PacketmasterEX(object):
 
     def tcam(self):
         """Return the max and currently used TCAM flows."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/flownumbers?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/flownumbers?'
         else:
-            uri = 'http://' + self.address + '/rest/flownumbers?'
+            uri = 'http://' + self._address + '/rest/flownumbers?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -447,10 +448,10 @@ class PacketmasterEX(object):
 
     def mem_free(self):
         """Return memory usage."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/memoryusage?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/memoryusage?'
         else:
-            uri = 'http://' + self.address + '/rest/device/memoryusage?'
+            uri = 'http://' + self._address + '/rest/device/memoryusage?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -462,10 +463,10 @@ class PacketmasterEX(object):
 
     def server_revision(self):
         """Return CCH machinery server revision."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/serverrevision?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/serverrevision?'
         else:
-            uri = 'http://' + self.address + '/rest/device/serverrevision?'
+            uri = 'http://' + self._address + '/rest/device/serverrevision?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -477,10 +478,10 @@ class PacketmasterEX(object):
 
     def save_points(self):
         """Return all available save points."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints?'
+            uri = 'http://' + self._address + '/rest/savepoints?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -492,10 +493,10 @@ class PacketmasterEX(object):
 
     def web_log(self):
         """Return web server log."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/weblog?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/weblog?'
         else:
-            uri = 'http://' + self.address + '/rest/weblog?'
+            uri = 'http://' + self._address + '/rest/weblog?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -507,10 +508,10 @@ class PacketmasterEX(object):
 
     def get_users(self):
         """Return all user accounts on Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/users?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/users?'
         else:
-            uri = 'http://' + self.address + '/rest/users?'
+            uri = 'http://' + self._address + '/rest/users?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -522,10 +523,10 @@ class PacketmasterEX(object):
 
     def user_uac(self):
         """Return status of User Authentication setting."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/users/uac?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/users/uac?'
         else:
-            uri = 'http://' + self.address + '/rest/users/uac?'
+            uri = 'http://' + self._address + '/rest/users/uac?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -537,10 +538,10 @@ class PacketmasterEX(object):
 
     def get_radius(self):
         """Return RADIUS settings."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/users/radius?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/users/radius?'
         else:
-            uri = 'http://' + self.address + '/rest/users/radius?'
+            uri = 'http://' + self._address + '/rest/users/radius?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -552,10 +553,10 @@ class PacketmasterEX(object):
 
     def get_dns(self):
         """Return DNS server settings."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/nameresolution?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/nameresolution?'
         else:
-            uri = 'http://' + self.address + '/rest/device/nameresolution?'
+            uri = 'http://' + self._address + '/rest/device/nameresolution?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -567,10 +568,10 @@ class PacketmasterEX(object):
 
     def get_telnet(self):
         """Return status of Telnet service setting."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/telnet?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/telnet?'
         else:
-            uri = 'http://' + self.address + '/rest/device/telnet?'
+            uri = 'http://' + self._address + '/rest/device/telnet?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -582,10 +583,10 @@ class PacketmasterEX(object):
 
     def get_controller(self):
         """Return Vitrum Controller configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/controller?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/controller?'
         else:
-            uri = 'http://' + self.address + '/rest/device/controller?'
+            uri = 'http://' + self._address + '/rest/device/controller?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -608,21 +609,13 @@ class PacketmasterEX(object):
         else:
             return "That is not a valid selection; canceling Set Controller. \n"
         ipadd = raw_input("What is the IP address of the controller: ")
-        try:
-            test = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', ipadd)
-            if len(test) == 1:
-                ipadd = test[0]
-            else:
-                return "That is not a valid IP address; canceling Set Controller. \n"
-        except TypeError as reason:
-            return ("That is not a valid IP address, canceling Set Controller.", reason)
+        if input_check.ipv4(ipadd) != 0:
+            ipadd = input_check.ipv4(ipadd)
+        else:
+            return "That is not a valid IP address; canceling Set Controller. \n"
         port = raw_input("What is the TCP Port of the controller: ")
-        try:
-            test = int(port)
-            if test not in range(1, 65536):
-                return "That is not a valid TCP port number; canceling Set Controller. \n"
-        except ValueError as reason:
-            return ("That is not a valid TCP port number; canceling Set Controller.", reason)
+        if not input_check.port(port):
+            return "That is not a valid TCP port number; canceling Set Controller. \n"
         confirm = raw_input("""Configuration change summary:
                             Controller connection type: %s
                             Controller IP Address: %s
@@ -635,26 +628,18 @@ class PacketmasterEX(object):
 
     def set_controller(self, conn, ipadd, port):
         """Set Vitrum Controller configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/controller?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/controller?'
         else:
-            uri = 'http://' + self.address + '/rest/device/controller?'
+            uri = 'http://' + self._address + '/rest/device/controller?'
         if conn.lower() not in ('tcp', 'ssl'):
             return "That is not a valid connection type; canceling Set Controller. \n"
-        try:
-            test = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', ipadd)
-            if len(test) == 1:
-                ipadd = test[0]
-            else:
-                return "That is not a valid IP address; canceling Set Controller. \n"
-        except TypeError as reason:
-            return ("That is not a valid IP address, canceling Set Controller.", reason)
-        try:
-            test = int(port)
-            if test not in range(1, 65536):
-                return "That is not a valid TCP port number; canceling Set Controller. \n"
-        except ValueError as reason:
-            return ("That is not a valid TCP port number; canceling Set Controller.", reason)
+        if input_check.ipv4(ipadd) != 0:
+            ipadd = input_check.ipv4(ipadd)
+        else:
+            return "That is not a valid IP address; canceling Set Controller. \n"
+        if not input_check.port(port):
+            return "That is not a valid TCP port number; canceling Set Controller. \n"
         params = {'connection': conn, 'ip': ipadd, 'port': port}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -678,21 +663,13 @@ class PacketmasterEX(object):
         else:
             return "That is not a valid selection; canceling Delete Controller. \n"
         ipadd = raw_input("What is the IP address of the controller: ")
-        try:
-            test = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', ipadd)
-            if len(test) == 1:
-                ipadd = test[0]
-            else:
-                return "That is not a valid IP address; canceling Delete Controller. \n"
-        except TypeError as reason:
-            return ("That is not a valid IP address, canceling Delete Controller.", reason)
+        if input_check.ipv4(ipadd) != 0:
+            ipadd = input_check.ipv4(ipadd)
+        else:
+            return "That is not a valid IP address; canceling Delete Controller. \n"
         port = raw_input("What is the TCP Port of the controller: ")
-        try:
-            test = int(port)
-            if test not in range(1, 65536):
-                return "That is not a valid TCP port number; canceling Delete Controller. \n"
-        except ValueError as reason:
-            return ("That is not a valid TCP port number; canceling Delete Controller.", reason)
+        if not input_check.port(port):
+            return "That is not a valid TCP port number; canceling Delete Controller. \n"
         confirm = raw_input("""Configuration change summary:
                             Controller connection type: %s
                             Controller IP Address: %s
@@ -705,26 +682,18 @@ class PacketmasterEX(object):
 
     def del_controller(self, conn, ipadd, port):
         """Remove a Vitrum Controller."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/controller?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/controller?'
         else:
-            uri = 'http://' + self.address + '/rest/device/controller?'
+            uri = 'http://' + self._address + '/rest/device/controller?'
         if conn.lower() not in ('tcp', 'ssl'):
             return "That is not a valid connection type; canceling Delete Controller. \n"
-        try:
-            test = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', ipadd)
-            if len(test) == 1:
-                ipadd = test[0]
-            else:
-                return "That is not a valid IP address; canceling Delete Controller. \n"
-        except TypeError as reason:
-            return ("That is not a valid IP address, canceling Delete Controller.", reason)
-        try:
-            test = int(port)
-            if test not in range(1, 65536):
-                return "That is not a valid TCP port number; canceling Delete Controller. \n"
-        except ValueError as reason:
-            return ("That is not a valid TCP port number; canceling Delete Controller.", reason)
+        if input_check.ipv4(ipadd) != 0:
+            ipadd = input_check.ipv4(ipadd)
+        else:
+            return "That is not a valid IP address; canceling Delete Controller. \n"
+        if not input_check.port(port):
+            return "That is not a valid TCP port number; canceling Delete Controller. \n"
         params = {'connection': conn, 'ip': ipadd, 'port': port}
         try:
             response = requests.delete(uri, data=params, auth=(self.username, self.password))
@@ -737,10 +706,10 @@ class PacketmasterEX(object):
 
     def get_dpid(self):
         """Return Device OpenFlow Datapath ID."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/dpid?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/dpid?'
         else:
-            uri = 'http://' + self.address + '/rest/device/dpid?'
+            uri = 'http://' + self._address + '/rest/device/dpid?'
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
@@ -760,30 +729,54 @@ class PacketmasterEX(object):
 
     def set_ip_config_guided(self):
         """Interactive menu for configuring management IP settings."""
-        newip = raw_input('Enter IP Address (e.g. 192.168.0.200): ')
-        newmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ')
-        newgate = raw_input('Enter gateway (e.g. 192.168.0.1): ')
+        address = raw_input('Enter IP Address (e.g. 192.168.0.200): ')
+        if input_check.ipv4(address) != 0:
+            address = input_check.ipv4(address)
+        #elif input_check.ipv6(address) != 0:
+        #   address = input_check.ipv6(address)
+        else:
+            return "That is not a valid IP address; canceling Set IP Configuration. \n"
+        netmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ')
+        if input_check.ipv4(netmask) != 0:
+            netmask = input_check.ipv4(netmask)
+        else:
+            return "That is not a valid Subnet Mask; canceling Set IP Configuration. \n"
+        gateway = raw_input('Enter gateway (e.g. 192.168.0.1): ')
+        if input_check.ipv4(gateway) != 0:
+            gateway = input_check.ipv4(gateway)
+        else:
+            return "That is not a valid Gateway Address; canceling Set IP Configuration. \n"
         confirm = raw_input("""Configuration change summary:
                             New management IP: %s
                             New Subnet Mask: %s
                             New Gateway: %s
-                            Confirm changes [y/n]: """ % (newip, newmask, newgate))
+                            Confirm changes [y/n]: """ % (address, netmask, gateway))
         if confirm.lower() in ('y', 'yes'):
-            run = self.set_ip_config(newip, newmask, newgate)
+            run = self.set_ip_config(address, netmask, gateway)
             return run
         return "Canceling; no changes made.\n"
 
     def set_ip_config(self, address, netmask, gateway):
         """Set management IP configuration for Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/ipconfig?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/ipconfig?'
         else:
-            uri = 'http://' + self.address + '/rest/device/ipconfig?'
-        newip = address.strip()
-        newmask = netmask.strip()
-        newgate = gateway.strip()
-        #Implement checks to validate IP input
-        params = {'ip': newip, 'mask': newmask, 'gw': newgate}
+            uri = 'http://' + self._address + '/rest/device/ipconfig?'
+        if input_check.ipv4(address) != 0:
+            address = input_check.ipv4(address)
+        #elif input_check.ipv6(address) != 0:
+        #   address = input_check.ipv6(address)
+        else:
+            return "That is not a valid IP address; canceling Set IP Configuration. \n"
+        if input_check.ipv4(netmask) != 0:
+            netmask = input_check.ipv4(netmask)
+        else:
+            return "That is not a valid Subnet Mask; canceling Set IP Configuration. \n"
+        if input_check.ipv4(gateway) != 0:
+            gateway = input_check.ipv4(gateway)
+        else:
+            return "That is not a valid Gateway Address; canceling Set IP Configuration. \n"
+        params = {'ip': address, 'mask': netmask, 'gw': gateway}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
             content = response.content
@@ -806,10 +799,10 @@ class PacketmasterEX(object):
 
     def set_name(self, name):
         """Set Packetmaster name."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/name?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/name?'
         else:
-            uri = 'http://' + self.address + '/rest/device/name?'
+            uri = 'http://' + self._address + '/rest/device/name?'
         params = {'name': name}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -835,10 +828,10 @@ class PacketmasterEX(object):
 
     def set_label(self, name, notes):
         """Set Packetmaster name and notes."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/customident?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/customident?'
         else:
-            uri = 'http://' + self.address + '/rest/device/customident?'
+            uri = 'http://' + self._address + '/rest/device/customident?'
         params = {'name': name,
                   'notes': notes}
         try:
@@ -974,10 +967,10 @@ on QSFP ports of G4 devices. \n"""
     def set_port_config(self, interface, speed, duplex, description='',
                         forcetx=False, check=False, recalc=False, split=False):
         """Set configuration of a port on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/ports/config?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/ports/config?'
         else:
-            uri = 'http://' + self.address + '/rest/ports/config?'
+            uri = 'http://' + self._address + '/rest/ports/config?'
         if_name = str(interface).strip()
         port_no = re.findall('[1-9][0-9/]*', if_name)
         if len(port_no) == 1:
@@ -1075,10 +1068,10 @@ on QSFP ports of G4 devices. \n"""
 
     def port_on_off(self, if_name, shutdown):
         """Enable/disable a port on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/ports/config?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/ports/config?'
         else:
-            uri = 'http://' + self.address + '/rest/ports/config?'
+            uri = 'http://' + self._address + '/rest/ports/config?'
         if_name = str(if_name).strip()
         port_no = re.findall('[1-9][0-9/]*', if_name)
         interface = 'eth-0-' + port_no[0]
@@ -1098,10 +1091,10 @@ on QSFP ports of G4 devices. \n"""
 
     def reset_port_counters(self):
         """Reser all port counters to zero."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/ports/counters?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/ports/counters?'
         else:
-            uri = 'http://' + self.address + '/rest/ports/counters?'
+            uri = 'http://' + self._address + '/rest/ports/counters?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -1113,10 +1106,10 @@ on QSFP ports of G4 devices. \n"""
 
     def reset_rule_counters(self):
         """Reset all rule counters to zero."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/rules/counters?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/rules/counters?'
         else:
-            uri = 'http://' + self.address + '/rest/rules/counters?'
+            uri = 'http://' + self._address + '/rest/rules/counters?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             code = response.status_code
@@ -1130,26 +1123,21 @@ on QSFP ports of G4 devices. \n"""
         """Interactive menu to add a rule/filter."""
         params = {}
         rulename = raw_input('Enter a name for the rule [none]: ')
-        if rulename != '':
-            params['name'] = rulename
+        params['name'] = rulename
         ruledescrip = raw_input('Enter a description for the rule [none]: ')
-        if ruledescrip != '':
-            params['description'] = ruledescrip
+        params['description'] = ruledescrip
         priority = raw_input('Enter the priority level of the rule; '
                              '0 - 65535 higher number = higher priority [32768]: ')
         if priority != '':
-            try:
-                priority = int(priority)
-                if priority >= 0 and priority <= 65535:
-                    params['priority'] = int(priority)
-                else:
-                    return "That is not a valid input for priority; canceling Add Rule."
-            except ValueError as reason:
-                return ("That is not a valid input for priority; canceling Add Rule.", reason)
+            if input_check.pm_pri(priority):
+                params['priority'] = int(priority)
+            else:
+                return "That is not a valid input for priority; canceling Add Rule."
         else:
             params['priority'] = 32768
         portin = raw_input('Enter the port number or numbers for incoming traffic; '
                            'multiple ports separated by a comma: ')
+        #Implement valid port number check against device
         params['match[in_port]'] = portin
         print '''\nMatch VLAN tag?
                 1 - No, match all tagged and untagged traffic
@@ -1163,28 +1151,28 @@ on QSFP ports of G4 devices. \n"""
         elif int(trafmatch) == 3:
             params['match[vlan]'] = 'match'
             matchid = raw_input('Enter the VLAN ID to filter on: ')
-            params['match[vlan_id]'] = matchid
-            vpri = raw_input('Enter a VLAN priority? Enter 0-7 orleave blank for none: ')
-            if vpri == '':
-                pass
+            if input_check.vlan(matchid):
+                params['match[vlan_id]'] = matchid
             else:
-                try:
-                    if int(vpri) >= 0 or int(vpri) <= 7:
-                        params['match[vlan_priority]'] = vpri
-                    else:
-                        print "That is not a valid selection; VLAN priority defaulting to '0'"
-                        params['match[vlan_priority]'] = '0'
-                except ValueError as reason:
-                    print ("That is not a valid selection; canceling Add Rule.", reason)
+                return "That is not a valid VLAN ID; canceling Add Rule."
+            vpri = raw_input('Enter a VLAN priority? Enter 0-7 orleave blank for none: ')
+            if vpri != '' and input_check.vlan_pri(vpri):
+                params['match[vlan_priority]'] = vpri
+            elif vpri == '':
+                params['match[vlan_priority]'] = '0'
+            else:
+                return "That is not a valid VLAN Priority; canceling Add Rule."
         else:
             return "That is not a valid selection; canceling Add Rule \n"
         macsrc = raw_input('Filter by source MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
+        #MAC Address input check
             params['match[dl_src]'] = macsrc
         macdst = raw_input('Filter by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
+        #MAC Address input check
             params['match[dl_dst]'] = macdst
         print '''\nFilter on protocol?
                 1 - No Protocol Filtering
@@ -1195,204 +1183,183 @@ on QSFP ports of G4 devices. \n"""
                 6 - ICMP
                 7 - ARP
                 8 - Enter Ethertype\n'''
+                #Add MPLS for G4 devices
         proto = raw_input('Enter the number of your selection [1]: ')
-        if proto == '' or int(proto) == 1:
-            pass
-        elif int(proto) == 2:
-            params['match[protocol]'] = 'ip'
-            nwsrc = raw_input('Filter on source IP address? '
-                              'Leave blank for no or enter IP address '
-                              '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"): ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
+        try:
+            if proto == '' or int(proto) == 1:
+                pass
+            elif int(proto) == 2:
+                params['match[protocol]'] = 'ip'
+                nwsrc = raw_input('Filter on source IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwsrc != '':
+                    if input_check.ipv4_mask(nwsrc) != 0:
+                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            nwdst = raw_input('Filter on destination IP address? '
-                              'Leave blank for no or enter IP address '
-                              '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"): ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
+                nwdst = raw_input('Filter on destination IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwdst != '':
+                    if input_check.ipv4_mask(nwdst) != 0:
+                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-        elif int(proto) == 3:
-            params['match[protocol]'] = 'tcp'
-            nwsrc = raw_input('Filter on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
+            elif int(proto) == 3:
+                params['match[protocol]'] = 'tcp'
+                nwsrc = raw_input('Filter on source IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwsrc != '':
+                    if input_check.ipv4_mask(nwsrc) != 0:
+                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            nwdst = raw_input('Filter on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
+                nwdst = raw_input('Filter on destination IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwdst != '':
+                    if input_check.ipv4_mask(nwdst) != 0:
+                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            tcpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
-            if tcpsrc != '':
-                params['match[tcp_src]'] = tcpsrc
-            tcpdst = raw_input('Filter on destination port? '
-                               'Leave blank for no or enter port number: ')
-            if tcpdst != '':
-                params['match[tcp_dst]'] = tcpdst
-        elif int(proto) == 4:
-            params['match[protocol]'] = 'udp'
-            nwsrc = raw_input('Filter on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
+                tcpsrc = raw_input('Filter on source port? '
+                                   'Leave blank for no or enter port number: ')
+                if tcpsrc != '':
+                    if input_check.port(tcpsrc):
+                        params['match[tcp_src]'] = tcpsrc
+                    else:
+                        return "That is not a valid port number; canceling Add Rule."
+                tcpdst = raw_input('Filter on destination port? '
+                                   'Leave blank for no or enter port number: ')
+                if tcpdst != '':
+                    if input_check.port(tcpdst):
+                        params['match[tcp_dst]'] = tcpdst
+                    else:
+                        return "That is not a valid port number; canceling Add Rule."
+            elif int(proto) == 4:
+                params['match[protocol]'] = 'udp'
+                nwsrc = raw_input('Filter on source IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwsrc != '':
+                    if input_check.ipv4_mask(nwsrc) != 0:
+                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            nwdst = raw_input('Filter on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
+                nwdst = raw_input('Filter on destination IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwdst != '':
+                    if input_check.ipv4_mask(nwdst) != 0:
+                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            udpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
-            if udpsrc != '':
-                params['match[udp_src]'] = udpsrc
-            udpdst = raw_input('Filter on destination port? '
-                               'Leave blank for no or enter port number: ')
-            if udpdst != '':
-                params['match[udp_dst]'] = udpdst
-        elif int(proto) == 5:
-            params['match[protocol]'] = 'sctp'
-            nwsrc = raw_input('Filter on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
+                udpsrc = raw_input('Filter on source port?'
+                                   'Leave blank for no or enter port number: ')
+                if udpsrc != '':
+                    if input_check.port(udpsrc):
+                        params['match[udp_src]'] = udpsrc
+                    else:
+                        return "That is not a valid port number; canceling Add Rule."
+                udpdst = raw_input('Filter on destination port? '
+                                   'Leave blank for no or enter port number: ')
+                if udpdst != '':
+                    if input_check.port(udpdst):
+                        params['match[udp_dst]'] = udpdst
+                    else:
+                        return "That is not a valid port number; canceling Add Rule."
+            elif int(proto) == 5:
+                params['match[protocol]'] = 'sctp'
+                nwsrc = raw_input('Filter on source IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwsrc != '':
+                    if input_check.ipv4_mask(nwsrc) != 0:
+                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            nwdst = raw_input('Filter on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
+                nwdst = raw_input('Filter on destination IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwdst != '':
+                    if input_check.ipv4_mask(nwdst) != 0:
+                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            sctpsrc = raw_input('Filter on source port?  Leave blank for no or enter port number: ')
-            if sctpsrc != '':
-                params['match[sctp_src]'] = sctpsrc
-            sctpdst = raw_input('Filter on destination port? '
-                                'Leave blank for no or enter port number: ')
-            if sctpdst != '':
-                params['match[sctp_dst]'] = sctpdst
-        elif int(proto) == 6:
-            params['match[protocol]'] = 'icmp'
-            nwsrc = raw_input('Filter on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
+                sctpsrc = raw_input('Filter on source port? '
+                                    'Leave blank for no or enter port number: ')
+                if sctpsrc != '':
+                    if input_check.port(sctpsrc):
+                        params['match[sctp_src]'] = sctpsrc
+                    else:
+                        return "That is not a valid port number; canceling Add Rule."
+                sctpdst = raw_input('Filter on destination port? '
+                                    'Leave blank for no or enter port number: ')
+                if sctpdst != '':
+                    if input_check.port(sctpdst):
+                        params['match[sctp_dst]'] = sctpdst
+                    else:
+                        return "That is not a valid port number; canceling Add Rule."
+            elif int(proto) == 6:
+                params['match[protocol]'] = 'icmp'
+                nwsrc = raw_input('Filter on source IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwsrc != '':
+                    if input_check.ipv4_mask(nwsrc) != 0:
+                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            nwdst = raw_input('Filter on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
+                nwdst = raw_input('Filter on destination IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwdst != '':
+                    if input_check.ipv4_mask(nwdst) != 0:
+                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Add Rule.", reason)
-            icmpt = raw_input('Filter on ICMP type? '
-                              'Leave blank for no or enter ICMP type number: ')
-            if icmpt != '':
-                params['match[icmp_type]'] = icmpt
-            icmpc = raw_input('Filter on ICMP code? '
-                              'Leave blank for no or enter ICMP code number: ')
-            if icmpc != '':
-                params['match[icmp_code]'] = icmpc
-        elif int(proto) == 7:
-            params['match[protocol]'] = 'arp'
-        elif int(proto) == 8:
-            params['match[protocol]'] = 'custom'
-            ether = raw_input('Enter Ethertype e.g. 0x800: ')
-            if ether != '':
-                params['match[dl_type]'] = ether
-            nwproto = raw_input('Enter protocol number '
-                                '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
-                                'or leave blank for none: ')
-            if nwproto != '':
-                params['match[nw_proto]'] = nwproto
-        else:
-            return "That is not a valid selection; canceling Add Rule \n"
+                icmpt = raw_input('Filter on ICMP type? '
+                                  'Leave blank for no or enter ICMP type number: ')
+                if icmpt != '':
+                    if input_check.icmp_type(icmpt):
+                        params['match[icmp_type]'] = icmpt
+                    else:
+                        return "That is not a valid ICMP Type; canceling Add Rule."
+                icmpc = raw_input('Filter on ICMP code? '
+                                  'Leave blank for no or enter ICMP code number: ')
+                if icmpc != '':
+                    if input_check.icmp_code(icmpc):
+                        params['match[icmp_code]'] = icmpc
+                    else:
+                        return "That is not a valid ICMP Code; canceling Add Rule."
+            elif int(proto) == 7:
+                params['match[protocol]'] = 'arp'
+            elif int(proto) == 8:
+                params['match[protocol]'] = 'custom'
+                ether = raw_input('Enter Ethertype e.g. 0x800: ')
+                if ether != '':
+                    params['match[dl_type]'] = ether
+                nwproto = raw_input('Enter protocol number '
+                                    '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                    'or leave blank for none: ')
+                if nwproto != '':
+                    params['match[nw_proto]'] = nwproto
+            else:
+                return "That is not a valid selection; canceling Add Rule \n"
+        except ValueError as reason:
+            return("That is not a valid input; canceling Add Rule", reason)
         print '''\nAdd Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
@@ -1414,10 +1381,10 @@ on QSFP ports of G4 devices. \n"""
 
     def add_rule(self, params):
         """Add a rule/filter to the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/rules?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/rules?'
         else:
-            uri = 'http://' + self.address + '/rest/rules?'
+            uri = 'http://' + self._address + '/rest/rules?'
         if not isinstance(params, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
@@ -1432,27 +1399,24 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_rule_guided(self):
         """Interactive menu to modify a rule/filter on the Packetmaster."""
+        params = {}
         name = raw_input('Enter a new name for the rule: ')
+        params['name'] = name
         cookie = raw_input('Enter the cookie of the rule to modify: ')
+        params['cookie'] = cookie
         description = raw_input('Enter a new description for the rule: ')
+        params['description'] = description
         priority = raw_input('Enter the priority of the rule (priority cannot be changed; '
                              'must match rule to be modified)[32768]: ')
         if priority != '':
-            try:
-                priority = int(priority)
-            except ValueError as reason:
-                return ("That is not a valid input for rule priority; "
-                        "canceling modify rule.", reason)
+            if input_check.pm_pri(priority):
+                params['priority'] = int(priority)
+            else:
+                return "That is not a valid input for priority; canceling Modify Rule."
         else:
             priority = 32768
-        if priority < 0 or priority > 65535:
-            return "That is not a valid input for rule priority; canceling modify rule."
         in_port = raw_input("What is (are) the input port(s)for the rule separated by commas: ")
-        params = {'name': name,
-                  'description': description,
-                  'cookie': cookie,
-                  'priority': priority,
-                  'match[in_port]': in_port}
+        params['match[in_port]'] = in_port
         print ("For the following input filters the selected option must match "
                "the rule being modified; these fields cannot be changed.")
         print '''\nIs the rule matching a VLAN tag?
@@ -1467,19 +1431,17 @@ on QSFP ports of G4 devices. \n"""
         elif int(trafmatch) == 3:
             params['match[vlan]'] = 'match'
             matchid = raw_input('Enter the VLAN ID the rule is filtering: ')
-            params['match[vlan_id]'] = matchid
-            vpri = raw_input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
-            if vpri == '':
-                pass
+            if input_check.vlan(matchid):
+                params['match[vlan_id]'] = matchid
             else:
-                try:
-                    if int(vpri) >= 0 or int(vpri) <= 7:
-                        params['match[vlan_priority]'] = vpri
-                    else:
-                        print "That is not a valid selection; VLAN priority defaulting to '0'"
-                        params['match[vlan_priority]'] = '0'
-                except ValueError as reason:
-                    return ("That is not a valid selection; canceling Modify Rule.", reason)
+                return "That is not a valid VLAN ID; canceling Modify Rule."
+            vpri = raw_input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
+            if vpri != '' and input_check.vlan_pri(vpri):
+                params['match[vlan_priority]'] = vpri
+            elif vpri == '':
+                params['match[vlan_priority]'] = '0'
+            else:
+                return "That is not a valid VLAN Priority; canceling Modify Rule."
         else:
             return "That is not a valid selection; canceling Modify Rule \n"
         macsrc = raw_input('Filtering by source MAC address? '
@@ -1507,31 +1469,17 @@ on QSFP ports of G4 devices. \n"""
             nwsrc = raw_input('Filtering on source IP address? '
                               'Leave blank for no or enter IP address: ')
             if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+                if input_check.ipv4_mask(nwsrc) != 0:
+                    params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                else:
+                    return "That is not a valid IP address; canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address? '
                               'Leave blank for no or enter IP address: ')
             if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+                if input_check.ipv4_mask(nwdst) != 0:
+                    params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                else:
+                    return "That is not a valid IP address; canceling Modify Rule."
         elif int(proto) == 3:
             params['match[protocol]'] = 'tcp'
             nwsrc = raw_input('Filtering on source IP address? '
@@ -1719,10 +1667,10 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_rule(self, params):
         """Modify a rule/filter on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/rules?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/rules?'
         else:
-            uri = 'http://' + self.address + '/rest/rules?'
+            uri = 'http://' + self._address + '/rest/rules?'
         if not isinstance(params, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
@@ -1948,10 +1896,10 @@ on QSFP ports of G4 devices. \n"""
 
     def del_rule(self, params):
         """Delete a rule/filter from the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/rules?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/rules?'
         else:
-            uri = 'http://' + self.address + '/rest/rules?'
+            uri = 'http://' + self._address + '/rest/rules?'
         if not isinstance(params, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
@@ -1966,10 +1914,10 @@ on QSFP ports of G4 devices. \n"""
 
     def del_rule_all(self):
         """Delete all rules from the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/rules/all?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/rules/all?'
         else:
-            uri = 'http://' + self.address + '/rest/rules/all?'
+            uri = 'http://' + self._address + '/rest/rules/all?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             content = response.content
@@ -2158,10 +2106,10 @@ on QSFP ports of G4 devices. \n"""
 
     def add_group(self, gid, json_app):
         """Add a port group to the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/groups?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/groups?'
         else:
-            uri = 'http://' + self.address + '/rest/groups?'
+            uri = 'http://' + self._address + '/rest/groups?'
         try:
             int(gid)
         except ValueError as reason:
@@ -2351,10 +2299,10 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_group(self, gid, json_app):
         """Modify a port group on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/groups?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/groups?'
         else:
-            uri = 'http://' + self.address + '/rest/groups?'
+            uri = 'http://' + self._address + '/rest/groups?'
         try:
             int(gid)
         except ValueError as reason:
@@ -2397,10 +2345,10 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_group(self, gid):
         """Delete a port group from the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/groups?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/groups?'
         else:
-            uri = 'http://' + self.address + '/rest/groups?'
+            uri = 'http://' + self._address + '/rest/groups?'
         try:
             int(gid)
         except ValueError as reason:
@@ -2426,10 +2374,10 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_groups_all(self):
         """Delete all port groups from the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/groups/all?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/groups/all?'
         else:
-            uri = 'http://' + self.address + '/rest/groups/all?'
+            uri = 'http://' + self._address + '/rest/groups/all?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             content = response.content
@@ -2452,10 +2400,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_port_savepoint(self, savename):
         """Activate a port save point."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/activeportsavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/activeportsavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/activeportsavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/activeportsavepoint?'
         #Add check against system savepoints
         params = {'name': savename}
         try:
@@ -2480,10 +2428,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_rule_savepoint(self, savename):
         """Activate a rule save point."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/activerulesavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/activerulesavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/activerulesavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/activerulesavepoint?'
         #Add check against system savepoints
         params = {'name': savename}
         try:
@@ -2508,10 +2456,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_boot_savepoint(self, savename):
         """Set a save point as default boot configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/defaultrulesavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/defaultrulesavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/defaultrulesavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/defaultrulesavepoint?'
         #Add check against system savepoints
         params = {'name': savename}
         try:
@@ -2542,10 +2490,10 @@ on QSFP ports of G4 devices. \n"""
     #This still needs worked out; Packetmaster returns empty save points
     def export_savepoint(self, rspname, pspname, filename):
         """Download a save point from the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/export?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/export?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/export?'
+            uri = 'http://' + self._address + '/rest/savepoints/export?'
         #Add checks to see if names exist
         params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
         try:
@@ -2588,10 +2536,10 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_port_savepoint(self, oldname, newname, description, override=True):
         """Modify a port save point."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/modportsavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/modportsavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/modportsavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/modportsavepoint?'
         if override is False:
             override = False
         elif override.lower() in ('false', 'f', 'n', 'no'):
@@ -2638,10 +2586,10 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_rule_savepoint(self, oldname, newname, description, override=True):
         """Modify a rule save point on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/modrulesavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/modrulesavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/modrulesavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/modrulesavepoint?'
         if not override:
             override = False
         elif override.lower() in ('false', 'f', 'n', 'no'):
@@ -2676,10 +2624,10 @@ on QSFP ports of G4 devices. \n"""
 
     def create_port_savepoint(self, name, description):
         """Create port save point from current configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/portsavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/portsavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/portsavepoint?'
         params = {'name': name, 'description': description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -2692,10 +2640,10 @@ on QSFP ports of G4 devices. \n"""
 
     def create_quick_savepoint(self):
         """Create a Quicksave save point from current configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/quicksaverules?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/quicksaverules?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/quicksaverules?'
+            uri = 'http://' + self._address + '/rest/savepoints/quicksaverules?'
         try:
             response = requests.put(uri, auth=(self.username, self.password))
             content = response.content
@@ -2720,10 +2668,10 @@ on QSFP ports of G4 devices. \n"""
 
     def create_rule_savepoint(self, name, description):
         """Create a rule save point from current configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/rulesavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/rulesavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/rulesavepoint?'
         params = {'name': name, 'description': description}
         try:
             response = requests.post(uri, data=params, auth=(self.username, self.password))
@@ -2747,10 +2695,10 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_port_savepoint(self, name):
         """Delete a port save point from the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/portsavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/portsavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/portsavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/portsavepoint?'
         #Add check to see if port savepoint exists
         params = {'name': name}
         try:
@@ -2775,10 +2723,10 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_rule_savepoint(self, name):
         """Delete a rule save point from the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/savepoints/rulesavepoint?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/savepoints/rulesavepoint?'
         else:
-            uri = 'http://' + self.address + '/rest/savepoints/rulesavepoint?'
+            uri = 'http://' + self._address + '/rest/savepoints/rulesavepoint?'
         #Add check to see if rule savepoint exists
         params = {'name': name}
         try:
@@ -3303,10 +3251,10 @@ on QSFP ports of G4 devices. \n"""
 
     def start_app_ntp(self, server1, server2=None, user_description=''):
         """Start an NTP app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         params = {'name': 'NTP',
                   'description': 'Syncs time with remote NTP servers.',
                   'server1': server1,
@@ -3325,10 +3273,10 @@ on QSFP ports of G4 devices. \n"""
                                interval='5000', inport=None, match_srcmac=None,
                                user_description=''):
         """Start an ArpResponder app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             input_check = int(interval)
         except ValueError as reason:
@@ -3376,10 +3324,10 @@ on QSFP ports of G4 devices. \n"""
                        trap_enable=True, trap1='1.1.1.1', trap1_port='162',
                        trap2='', trap2_port='162'):
         """Start an SNMP app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(interval)
         except ValueError as reason:
@@ -3449,10 +3397,10 @@ on QSFP ports of G4 devices. \n"""
                                   src_port='5555', dst_port='5556',
                                   bypass_ip='1.1.1.1'):
         """Start a HeartbeatBypass app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(bypass_port1)
         except ValueError as reason:
@@ -3548,10 +3496,10 @@ on QSFP ports of G4 devices. \n"""
 
     def start_app_syslog(self, server_ip, port='514', user_description=''):
         """Start a Syslog app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', server_ip)
             server = ip_check[0]
@@ -3578,10 +3526,10 @@ on QSFP ports of G4 devices. \n"""
     def start_app_bypasskeepalive(self, conn_type='ip', interval='2000',
                                   description='', bypass_ip='1.1.1.1'):
         """Start a Bypass BypassKeepalive app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(interval)
         except ValueError as reason:
@@ -3621,10 +3569,10 @@ on QSFP ports of G4 devices. \n"""
                             dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1',
                             dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
         """Start a Heartbeat app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(hb_in)
         except ValueError as reason:
@@ -4203,10 +4151,10 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_app_ntp(self, pid, server1, server2=None, user_description=''):
         """Modify an NTP app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(pid)
         except ValueError as reason:
@@ -4230,10 +4178,10 @@ on QSFP ports of G4 devices. \n"""
                              dst_ip, interval='5000', inport=None,
                              match_srcmac=None, user_description=''):
         """Modify an ArpResponder app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(pid)
         except ValueError as reason:
@@ -4286,10 +4234,10 @@ on QSFP ports of G4 devices. \n"""
                      trap1='1.1.1.1', trap1_port='162', trap2='',
                      trap2_port='162'):
         """Modify an SNMP app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(pid)
         except ValueError as reason:
@@ -4365,10 +4313,10 @@ on QSFP ports of G4 devices. \n"""
                                 dst_ip='0.0.0.2', src_port='5555',
                                 dst_port='5556', bypass_ip='1.1.1.1'):
         """Modify a HeartbeatBypass app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(pid)
         except ValueError as reason:
@@ -4470,10 +4418,10 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_app_syslog(self, pid, server_ip, port='514', user_description=''):
         """Modify a Syslog app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(pid)
         except ValueError as reason:
@@ -4505,10 +4453,10 @@ on QSFP ports of G4 devices. \n"""
     def mod_app_bypasskeepalive(self, pid, conn_type='ip', interval='2000',
                                 description='', bypass_ip='1.1.1.1'):
         """Modify a BypassKeepalive app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(pid)
         except ValueError as reason:
@@ -4553,10 +4501,10 @@ on QSFP ports of G4 devices. \n"""
                           dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1',
                           dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
         """Modify a Heartbeat app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             int(pid)
         except ValueError as reason:
@@ -4645,10 +4593,10 @@ on QSFP ports of G4 devices. \n"""
 
     def call_app_action(self, pid, name):
         """Call a custom app action."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps/action?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps/action?'
         else:
-            uri = 'http://' + self.address + '/rest/apps/action?'
+            uri = 'http://' + self._address + '/rest/apps/action?'
         try:
             pid = int(pid)
         except ValueError as reason:
@@ -4677,10 +4625,10 @@ on QSFP ports of G4 devices. \n"""
 
     def kill_app(self, pid):
         """Stop an active app instance."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/apps?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/apps?'
         else:
-            uri = 'http://' + self.address + '/rest/apps?'
+            uri = 'http://' + self._address + '/rest/apps?'
         try:
             pid = int(pid)
         except ValueError as reason:
@@ -4762,10 +4710,10 @@ on QSFP ports of G4 devices. \n"""
                             ipsa, ipda, proto, src, dst):
         """Set group hash algorithms on the Packetmaster."""
         #EX2 has only 'ipsa', 'ipda', 'ip_protocol', 'scp_port', 'dst_port'
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/grouphash?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/grouphash?'
         else:
-            uri = 'http://' + self.address + '/rest/device/grouphash?'
+            uri = 'http://' + self._address + '/rest/device/grouphash?'
         if macsa in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
             macsa = False
         else:
@@ -4839,10 +4787,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_rule_permanence(self, permanence):
         """Set Rule Mode Permanance on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/permanentrulesmode?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/permanentrulesmode?'
         else:
-            uri = 'http://' + self.address + '/rest/device/permanentrulesmode?'
+            uri = 'http://' + self._address + '/rest/device/permanentrulesmode?'
         if isinstance(permanence, bool) and permanence:
             permanence = True
         elif isinstance(permanence, str) and permanence.lower() in ('true', 'yes',
@@ -4889,10 +4837,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_storage_mode(self, mode):
         """Set Rule Storage Mode of the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/rulestoragemode?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/rulestoragemode?'
         else:
-            uri = 'http://' + self.address + '/rest/device/rulestoragemode?'
+            uri = 'http://' + self._address + '/rest/device/rulestoragemode?'
         try:
             mode = mode.lower()
         except AttributeError as reason:
@@ -4945,10 +4893,10 @@ on QSFP ports of G4 devices. \n"""
     def add_user(self, username, access_level,
                  passwd, description='', rad=False):
         """Add a user account to the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/users?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/users?'
         else:
-            uri = 'http://' + self.address + '/rest/users?'
+            uri = 'http://' + self._address + '/rest/users?'
         user_list = []
         if username == '':
             return "That is not a valid username; canceling Add User."
@@ -5020,10 +4968,10 @@ on QSFP ports of G4 devices. \n"""
     def mod_user(self, cur_name, new_name,
                  access_level, passwd, description='', rad=False):
         """Modify a user account on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/users?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/users?'
         else:
-            uri = 'http://' + self.address + '/rest/users?'
+            uri = 'http://' + self._address + '/rest/users?'
         user_list = []
         active_users = self.get_users()
         json_users = json.loads(active_users)
@@ -5077,10 +5025,10 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_user(self, username):
         """Delete a user account from the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/users?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/users?'
         else:
-            uri = 'http://' + self.address + '/rest/users?'
+            uri = 'http://' + self._address + '/rest/users?'
         user_list = []
         active_users = self.get_users()
         json_users = json.loads(active_users)
@@ -5113,10 +5061,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_uac(self, uac):
         """Enable/disable user authentication on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/users/uac?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/users/uac?'
         else:
-            uri = 'http://' + self.address + '/rest/users/uac?'
+            uri = 'http://' + self._address + '/rest/users/uac?'
         if isinstance(uac, bool) and uac:
             uac = True
         elif isinstance(uac, str) and uac.lower() in ('true', 'yes', 't', 'y'):
@@ -5168,10 +5116,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_radius(self, server, secret, refresh, level, port=1812):
         """Set RADIUS configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/users/radius?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/users/radius?'
         else:
-            uri = 'http://' + self.address + '/rest/users/radius?'
+            uri = 'http://' + self._address + '/rest/users/radius?'
         server = server.strip()
         try:
             refresh = int(refresh)
@@ -5226,10 +5174,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_https(self, enabled=False, ssl=None):
         """Enable/disable HTTPS web interface."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/https?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/https?'
         else:
-            uri = 'http://' + self.address + '/rest/device/https?'
+            uri = 'http://' + self._address + '/rest/device/https?'
         if enabled.lower() == 'true' or enabled is True:
             enabled = True
         else:
@@ -5260,10 +5208,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_telnet(self, enabled=False):
         """Enable/disable Telnet service on the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/telnet?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/telnet?'
         else:
-            uri = 'http://' + self.address + '/rest/device/telnet?'
+            uri = 'http://' + self._address + '/rest/device/telnet?'
         if enabled.lower() == 'true' or enabled is True:
             enabled = True
         else:
@@ -5282,10 +5230,10 @@ on QSFP ports of G4 devices. \n"""
 
     def del_web_log(self):
         """Delete Webserver logs."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/weblog?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/weblog?'
         else:
-            uri = 'http://' + self.address + '/rest/weblog?'
+            uri = 'http://' + self._address + '/rest/weblog?'
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             content = response.content
@@ -5316,10 +5264,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_dns(self, dns1='', dns2='', dns3=''):
         """Set DNS configuration."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/nameresolution?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/nameresolution?'
         else:
-            uri = 'http://' + self.address + '/rest/device/nameresolution?'
+            uri = 'http://' + self._address + '/rest/device/nameresolution?'
         params = {}
         if dns1 != '':
             params['dns1'] = dns1
@@ -5354,10 +5302,10 @@ on QSFP ports of G4 devices. \n"""
 
     def set_id_led(self, led):
         """Enable/disable ID LED on the face of the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/idled?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/idled?'
         else:
-            uri = 'http://' + self.address + '/rest/device/idled?'
+            uri = 'http://' + self._address + '/rest/device/idled?'
         led = led.lower()
         if led == 'true' or led is True:
             led = True
@@ -5376,10 +5324,10 @@ on QSFP ports of G4 devices. \n"""
 
     def restart_webserver(self):
         """Restart the Packetmaster Web Server.  Does not reboot device."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/restartwebserver?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/restartwebserver?'
         else:
-            uri = 'http://' + self.address + '/rest/device/restartwebserver?'
+            uri = 'http://' + self._address + '/rest/device/restartwebserver?'
 
         try:
             response = requests.post(uri, auth=(self.username, self.password))
@@ -5392,10 +5340,10 @@ on QSFP ports of G4 devices. \n"""
 
     def reboot(self):
         """Reboot the Packetmaster."""
-        if self.https:
-            uri = 'https://' + self.address + '/rest/device/reboot?'
+        if self.__https:
+            uri = 'https://' + self._address + '/rest/device/reboot?'
         else:
-            uri = 'http://' + self.address + '/rest/device/reboot?'
+            uri = 'http://' + self._address + '/rest/device/reboot?'
 
         try:
             requests.post(uri, auth=(self.username, self.password))
