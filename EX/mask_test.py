@@ -18,7 +18,7 @@ def rules(ip, user=None, passwd=None):
     for n in range(1000, 2000):
         params = {'name': 'test' + str(n),
                   'priority': 32768,
-                  'in_port': '1',
+                  'match[in_port]': '1',
                   'match[protocol]': 'tcp',
                   'match[nw_src]': '131.151.32.129',
                   'match[tcp_src]': n,
