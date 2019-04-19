@@ -1485,31 +1485,17 @@ on QSFP ports of G4 devices. \n"""
             nwsrc = raw_input('Filtering on source IP address? '
                               'Leave blank for no or enter IP address: ')
             if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+                if input_check.ipv4_mask(nwsrc) != 0:
+                    params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                else:
+                    return "That is not a valid IP address; canceling Modify Rule."
             nwdst = raw_input('Filtering on destination IP address? '
                               'Leave blank for no or enter IP address: ')
             if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
+                if input_check.ipv4_mask(nwdst) != 0:
+                    params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                else:
+                    return "That is not a valid IP address; canceling Modify Rule."
             tcpsrc = raw_input('Filtering on source port? '
                                'Leave blank for no or enter port number: ')
             if tcpsrc != '':
