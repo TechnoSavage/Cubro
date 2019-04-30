@@ -23,4 +23,5 @@ if __name__ == '__main__':
                       'match[nw_src]': '131.151.32.129',
                       'match[tcp_src]': n,
                       'actions': 'output:4'}
-            PACKETMASTER.add_rule(params)
+            result = PACKETMASTER.add_rule(params)
+            print result

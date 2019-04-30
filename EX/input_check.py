@@ -46,7 +46,6 @@ def ipv4_mask(test):
         ipv4_address = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', test)
         if "/" in test and len(ipv4_address) == 1:
             cidr = re.findall('/([1-9][0-9]*)', test)
-            print cidr
             if int(cidr[0]) in range(1, 33):
                 ipv4_subnet = ipv4_address[0] + '/' + cidr[0]
                 return ipv4_subnet

@@ -1174,6 +1174,13 @@ on QSFP ports of G4 devices. \n"""
         if macdst != '':
         #MAC Address input check
             params['match[dl_dst]'] = macdst
+        proto_options = {2: 'ip',
+                         3: 'tcp',
+                         4: 'udp',
+                         5: 'sctp',
+                         6: 'icmp',
+                         7: 'arp',
+                         8: 'custom'}
         print '''\nFilter on protocol?
                 1 - No Protocol Filtering
                 2 - IP
@@ -1185,11 +1192,17 @@ on QSFP ports of G4 devices. \n"""
                 8 - Enter Ethertype\n'''
                 #Add MPLS for G4 devices
         proto = raw_input('Enter the number of your selection [1]: ')
-        try:
-            if proto == '' or int(proto) == 1:
-                pass
-            elif int(proto) == 2:
-                params['match[protocol]'] = 'ip'
+        if proto == '' or int(proto) == 1:
+            pass
+        else:
+            try:
+                if int(proto) in range(2, 9):
+                    params['match[protocol]'] = proto_options[int(proto)]
+                else:
+                    return "That is not a valid selection; canceling Add Rule \n"
+            except ValueError as reason:
+                return("That is not a valid input; canceling Add Rule", reason)
+            if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
                 nwsrc = raw_input('Filter on source IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
@@ -1208,128 +1221,28 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-            elif int(proto) == 3:
-                params['match[protocol]'] = 'tcp'
-                nwsrc = raw_input('Filter on source IP address? '
-                                  'Leave blank for no or enter IP address + optional mask'
-                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
-                                  'or "192.168.1.5/24"): ')
-                if nwsrc != '':
-                    if input_check.ipv4_mask(nwsrc) != 0:
-                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
-                    else:
-                        return "That is not a valid IP address; canceling Add Rule."
-                nwdst = raw_input('Filter on destination IP address? '
-                                  'Leave blank for no or enter IP address + optional mask'
-                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
-                                  'or "192.168.1.5/24"): ')
-                if nwdst != '':
-                    if input_check.ipv4_mask(nwdst) != 0:
-                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
-                    else:
-                        return "That is not a valid IP address; canceling Add Rule."
-                tcpsrc = raw_input('Filter on source port? '
+            if params['match[protocol]'] == 'ip':
+                nwproto = raw_input('Enter protocol number '
+                                    '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                    'or leave blank for none: ')
+                if nwproto != '':
+                    params['match[nw_proto]'] = nwproto
+            if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
+                tp_src = raw_input('Filter on source port? '
                                    'Leave blank for no or enter port number: ')
-                if tcpsrc != '':
-                    if input_check.port(tcpsrc):
-                        params['match[tcp_src]'] = tcpsrc
+                if tp_src != '':
+                    if input_check.port(tp_src):
+                        params['match[' + params['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Add Rule."
-                tcpdst = raw_input('Filter on destination port? '
+                tp_dst = raw_input('Filter on destination port? '
                                    'Leave blank for no or enter port number: ')
-                if tcpdst != '':
-                    if input_check.port(tcpdst):
-                        params['match[tcp_dst]'] = tcpdst
+                if tp_dst != '':
+                    if input_check.port(tp_dst):
+                        params['match[' + params['match[protocol]'] + '_dst]'] = tp_dst
                     else:
                         return "That is not a valid port number; canceling Add Rule."
-            elif int(proto) == 4:
-                params['match[protocol]'] = 'udp'
-                nwsrc = raw_input('Filter on source IP address? '
-                                  'Leave blank for no or enter IP address + optional mask'
-                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
-                                  'or "192.168.1.5/24"): ')
-                if nwsrc != '':
-                    if input_check.ipv4_mask(nwsrc) != 0:
-                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
-                    else:
-                        return "That is not a valid IP address; canceling Add Rule."
-                nwdst = raw_input('Filter on destination IP address? '
-                                  'Leave blank for no or enter IP address + optional mask'
-                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
-                                  'or "192.168.1.5/24"): ')
-                if nwdst != '':
-                    if input_check.ipv4_mask(nwdst) != 0:
-                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
-                    else:
-                        return "That is not a valid IP address; canceling Add Rule."
-                udpsrc = raw_input('Filter on source port?'
-                                   'Leave blank for no or enter port number: ')
-                if udpsrc != '':
-                    if input_check.port(udpsrc):
-                        params['match[udp_src]'] = udpsrc
-                    else:
-                        return "That is not a valid port number; canceling Add Rule."
-                udpdst = raw_input('Filter on destination port? '
-                                   'Leave blank for no or enter port number: ')
-                if udpdst != '':
-                    if input_check.port(udpdst):
-                        params['match[udp_dst]'] = udpdst
-                    else:
-                        return "That is not a valid port number; canceling Add Rule."
-            elif int(proto) == 5:
-                params['match[protocol]'] = 'sctp'
-                nwsrc = raw_input('Filter on source IP address? '
-                                  'Leave blank for no or enter IP address + optional mask'
-                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
-                                  'or "192.168.1.5/24"): ')
-                if nwsrc != '':
-                    if input_check.ipv4_mask(nwsrc) != 0:
-                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
-                    else:
-                        return "That is not a valid IP address; canceling Add Rule."
-                nwdst = raw_input('Filter on destination IP address? '
-                                  'Leave blank for no or enter IP address + optional mask'
-                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
-                                  'or "192.168.1.5/24"): ')
-                if nwdst != '':
-                    if input_check.ipv4_mask(nwdst) != 0:
-                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
-                    else:
-                        return "That is not a valid IP address; canceling Add Rule."
-                sctpsrc = raw_input('Filter on source port? '
-                                    'Leave blank for no or enter port number: ')
-                if sctpsrc != '':
-                    if input_check.port(sctpsrc):
-                        params['match[sctp_src]'] = sctpsrc
-                    else:
-                        return "That is not a valid port number; canceling Add Rule."
-                sctpdst = raw_input('Filter on destination port? '
-                                    'Leave blank for no or enter port number: ')
-                if sctpdst != '':
-                    if input_check.port(sctpdst):
-                        params['match[sctp_dst]'] = sctpdst
-                    else:
-                        return "That is not a valid port number; canceling Add Rule."
-            elif int(proto) == 6:
-                params['match[protocol]'] = 'icmp'
-                nwsrc = raw_input('Filter on source IP address? '
-                                  'Leave blank for no or enter IP address + optional mask'
-                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
-                                  'or "192.168.1.5/24"): ')
-                if nwsrc != '':
-                    if input_check.ipv4_mask(nwsrc) != 0:
-                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
-                    else:
-                        return "That is not a valid IP address; canceling Add Rule."
-                nwdst = raw_input('Filter on destination IP address? '
-                                  'Leave blank for no or enter IP address + optional mask'
-                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
-                                  'or "192.168.1.5/24"): ')
-                if nwdst != '':
-                    if input_check.ipv4_mask(nwdst) != 0:
-                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
-                    else:
-                        return "That is not a valid IP address; canceling Add Rule."
+            if params['match[protocol]'] == 'icmp':
                 icmpt = raw_input('Filter on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
@@ -1344,11 +1257,8 @@ on QSFP ports of G4 devices. \n"""
                         params['match[icmp_code]'] = icmpc
                     else:
                         return "That is not a valid ICMP Code; canceling Add Rule."
-            elif int(proto) == 7:
-                params['match[protocol]'] = 'arp'
-            elif int(proto) == 8:
-                params['match[protocol]'] = 'custom'
-                ether = raw_input('Enter Ethertype e.g. 0x800: ')
+            if params['match[protocol]'] == 'custom':
+                ether = raw_input('Enter Ethertype e.g. 0x0800: ')
                 if ether != '':
                     params['match[dl_type]'] = ether
                 nwproto = raw_input('Enter protocol number '
@@ -1356,10 +1266,6 @@ on QSFP ports of G4 devices. \n"""
                                     'or leave blank for none: ')
                 if nwproto != '':
                     params['match[nw_proto]'] = nwproto
-            else:
-                return "That is not a valid selection; canceling Add Rule \n"
-        except ValueError as reason:
-            return("That is not a valid input; canceling Add Rule", reason)
         print '''\nAdd Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
@@ -1452,6 +1358,13 @@ on QSFP ports of G4 devices. \n"""
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
             params['match[dl_dst]'] = macdst
+        proto_options = {2: 'ip',
+                         3: 'tcp',
+                         4: 'udp',
+                         5: 'sctp',
+                         6: 'icmp',
+                         7: 'arp',
+                         8: 'custom'}
         print '''\nFiltering on a protocol?
                 1 - No Protocol Filtering
                 2 - IP
@@ -1460,178 +1373,83 @@ on QSFP ports of G4 devices. \n"""
                 5 - SCTP
                 6 - ICMP
                 7 - ARP
-                8 - Ethertype\n'''
+                8 - Enter Ethertype\n'''
+                #Add MPLS for G4 devices
         proto = raw_input('Enter the number of your selection [1]: ')
         if proto == '' or int(proto) == 1:
-            params['match[protocol]'] = ''
-        elif int(proto) == 2:
-            params['match[protocol]'] = 'ip'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                if input_check.ipv4_mask(nwsrc) != 0:
-                    params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
-                else:
-                    return "That is not a valid IP address; canceling Modify Rule."
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                if input_check.ipv4_mask(nwdst) != 0:
-                    params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
-                else:
-                    return "That is not a valid IP address; canceling Modify Rule."
-        elif int(proto) == 3:
-            params['match[protocol]'] = 'tcp'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                if input_check.ipv4_mask(nwsrc) != 0:
-                    params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
-                else:
-                    return "That is not a valid IP address; canceling Modify Rule."
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                if input_check.ipv4_mask(nwdst) != 0:
-                    params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
-                else:
-                    return "That is not a valid IP address; canceling Modify Rule."
-            tcpsrc = raw_input('Filtering on source port? '
-                               'Leave blank for no or enter port number: ')
-            if tcpsrc != '':
-                params['match[tcp_src]'] = tcpsrc
-            tcpdst = raw_input('Filtering on destination port? '
-                               'Leave blank for no or enter port number: ')
-            if tcpdst != '':
-                params['match[tcp_dst]'] = tcpdst
-        elif int(proto) == 4:
-            params['match[protocol]'] = 'udp'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
-            udpsrc = raw_input('Filtering on source port? '
-                               'Leave blank for no or enter port number: ')
-            if udpsrc != '':
-                params['match[udp_src]'] = udpsrc
-            udpdst = raw_input('Filtering on destination port? '
-                               'Leave blank for no or enter port number: ')
-            if udpdst != '':
-                params['match[udp_dst]'] = udpdst
-        elif int(proto) == 5:
-            params['match[protocol]'] = 'sctp'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
-            sctpsrc = raw_input('Filtering on source port? '
-                                'Leave blank for no or enter port number: ')
-            if sctpsrc != '':
-                params['match[sctp_src]'] = sctpsrc
-            sctpdst = raw_input('Filtering on destination port? '
-                                'Leave blank for no or enter port number: ')
-            if sctpdst != '':
-                params['match[sctp_dst]'] = sctpdst
-        elif int(proto) == 6:
-            params['match[protocol]'] = 'icmp'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwsrc)
-                    if len(nwsrc) == 1:
-                        params['match[nw_src]'] = nwsrc[0]
-                    elif len(nwsrc) > 1:
-                        nw_src = nwsrc[0] + '/' + nwsrc[1]
-                        params['match[nw_src]'] = nw_src
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)', nwdst)
-                    if len(nwdst) == 1:
-                        params['match[nw_dst]'] = nwdst[0]
-                    elif len(nwdst) > 1:
-                        nw_dst = nwsrc[0] + '/' + nwdst[1]
-                        params['match[nw_dst]'] = nw_dst
-                    else:
-                        return "That is not a valid IP address; canceling Modify Rule."
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Modify Rule.", reason)
-            icmpt = raw_input('Filtering on ICMP type? '
-                              'Leave blank for no or enter ICMP type number: ')
-            if icmpt != '':
-                params['match[icmp_type]'] = icmpt
-            icmpc = raw_input('Filtering on ICMP code? '
-                              'Leave blank for no or enter ICMP code number: ')
-            if icmpc != '':
-                params['match[icmp_code]'] = icmpc
-        elif int(proto) == 7:
-            params['match[protocol]'] = 'arp'
-        elif int(proto) == 8:
-            params['match[protocol]'] = 'custom'
-            ether = raw_input('Enter Ethertype e.g. 0x800: ')
-            if ether != '':
-                params['match[dl_type]'] = ether
-            nwproto = raw_input('Enter protocol number '
-                                '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
-                                'or leave blank for none: ')
-            if nwproto != '':
-                params['match[nw_proto]'] = nwproto
+            pass
         else:
-            return "That is not a valid selection; canceling Modify Rule \n"
+            try:
+                if int(proto) in range(2, 9):
+                    params['match[protocol]'] = proto_options[int(proto)]
+                else:
+                    return "That is not a valid selection; canceling Modify Rule \n"
+            except ValueError as reason:
+                return("That is not a valid input; canceling Modify Rule", reason)
+            if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
+                nwsrc = raw_input('Filtering on a source IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwsrc != '':
+                    if input_check.ipv4_mask(nwsrc) != 0:
+                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
+                nwdst = raw_input('Filtering on a destination IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwdst != '':
+                    if input_check.ipv4_mask(nwdst) != 0:
+                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                    else:
+                        return "That is not a valid IP address; canceling Modify Rule."
+            if params['match[protocol]'] == 'ip':
+                nwproto = raw_input('Filtering on a protocol number? '
+                                    '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                    'or leave blank for none: ')
+                if nwproto != '':
+                    params['match[nw_proto]'] = nwproto
+            if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
+                tp_src = raw_input('Filtering on a source port? '
+                                   'Leave blank for no or enter port number: ')
+                if tp_src != '':
+                    if input_check.port(tp_src):
+                        params['match[' + params['match[protocol]'] + '_src]'] = tp_src
+                    else:
+                        return "That is not a valid port number; canceling Modify Rule."
+                tp_dst = raw_input('Filtering on a destination port? '
+                                   'Leave blank for no or enter port number: ')
+                if tp_dst != '':
+                    if input_check.port(tp_dst):
+                        params['match[' + params['match[protocol]'] + '_dst]'] = tp_dst
+                    else:
+                        return "That is not a valid port number; canceling Modify Rule."
+            if params['match[protocol]'] == 'icmp':
+                icmpt = raw_input('Filtering on ICMP type? '
+                                  'Leave blank for no or enter ICMP type number: ')
+                if icmpt != '':
+                    if input_check.icmp_type(icmpt):
+                        params['match[icmp_type]'] = icmpt
+                    else:
+                        return "That is not a valid ICMP Type; canceling Modify Rule."
+                icmpc = raw_input('Filtering on ICMP code? '
+                                  'Leave blank for no or enter ICMP code number: ')
+                if icmpc != '':
+                    if input_check.icmp_code(icmpc):
+                        params['match[icmp_code]'] = icmpc
+                    else:
+                        return "That is not a valid ICMP Code; canceling Modify Rule."
+            if params['match[protocol]'] == 'custom':
+                ether = raw_input('Enter Ethertype e.g. 0x0800: ')
+                if ether != '':
+                    params['match[dl_type]'] = ether
+                nwproto = raw_input('Enter protocol number '
+                                    '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                    'or leave blank for none: ')
+                if nwproto != '':
+                    params['match[nw_proto]'] = nwproto
         print '''\nUsing Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
@@ -1693,19 +1511,17 @@ on QSFP ports of G4 devices. \n"""
         elif int(trafmatch) == 3:
             params['match[vlan]'] = 'match'
             matchid = raw_input('Enter the VLAN ID the rule is filtering: ')
-            params['match[vlan_id]'] = matchid
-            vpri = raw_input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
-            if vpri == '':
-                pass
+            if input_check.vlan(matchid):
+                params['match[vlan_id]'] = matchid
             else:
-                try:
-                    if int(vpri) >= 0 or int(vpri) <= 7:
-                        params['match[vlan_priority]'] = vpri
-                    else:
-                        print "That is not a valid selection; VLAN priority defaulting to '0'"
-                        params['match[vlan_priority]'] = '0'
-                except ValueError as reason:
-                    return ("That is not a valid selection; canceling Delete Rule.", reason)
+                return "That is not a valid VLAN ID; canceling Delete Rule."
+            vpri = raw_input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
+            if vpri != '' and input_check.vlan_pri(vpri):
+                params['match[vlan_priority]'] = vpri
+            elif vpri == '':
+                params['match[vlan_priority]'] = '0'
+            else:
+                return "That is not a valid VLAN Priority; canceling Delete Rule."
         else:
             return "That is not a valid selection; canceling Delete Rule \n"
         macsrc = raw_input('Filtering by source MAC address? '
@@ -1716,6 +1532,13 @@ on QSFP ports of G4 devices. \n"""
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
             params['match[dl_dst]'] = macdst
+        proto_options = {2: 'ip',
+                         3: 'tcp',
+                         4: 'udp',
+                         5: 'sctp',
+                         6: 'icmp',
+                         7: 'arp',
+                         8: 'custom'}
         print '''\nFiltering on a protocol?
                 1 - No Protocol Filtering
                 2 - IP
@@ -1724,146 +1547,83 @@ on QSFP ports of G4 devices. \n"""
                 5 - SCTP
                 6 - ICMP
                 7 - ARP
-                8 - Ethertype\n'''
+                8 - Enter Ethertype\n'''
+                #Add MPLS for G4 devices
         proto = raw_input('Enter the number of your selection [1]: ')
         if proto == '' or int(proto) == 1:
-            params['match[protocol]'] = ''
-        elif int(proto) == 2:
-            params['match[protocol]'] = 'ip'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-        elif int(proto) == 3:
-            params['match[protocol]'] = 'tcp'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            tcpsrc = raw_input('Filtering on source port? '
-                               'Leave blank for no or enter port number: ')
-            if tcpsrc != '':
-                params['match[tcp_src]'] = tcpsrc
-            tcpdst = raw_input('Filtering on destination port? '
-                               'Leave blank for no or enter port number: ')
-            if tcpdst != '':
-                params['match[tcp_dst]'] = tcpdst
-        elif int(proto) == 4:
-            params['match[protocol]'] = 'udp'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            udpsrc = raw_input('Filtering on source port? '
-                               'Leave blank for no or enter port number: ')
-            if udpsrc != '':
-                params['match[udp_src]'] = udpsrc
-            udpdst = raw_input('Filtering on destination port? '
-                               'Leave blank for no or enter port number: ')
-            if udpdst != '':
-                params['match[udp_dst]'] = udpdst
-        elif int(proto) == 5:
-            params['match[protocol]'] = 'sctp'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            sctpsrc = raw_input('Filtering on source port? '
-                                'Leave blank for no or enter port number: ')
-            if sctpsrc != '':
-                params['match[sctp_src]'] = sctpsrc
-            sctpdst = raw_input('Filtering on destination port? '
-                                'Leave blank for no or enter port number: ')
-            if sctpdst != '':
-                params['match[sctp_dst]'] = sctpdst
-        elif int(proto) == 6:
-            params['match[protocol]'] = 'icmp'
-            nwsrc = raw_input('Filtering on source IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwsrc != '':
-                try:
-                    nwsrc = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwsrc)
-                    params['match[nw_src]'] = nwsrc[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            nwdst = raw_input('Filtering on destination IP address? '
-                              'Leave blank for no or enter IP address: ')
-            if nwdst != '':
-                try:
-                    nwdst = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', nwdst)
-                    params['match[nw_dst]'] = nwdst[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address, canceling Delete Rule.", reason)
-            icmpt = raw_input('Filtering on ICMP type? '
-                              'Leave blank for no or enter ICMP type number: ')
-            if icmpt != '':
-                params['match[icmp_type]'] = icmpt
-            icmpc = raw_input('Filtering on ICMP code? '
-                              'Leave blank for no or enter ICMP code number: ')
-            if icmpc != '':
-                params['match[icmp_code]'] = icmpc
-        elif int(proto) == 7:
-            params['match[protocol]'] = 'arp'
-        elif int(proto) == 8:
-            params['match[protocol]'] = 'custom'
-            ether = raw_input('Enter Ethertype e.g. 0x800: ')
-            if ether != '':
-                params['match[dl_type]'] = ether
-            nwproto = raw_input('Enter protocol number '
-                                '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
-                                'or leave blank for none: ')
-            if nwproto != '':
-                params['match[nw_proto]'] = nwproto
+            pass
         else:
-            return "That is not a valid selection; canceling Delete Rule \n"
+            try:
+                if int(proto) in range(2, 9):
+                    params['match[protocol]'] = proto_options[int(proto)]
+                else:
+                    return "That is not a valid selection; canceling Delete Rule \n"
+            except ValueError as reason:
+                return("That is not a valid input; canceling Delete Rule", reason)
+            if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
+                nwsrc = raw_input('Filtering on a source IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwsrc != '':
+                    if input_check.ipv4_mask(nwsrc) != 0:
+                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                    else:
+                        return "That is not a valid IP address; canceling Delete Rule."
+                nwdst = raw_input('Filtering on a destination IP address? '
+                                  'Leave blank for no or enter IP address + optional mask'
+                                  '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
+                                  'or "192.168.1.5/24"): ')
+                if nwdst != '':
+                    if input_check.ipv4_mask(nwdst) != 0:
+                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                    else:
+                        return "That is not a valid IP address; canceling Delete Rule."
+            if params['match[protocol]'] == 'ip':
+                nwproto = raw_input('Filtering on a protocol number? '
+                                    '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                    'or leave blank for none: ')
+                if nwproto != '':
+                    params['match[nw_proto]'] = nwproto
+            if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
+                tp_src = raw_input('Filtering on a source port? '
+                                   'Leave blank for no or enter port number: ')
+                if tp_src != '':
+                    if input_check.port(tp_src):
+                        params['match[' + params['match[protocol]'] + '_src]'] = tp_src
+                    else:
+                        return "That is not a valid port number; canceling Delete Rule."
+                tp_dst = raw_input('Filtering on a destination port? '
+                                   'Leave blank for no or enter port number: ')
+                if tp_dst != '':
+                    if input_check.port(tp_dst):
+                        params['match[' + params['match[protocol]'] + '_dst]'] = tp_dst
+                    else:
+                        return "That is not a valid port number; canceling Delete Rule."
+            if params['match[protocol]'] == 'icmp':
+                icmpt = raw_input('Filtering on ICMP type? '
+                                  'Leave blank for no or enter ICMP type number: ')
+                if icmpt != '':
+                    if input_check.icmp_type(icmpt):
+                        params['match[icmp_type]'] = icmpt
+                    else:
+                        return "That is not a valid ICMP Type; canceling Delete Rule."
+                icmpc = raw_input('Filtering on ICMP code? '
+                                  'Leave blank for no or enter ICMP code number: ')
+                if icmpc != '':
+                    if input_check.icmp_code(icmpc):
+                        params['match[icmp_code]'] = icmpc
+                    else:
+                        return "That is not a valid ICMP Code; canceling Delete Rule."
+            if params['match[protocol]'] == 'custom':
+                ether = raw_input('Enter Ethertype e.g. 0x0800: ')
+                if ether != '':
+                    params['match[dl_type]'] = ether
+                nwproto = raw_input('Enter protocol number '
+                                    '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
+                                    'or leave blank for none: ')
+                if nwproto != '':
+                    params['match[nw_proto]'] = nwproto
         print '''\nUsing Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
