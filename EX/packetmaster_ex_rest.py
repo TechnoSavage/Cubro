@@ -1,11 +1,13 @@
 """ Packetmaster EX device class for REST API interaction,
     Use with firmware version 2.2.5 or newer and up to G4 NPB. """
 
+from __future__ import print_function #Requires Python 2.6 or later
 from getpass import getpass
 import json
 import re
 import requests
 from requests.exceptions import ConnectionError
+from six import moves
 import input_check
 
 
@@ -30,44 +32,42 @@ class PacketmasterEX(object):
         self.password = password
         self.__https = False
         conn_test = self.conn_test()
-        print conn_test
+        print(conn_test)
 
     def conn_test(self):
         """Test if device is reachable and assign properties.
-
         Assigns additional properties including connecting via HTTP or HTTPS
         Total port count for device
         Model of Packetmaster
         Hardware generation of Packetmaster
         """
-
         try:
             gen_test = self.hardware_generation()
             data = json.loads(gen_test)
             for item in data:
                 if item == 'error':
-                    print data['error']
+                    print(data['error'])
                     return "Connection test failed"
                 self.hardware = data['generation']
                 self.get_port_count()
                 self.device_model()
                 return "Connection established"
         except ConnectionError as fail:
-            print fail
+            print(fail)
             try:
                 self.__https = True
                 gen_test = self.hardware_generation()
                 data = json.loads(gen_test)
                 for item in data:
                     if item == 'error':
-                        print data['error']
+                        print(data['error'])
                         return "Connection test failed"
                     self.hardware = data['generation']
                     self.get_port_count()
                     self.device_model()
                     return "Connection established"
             except ConnectionError as fail:
-                print ("Unable to establish connection; check if IP address is correct.", fail)
+                print("Unable to establish connection; check if IP address is correct.", fail)
 
     #This will currently return both Physical and Logical ports.
     #Find way to list Physical ports only.
@@ -86,6 +86,7 @@ class PacketmasterEX(object):
             for port in data['port_config']:
                 ports.append(data['port_config'][count]['if_name'])
                 count += 1
+            #Exclude all logical ports
             self.ports = len(ports)
             return len(ports)
         except ConnectionError as error:
@@ -598,7 +599,7 @@ class PacketmasterEX(object):
 
     def set_controller_guided(self):
         """Interactive menu for setting Vitrum Controller configuration."""
-        conn = raw_input("""What is the connection type of the controller?
+        conn = moves.input("""What is the connection type of the controller?
                 1 - TCP
                 2 - SSL
                 Enter the number of your selection: """)
@@ -608,15 +609,15 @@ class PacketmasterEX(object):
             conn = "ssl"
         else:
             return "That is not a valid selection; canceling Set Controller. \n"
-        ipadd = raw_input("What is the IP address of the controller: ")
+        ipadd = moves.input("What is the IP address of the controller: ")
         if input_check.ipv4(ipadd) != 0:
             ipadd = input_check.ipv4(ipadd)
         else:
             return "That is not a valid IP address; canceling Set Controller. \n"
-        port = raw_input("What is the TCP Port of the controller: ")
+        port = moves.input("What is the TCP Port of the controller: ")
         if not input_check.port(port):
             return "That is not a valid TCP port number; canceling Set Controller. \n"
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             Controller connection type: %s
                             Controller IP Address: %s
                             Controller port: %s
@@ -652,7 +653,7 @@ class PacketmasterEX(object):
 
     def del_controller_guided(self):
         """Interactive menu for removing a Vitrum Controller."""
-        conn = raw_input("""What is the connection type of the controller?
+        conn = moves.input("""What is the connection type of the controller?
                 1 - TCP
                 2 - SSL
                 Enter the number of your selection: """)
@@ -662,15 +663,15 @@ class PacketmasterEX(object):
             conn = "ssl"
         else:
             return "That is not a valid selection; canceling Delete Controller. \n"
-        ipadd = raw_input("What is the IP address of the controller: ")
+        ipadd = moves.input("What is the IP address of the controller: ")
         if input_check.ipv4(ipadd) != 0:
             ipadd = input_check.ipv4(ipadd)
         else:
             return "That is not a valid IP address; canceling Delete Controller. \n"
-        port = raw_input("What is the TCP Port of the controller: ")
+        port = moves.input("What is the TCP Port of the controller: ")
         if not input_check.port(port):
             return "That is not a valid TCP port number; canceling Delete Controller. \n"
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             Controller connection type: %s
                             Controller IP Address: %s
                             Controller port: %s
@@ -729,24 +730,24 @@ class PacketmasterEX(object):
 
     def set_ip_config_guided(self):
         """Interactive menu for configuring management IP settings."""
-        address = raw_input('Enter IP Address (e.g. 192.168.0.200): ')
+        address = moves.input('Enter IP Address (e.g. 192.168.0.200): ')
         if input_check.ipv4(address) != 0:
             address = input_check.ipv4(address)
         #elif input_check.ipv6(address) != 0:
         #   address = input_check.ipv6(address)
         else:
             return "That is not a valid IP address; canceling Set IP Configuration. \n"
-        netmask = raw_input('Enter Subnet Mask (e.g. 255.255.255.0): ')
+        netmask = moves.input('Enter Subnet Mask (e.g. 255.255.255.0): ')
         if input_check.ipv4(netmask) != 0:
             netmask = input_check.ipv4(netmask)
         else:
             return "That is not a valid Subnet Mask; canceling Set IP Configuration. \n"
-        gateway = raw_input('Enter gateway (e.g. 192.168.0.1): ')
+        gateway = moves.input('Enter gateway (e.g. 192.168.0.1): ')
         if input_check.ipv4(gateway) != 0:
             gateway = input_check.ipv4(gateway)
         else:
             return "That is not a valid Gateway Address; canceling Set IP Configuration. \n"
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             New management IP: %s
                             New Subnet Mask: %s
                             New Gateway: %s
@@ -788,8 +789,8 @@ class PacketmasterEX(object):
 
     def set_name_guided(self):
         """Interactive menu for setting Packetmaster name."""
-        newname = raw_input('Enter device name: ')
-        confirm = raw_input("""Configuration change summary:
+        newname = moves.input('Enter device name: ')
+        confirm = moves.input("""Configuration change summary:
                             New Device Name: %s
                             Confirm changes [y/n]: """ % newname)
         if confirm.lower() in ('y', 'yes'):
@@ -815,9 +816,9 @@ class PacketmasterEX(object):
 
     def set_label_guided(self):
         """Interactive menu for setting Packetmaster name and notes."""
-        newname = raw_input('Enter device name: ')
-        newnotes = raw_input('Enter device notes: ')
-        confirm = raw_input("""Configuration change summary:
+        newname = moves.input('Enter device name: ')
+        newnotes = moves.input('Enter device notes: ')
+        confirm = moves.input("""Configuration change summary:
                             New Device Name: %s
                             New Device Notes: %s
                             Confirm changes [y/n]: """ % (newname, newnotes))
@@ -845,9 +846,9 @@ class PacketmasterEX(object):
 
     def set_port_config_guided(self):
         """Interactive menu for setting port configuration on Packetmaster."""
-        interface = raw_input('Enter the interface name of the port you want to change: ')
+        interface = moves.input('Enter the interface name of the port you want to change: ')
         if self.hardware == '4':
-            speed = raw_input('Enter interface speed; e.g. "1000", "10G", "40G", "100G": ').strip()
+            speed = moves.input('Enter interface speed; e.g. "1000", "10G", "40G", "100G": ').strip()
             if speed in ('1000', '10g', '10G', '40g', '40G', '100g', '100G'):
                 speed = speed.upper()
             else:
@@ -855,10 +856,10 @@ class PacketmasterEX(object):
         else: #May need to become 'elif self.hardware == '3.1'' with new else
               #clause; need EX5-2,and EX12 to verify.  EX6 (Gen-2) does not
               #allow speed changes on SFP+ ports
-            print """Enter interface speed:
+            print("""Enter interface speed:
                     e.g. "10", "100", "1000", "auto" for copper or SFP ports;
-                    "XG" (10G) or "1G" for SFP+ ports"""
-            speed = raw_input(': ').strip()
+                    "XG" (10G) or "1G" for SFP+ ports""")
+            speed = moves.input(': ').strip()
             if speed.lower() == 'auto':
                 speed = 'auto'
             elif speed in ('10', '100', '1000', 'XG', 'xg', 'Xg', 'xG', '1g', '1G'):
@@ -866,31 +867,31 @@ class PacketmasterEX(object):
             else:
                 return "That is not a valid input for port speed; canceling Set Port Config."
         if speed in ('10', '100', '1000', 'auto'):
-            duplex = raw_input('Enter the Duplex of the interface;'
+            duplex = moves.input('Enter the Duplex of the interface;'
                                'options are "full", "half, or "auto" [auto]: ')
             if duplex == '':
                 duplex = 'auto'
         else:
             duplex = 'full'
         if speed in ('40G', '100G'):
-            split = raw_input('Split to breakout cable?'
+            split = moves.input('Split to breakout cable?'
                               'Enter "yes" for yes and "no" for no [no]: ')
             if split == '':
                 split = 'no'
-        description = raw_input('Enter description for this port; leave blank for none: ')
+        description = moves.input('Enter description for this port; leave blank for none: ')
         if self.hardware == '4' and speed in ('40G', '100G'):
-            forcetx = raw_input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
+            forcetx = moves.input('Force TX?  Enter "true" for yes and "false" for no [false]: ')
             if forcetx == '':
                 forcetx = False
-            check = raw_input('Perform CRC check?'
+            check = moves.input('Perform CRC check?'
                               'Enter "true" for yes and "false" for no [false]: ')
             if check == '':
                 check = False
-            recalc = raw_input('Perform CRC recalculation?'
+            recalc = moves.input('Perform CRC recalculation?'
                                'Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
-            confirm = raw_input("""Configuration change summary:
+            confirm = moves.input("""Configuration change summary:
                                 Interface: %s
                                 New Speed: %s
                                 New Duplex: %s
@@ -914,18 +915,18 @@ class PacketmasterEX(object):
             else:
                 return "Canceling; no changes made.\n"
         elif self.hardware == '4':
-            forcetx = raw_input('Force TX? Enter "true" for yes and "false" for no [false]: ')
+            forcetx = moves.input('Force TX? Enter "true" for yes and "false" for no [false]: ')
             if forcetx == '':
                 forcetx = False
-            check = raw_input('Perform CRC check? '
+            check = moves.input('Perform CRC check? '
                               'Enter "true" for yes and "false" for no [false]: ')
             if check == '':
                 check = False
-            recalc = raw_input('Perform CRC recalculation? '
+            recalc = moves.input('Perform CRC recalculation? '
                                'Enter "true" for yes and "false" for no [false]: ')
             if recalc == '':
                 recalc = False
-            confirm = raw_input("""Configuration change summary:
+            confirm = moves.input("""Configuration change summary:
                                 Interface: %s
                                 New Speed: %s
                                 New Duplex: %s
@@ -946,7 +947,7 @@ class PacketmasterEX(object):
             else:
                 return "Canceling; no changes made.\n"
         else:
-            confirm = raw_input("""Configuration change summary:
+            confirm = moves.input("""Configuration change summary:
                                 Interface: %s
                                 New Speed: %s
                                 New Duplex: %s
@@ -959,9 +960,9 @@ class PacketmasterEX(object):
                 run = self.set_port_config(interface, speed, duplex, description)
             else:
                 return "Canceling; no changes made.\n"
-        print """\nA device reboot is required for changes to take effect when changing
+        print("""\nA device reboot is required for changes to take effect when changing
 between 1G and 10G on pre-G4 devices and when changing to or from breakout cables
-on QSFP ports of G4 devices. \n"""
+on QSFP ports of G4 devices. \n""")
         return run
 
     def set_port_config(self, interface, speed, duplex, description='',
@@ -1054,10 +1055,10 @@ on QSFP ports of G4 devices. \n"""
 
     def port_on_off_guided(self):
         """Interactive menu for enabling/disabling a port on the Packetmaster."""
-        if_name = raw_input('Enter the interface name of the port you want to change: ')
-        shutdown = raw_input('Enter "true" to shut port down; '
+        if_name = moves.input('Enter the interface name of the port you want to change: ')
+        shutdown = moves.input('Enter "true" to shut port down; '
                              'Enter "false" to activate port [false]: ')
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             Interface: %s
                             Shutdown: %s
                             Confirm changes [y/n]: """ % (if_name, shutdown))
@@ -1122,11 +1123,11 @@ on QSFP ports of G4 devices. \n"""
     def add_rule_guided(self):
         """Interactive menu to add a rule/filter."""
         params = {}
-        rulename = raw_input('Enter a name for the rule [none]: ')
+        rulename = moves.input('Enter a name for the rule [none]: ')
         params['name'] = rulename
-        ruledescrip = raw_input('Enter a description for the rule [none]: ')
+        ruledescrip = moves.input('Enter a description for the rule [none]: ')
         params['description'] = ruledescrip
-        priority = raw_input('Enter the priority level of the rule; '
+        priority = moves.input('Enter the priority level of the rule; '
                              '0 - 65535 higher number = higher priority [32768]: ')
         if priority != '':
             if input_check.pm_pri(priority):
@@ -1135,27 +1136,27 @@ on QSFP ports of G4 devices. \n"""
                 return "That is not a valid input for priority; canceling Add Rule."
         else:
             params['priority'] = 32768
-        portin = raw_input('Enter the port number or numbers for incoming traffic; '
+        portin = moves.input('Enter the port number or numbers for incoming traffic; '
                            'multiple ports separated by a comma: ')
         #Implement valid port number check against device
         params['match[in_port]'] = portin
-        print '''\nMatch VLAN tag?
+        print('''\nMatch VLAN tag?
                 1 - No, match all tagged and untagged traffic
                 2 - No, match only untagged traffic
-                3 - Yes, match a VLAN tag \n'''
-        trafmatch = raw_input('Enter the number of your selection [1]: ')
+                3 - Yes, match a VLAN tag \n''')
+        trafmatch = moves.input('Enter the number of your selection [1]: ')
         if trafmatch == '' or int(trafmatch) == 1:
             pass
         elif int(trafmatch) == 2:
             params['match[vlan]'] = 'neg_match'
         elif int(trafmatch) == 3:
             params['match[vlan]'] = 'match'
-            matchid = raw_input('Enter the VLAN ID to filter on: ')
+            matchid = moves.input('Enter the VLAN ID to filter on: ')
             if input_check.vlan(matchid):
                 params['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Add Rule."
-            vpri = raw_input('Enter a VLAN priority? Enter 0-7 orleave blank for none: ')
+            vpri = moves.input('Enter a VLAN priority? Enter 0-7 orleave blank for none: ')
             if vpri != '' and input_check.vlan_pri(vpri):
                 params['match[vlan_priority]'] = vpri
             elif vpri == '':
@@ -1164,12 +1165,12 @@ on QSFP ports of G4 devices. \n"""
                 return "That is not a valid VLAN Priority; canceling Add Rule."
         else:
             return "That is not a valid selection; canceling Add Rule \n"
-        macsrc = raw_input('Filter by source MAC address? '
+        macsrc = moves.input('Filter by source MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
         #MAC Address input check
             params['match[dl_src]'] = macsrc
-        macdst = raw_input('Filter by destination MAC address? '
+        macdst = moves.input('Filter by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
         #MAC Address input check
@@ -1181,7 +1182,7 @@ on QSFP ports of G4 devices. \n"""
                          6: 'icmp',
                          7: 'arp',
                          8: 'custom'}
-        print '''\nFilter on protocol?
+        print('''\nFilter on protocol?
                 1 - No Protocol Filtering
                 2 - IP
                 3 - TCP
@@ -1189,9 +1190,9 @@ on QSFP ports of G4 devices. \n"""
                 5 - SCTP
                 6 - ICMP
                 7 - ARP
-                8 - Enter Ethertype\n'''
+                8 - Enter Ethertype\n''')
                 #Add MPLS for G4 devices
-        proto = raw_input('Enter the number of your selection [1]: ')
+        proto = moves.input('Enter the number of your selection [1]: ')
         if proto == '' or int(proto) == 1:
             pass
         else:
@@ -1203,7 +1204,7 @@ on QSFP ports of G4 devices. \n"""
             except ValueError as reason:
                 return("That is not a valid input; canceling Add Rule", reason)
             if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
-                nwsrc = raw_input('Filter on source IP address? '
+                nwsrc = moves.input('Filter on source IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
@@ -1212,7 +1213,7 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-                nwdst = raw_input('Filter on destination IP address? '
+                nwdst = moves.input('Filter on destination IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
@@ -1222,20 +1223,20 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
             if params['match[protocol]'] == 'ip':
-                nwproto = raw_input('Enter protocol number '
+                nwproto = moves.input('Enter protocol number '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
                     params['match[nw_proto]'] = nwproto
             if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
-                tp_src = raw_input('Filter on source port? '
+                tp_src = moves.input('Filter on source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
                     if input_check.port(tp_src):
                         params['match[' + params['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Add Rule."
-                tp_dst = raw_input('Filter on destination port? '
+                tp_dst = moves.input('Filter on destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
                     if input_check.port(tp_dst):
@@ -1243,14 +1244,14 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid port number; canceling Add Rule."
             if params['match[protocol]'] == 'icmp':
-                icmpt = raw_input('Filter on ICMP type? '
+                icmpt = moves.input('Filter on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
                     if input_check.icmp_type(icmpt):
                         params['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Add Rule."
-                icmpc = raw_input('Filter on ICMP code? '
+                icmpc = moves.input('Filter on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
                     if input_check.icmp_code(icmpc):
@@ -1258,26 +1259,26 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid ICMP Code; canceling Add Rule."
             if params['match[protocol]'] == 'custom':
-                ether = raw_input('Enter Ethertype e.g. 0x0800: ')
+                ether = moves.input('Enter Ethertype e.g. 0x0800: ')
                 if ether != '':
                     params['match[dl_type]'] = ether
-                nwproto = raw_input('Enter protocol number '
+                nwproto = moves.input('Enter protocol number '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
                     params['match[nw_proto]'] = nwproto
-        print '''\nAdd Custom Extra Match?
+        print('''\nAdd Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
-        Improper syntax will cause Add Rule to fail \n'''
-        extra = raw_input('Enter Extra Custom Match String: ')
+        Improper syntax will cause Add Rule to fail \n''')
+        extra = moves.input('Enter Extra Custom Match String: ')
         if extra != '':
             params['match[extra]'] = extra
-        ruleaction = raw_input('\nEnter the desired output actions separated by commas; '
+        ruleaction = moves.input('\nEnter the desired output actions separated by commas; '
                                'order matters - improper syntax will cause Add Rule to fail: ')
         params['actions'] = ruleaction
         check_params = json.dumps(params, indent=4)
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             Rule Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
         if confirm.lower() in ('y', 'yes'):
@@ -1306,13 +1307,13 @@ on QSFP ports of G4 devices. \n"""
     def mod_rule_guided(self):
         """Interactive menu to modify a rule/filter on the Packetmaster."""
         params = {}
-        name = raw_input('Enter a new name for the rule: ')
+        name = moves.input('Enter a new name for the rule: ')
         params['name'] = name
-        cookie = raw_input('Enter the cookie of the rule to modify: ')
+        cookie = moves.input('Enter the cookie of the rule to modify: ')
         params['cookie'] = cookie
-        description = raw_input('Enter a new description for the rule: ')
+        description = moves.input('Enter a new description for the rule: ')
         params['description'] = description
-        priority = raw_input('Enter the priority of the rule (priority cannot be changed; '
+        priority = moves.input('Enter the priority of the rule (priority cannot be changed; '
                              'must match rule to be modified)[32768]: ')
         if priority != '':
             if input_check.pm_pri(priority):
@@ -1321,27 +1322,27 @@ on QSFP ports of G4 devices. \n"""
                 return "That is not a valid input for priority; canceling Modify Rule."
         else:
             priority = 32768
-        in_port = raw_input("What is (are) the input port(s)for the rule separated by commas: ")
+        in_port = moves.input("What is (are) the input port(s)for the rule separated by commas: ")
         params['match[in_port]'] = in_port
-        print ("For the following input filters the selected option must match "
-               "the rule being modified; these fields cannot be changed.")
-        print '''\nIs the rule matching a VLAN tag?
+        print("For the following input filters the selected option must match "
+              "the rule being modified; these fields cannot be changed.")
+        print('''\nIs the rule matching a VLAN tag?
                 1 - No, matching all tagged and untagged traffic
                 2 - No, matching only untagged traffic
-                3 - Yes, matching a VLAN tag \n'''
-        trafmatch = raw_input('Enter the number of your selection [1]: ')
+                3 - Yes, matching a VLAN tag \n''')
+        trafmatch = moves.input('Enter the number of your selection [1]: ')
         if trafmatch == '' or int(trafmatch) == 1:
             pass
         elif int(trafmatch) == 2:
             params['match[vlan]'] = 'neg_match'
         elif int(trafmatch) == 3:
             params['match[vlan]'] = 'match'
-            matchid = raw_input('Enter the VLAN ID the rule is filtering: ')
+            matchid = moves.input('Enter the VLAN ID the rule is filtering: ')
             if input_check.vlan(matchid):
                 params['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Modify Rule."
-            vpri = raw_input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
+            vpri = moves.input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
             if vpri != '' and input_check.vlan_pri(vpri):
                 params['match[vlan_priority]'] = vpri
             elif vpri == '':
@@ -1350,11 +1351,11 @@ on QSFP ports of G4 devices. \n"""
                 return "That is not a valid VLAN Priority; canceling Modify Rule."
         else:
             return "That is not a valid selection; canceling Modify Rule \n"
-        macsrc = raw_input('Filtering by source MAC address? '
+        macsrc = moves.input('Filtering by source MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
             params['match[dl_src]'] = macsrc
-        macdst = raw_input('Filtering by destination MAC address? '
+        macdst = moves.input('Filtering by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
             params['match[dl_dst]'] = macdst
@@ -1365,7 +1366,7 @@ on QSFP ports of G4 devices. \n"""
                          6: 'icmp',
                          7: 'arp',
                          8: 'custom'}
-        print '''\nFiltering on a protocol?
+        print('''\nFiltering on a protocol?
                 1 - No Protocol Filtering
                 2 - IP
                 3 - TCP
@@ -1373,9 +1374,9 @@ on QSFP ports of G4 devices. \n"""
                 5 - SCTP
                 6 - ICMP
                 7 - ARP
-                8 - Enter Ethertype\n'''
+                8 - Enter Ethertype\n''')
                 #Add MPLS for G4 devices
-        proto = raw_input('Enter the number of your selection [1]: ')
+        proto = moves.input('Enter the number of your selection [1]: ')
         if proto == '' or int(proto) == 1:
             pass
         else:
@@ -1387,7 +1388,7 @@ on QSFP ports of G4 devices. \n"""
             except ValueError as reason:
                 return("That is not a valid input; canceling Modify Rule", reason)
             if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
-                nwsrc = raw_input('Filtering on a source IP address? '
+                nwsrc = moves.input('Filtering on a source IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
@@ -1396,7 +1397,7 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-                nwdst = raw_input('Filtering on a destination IP address? '
+                nwdst = moves.input('Filtering on a destination IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
@@ -1406,20 +1407,20 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
             if params['match[protocol]'] == 'ip':
-                nwproto = raw_input('Filtering on a protocol number? '
+                nwproto = moves.input('Filtering on a protocol number? '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
                     params['match[nw_proto]'] = nwproto
             if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
-                tp_src = raw_input('Filtering on a source port? '
+                tp_src = moves.input('Filtering on a source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
                     if input_check.port(tp_src):
                         params['match[' + params['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Modify Rule."
-                tp_dst = raw_input('Filtering on a destination port? '
+                tp_dst = moves.input('Filtering on a destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
                     if input_check.port(tp_dst):
@@ -1427,14 +1428,14 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid port number; canceling Modify Rule."
             if params['match[protocol]'] == 'icmp':
-                icmpt = raw_input('Filtering on ICMP type? '
+                icmpt = moves.input('Filtering on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
                     if input_check.icmp_type(icmpt):
                         params['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Modify Rule."
-                icmpc = raw_input('Filtering on ICMP code? '
+                icmpc = moves.input('Filtering on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
                     if input_check.icmp_code(icmpc):
@@ -1442,26 +1443,26 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid ICMP Code; canceling Modify Rule."
             if params['match[protocol]'] == 'custom':
-                ether = raw_input('Enter Ethertype e.g. 0x0800: ')
+                ether = moves.input('Enter Ethertype e.g. 0x0800: ')
                 if ether != '':
                     params['match[dl_type]'] = ether
-                nwproto = raw_input('Enter protocol number '
+                nwproto = moves.input('Enter protocol number '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
                     params['match[nw_proto]'] = nwproto
-        print '''\nUsing Custom Extra Match?
+        print('''\nUsing Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
-        Improper syntax will cause Delete Rule to fail \n'''
-        extra = raw_input('Enter Extra Custom Match String: ')
+        Improper syntax will cause Delete Rule to fail \n''')
+        extra = moves.input('Enter Extra Custom Match String: ')
         if extra != '':
             params['match[extra]'] = extra
-        ruleaction = raw_input('Enter the new output actions separated by commas; '
+        ruleaction = moves.input('Enter the new output actions separated by commas; '
                                'order matters - improper syntax will cause Modify Rule to fail: ')
         params['actions'] = ruleaction
         check_params = json.dumps(params, indent=4)
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             Modified Rule Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
         if confirm.lower() in ('y', 'yes'):
@@ -1489,33 +1490,33 @@ on QSFP ports of G4 devices. \n"""
 
     def del_rule_guided(self):
         """Interactive menu to delete a rule/filter."""
-        priority = raw_input("What is the priority of the rule to delete: ")
+        priority = moves.input("What is the priority of the rule to delete: ")
         try:
             priority = int(priority)
         except ValueError as reason:
             return ("That is not a valid input for rule priority; canceling Delete Rule.", reason)
         if priority < 0 or priority > 65535:
-            print "That is not a valid input for rule priority; canceling Delete Rule."
-        in_port = raw_input("What is (are) the input port(s)for the rule separated by commas: ")
+            print("That is not a valid input for rule priority; canceling Delete Rule.")
+        in_port = moves.input("What is (are) the input port(s)for the rule separated by commas: ")
         params = {'priority': priority,
                   'match[in_port]': in_port}
-        print '''\nIs the rule matching a VLAN tag?
+        print('''\nIs the rule matching a VLAN tag?
                 1 - No, matching all tagged and untagged traffic
                 2 - No, matching only untagged traffic
-                3 - Yes, matching a VLAN tag \n'''
-        trafmatch = raw_input('Enter the number of your selection [1]: ')
+                3 - Yes, matching a VLAN tag \n''')
+        trafmatch = moves.input('Enter the number of your selection [1]: ')
         if trafmatch == '' or int(trafmatch) == 1:
             pass
         elif int(trafmatch) == 2:
             params['match[vlan]'] = 'neg_match'
         elif int(trafmatch) == 3:
             params['match[vlan]'] = 'match'
-            matchid = raw_input('Enter the VLAN ID the rule is filtering: ')
+            matchid = moves.input('Enter the VLAN ID the rule is filtering: ')
             if input_check.vlan(matchid):
                 params['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Delete Rule."
-            vpri = raw_input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
+            vpri = moves.input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
             if vpri != '' and input_check.vlan_pri(vpri):
                 params['match[vlan_priority]'] = vpri
             elif vpri == '':
@@ -1524,11 +1525,11 @@ on QSFP ports of G4 devices. \n"""
                 return "That is not a valid VLAN Priority; canceling Delete Rule."
         else:
             return "That is not a valid selection; canceling Delete Rule \n"
-        macsrc = raw_input('Filtering by source MAC address? '
+        macsrc = moves.input('Filtering by source MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
             params['match[dl_src]'] = macsrc
-        macdst = raw_input('Filtering by destination MAC address? '
+        macdst = moves.input('Filtering by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
             params['match[dl_dst]'] = macdst
@@ -1539,7 +1540,7 @@ on QSFP ports of G4 devices. \n"""
                          6: 'icmp',
                          7: 'arp',
                          8: 'custom'}
-        print '''\nFiltering on a protocol?
+        print('''\nFiltering on a protocol?
                 1 - No Protocol Filtering
                 2 - IP
                 3 - TCP
@@ -1547,9 +1548,9 @@ on QSFP ports of G4 devices. \n"""
                 5 - SCTP
                 6 - ICMP
                 7 - ARP
-                8 - Enter Ethertype\n'''
+                8 - Enter Ethertype\n''')
                 #Add MPLS for G4 devices
-        proto = raw_input('Enter the number of your selection [1]: ')
+        proto = moves.input('Enter the number of your selection [1]: ')
         if proto == '' or int(proto) == 1:
             pass
         else:
@@ -1561,7 +1562,7 @@ on QSFP ports of G4 devices. \n"""
             except ValueError as reason:
                 return("That is not a valid input; canceling Delete Rule", reason)
             if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
-                nwsrc = raw_input('Filtering on a source IP address? '
+                nwsrc = moves.input('Filtering on a source IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
@@ -1570,7 +1571,7 @@ on QSFP ports of G4 devices. \n"""
                         params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Delete Rule."
-                nwdst = raw_input('Filtering on a destination IP address? '
+                nwdst = moves.input('Filtering on a destination IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
@@ -1580,20 +1581,20 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid IP address; canceling Delete Rule."
             if params['match[protocol]'] == 'ip':
-                nwproto = raw_input('Filtering on a protocol number? '
+                nwproto = moves.input('Filtering on a protocol number? '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
                     params['match[nw_proto]'] = nwproto
             if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
-                tp_src = raw_input('Filtering on a source port? '
+                tp_src = moves.input('Filtering on a source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
                     if input_check.port(tp_src):
                         params['match[' + params['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Delete Rule."
-                tp_dst = raw_input('Filtering on a destination port? '
+                tp_dst = moves.input('Filtering on a destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
                     if input_check.port(tp_dst):
@@ -1601,14 +1602,14 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid port number; canceling Delete Rule."
             if params['match[protocol]'] == 'icmp':
-                icmpt = raw_input('Filtering on ICMP type? '
+                icmpt = moves.input('Filtering on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
                     if input_check.icmp_type(icmpt):
                         params['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Delete Rule."
-                icmpc = raw_input('Filtering on ICMP code? '
+                icmpc = moves.input('Filtering on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
                     if input_check.icmp_code(icmpc):
@@ -1616,23 +1617,23 @@ on QSFP ports of G4 devices. \n"""
                     else:
                         return "That is not a valid ICMP Code; canceling Delete Rule."
             if params['match[protocol]'] == 'custom':
-                ether = raw_input('Enter Ethertype e.g. 0x0800: ')
+                ether = moves.input('Enter Ethertype e.g. 0x0800: ')
                 if ether != '':
                     params['match[dl_type]'] = ether
-                nwproto = raw_input('Enter protocol number '
+                nwproto = moves.input('Enter protocol number '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
                     params['match[nw_proto]'] = nwproto
-        print '''\nUsing Custom Extra Match?
+        print('''\nUsing Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
-        Improper syntax will cause Delete Rule to fail \n'''
-        extra = raw_input('Enter Extra Custom Match String: ')
+        Improper syntax will cause Delete Rule to fail \n''')
+        extra = moves.input('Enter Extra Custom Match String: ')
         if extra != '':
             params['match[extra]'] = extra
         check_params = json.dumps(params, indent=4)
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             Delete Rule Matching: %s
                             Confirm changes [y/n]: """ % check_params)
         if confirm.lower() in ('y', 'yes'):
@@ -1675,7 +1676,7 @@ on QSFP ports of G4 devices. \n"""
 
     def add_group_guided(self):
         """Interactive menu for adding a port group."""
-        name = raw_input("Enter the group ID: ")
+        name = moves.input("Enter the group ID: ")
         try:
             int(name)
         except ValueError as reason:
@@ -1690,8 +1691,8 @@ on QSFP ports of G4 devices. \n"""
         if name in existing:
             return ("A group with this group ID already exists; "
                     "use Modify Group or select a different group ID. Canceling Add Group")
-        description = raw_input("Enter the group description: ")
-        group_type = raw_input(""" Select the group type:
+        description = moves.input("Enter the group description: ")
+        group_type = moves.input(""" Select the group type:
                                 1 - All
                                 2 - Select
                                 3 - Fast Failover
@@ -1709,7 +1710,7 @@ on QSFP ports of G4 devices. \n"""
         else:
             return "That is not a valid group type selection; canceling Add Group."
         bucket_list = []
-        buckets = raw_input("How many buckets in this port group? "
+        buckets = moves.input("How many buckets in this port group? "
                             "Must be at least 2 and no more than 16: ")
         try:
             buckets = int(buckets)
@@ -1717,9 +1718,9 @@ on QSFP ports of G4 devices. \n"""
             return ("That is not a valid bucket number; canceling Add Group.", reason)
         if buckets >= 2 and buckets <= 16:
             for bucket in xrange(buckets):
-                print "\nConfigure settings for bucket %s" % bucket
+                print("\nConfigure settings for bucket %s" % bucket)
                 #Add check against number of ports on device
-                output = raw_input("Output on which port: ")
+                output = moves.input("Output on which port: ")
                 try:
                     int(output)
                     output = 'output:' + output
@@ -1727,107 +1728,103 @@ on QSFP ports of G4 devices. \n"""
                     return ("That is not a valid port number; canceling Add Group", reason)
                 actions = output
                 if self.hardware != '4' or group_type == 3:
-                    watch = raw_input("Set watch port to: ")
+                    watch = moves.input("Set watch port to: ")
                     try:
                         int(watch)
                     except ValueError as reason:
                         return ("That is not a valid port number; canceling Add Group", reason)
-                push_vlan = raw_input('Push VLAN ID to outout traffic? '
+                push_vlan = moves.input('Push VLAN ID to outout traffic? '
                                       'Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
-                    try:
+                    if input_check.vlan(push_vlan):
                         vlan = str(int(push_vlan) + 4096)
                         vlan = 'push_vlan:0x8100,set_field:' + vlan + '->vlan_vid,'
                         actions = vlan + actions
-                    except ValueError as reason:
-                        return ("That is not a valid VLAN ID, canceling Add Group.", reason)
+                    else:
+                        return "That is not a valid VLAN ID, canceling Add Group."
                 else:
-                    mod_vlan = raw_input('Modify VLAN ID of output traffic? '
+                    mod_vlan = moves.input('Modify VLAN ID of output traffic? '
                                          'Enter VLAN ID or leave blank for no: ').strip()
                     if mod_vlan != '':
-                        try:
+                        if input_check.vlan(mod_vlan):
                             vlan = str(int(mod_vlan) + 4096)
                             vlan = 'set_field:' + vlan + '->vlan_vid,'
                             actions = vlan + actions
-                        except ValueError as reason:
+                        else:
                             return ("That is not a valid input for VLAN ID, "
-                                    "canceling Add Group.", reason)
+                                    "canceling Add Group.")
                     else:
-                        strip_vlan = raw_input('Strip VLAN ID from output traffic? '
+                        strip_vlan = moves.input('Strip VLAN ID from output traffic? '
                                                'Y or N [N]: ').lower()
-                        if strip_vlan == 'y' or strip_vlan == 'yes':
+                        if strip_vlan in ('y', 'yes'):
                             actions = 'strip_vlan,' + actions
                 if self.hardware == '4':
-                    pop_l2 = raw_input('Pop all L2 information from packet?  Y or N [N]: ').lower()
-                    if pop_l2 == 'y' or pop_l2 == 'yes':
+                    pop_l2 = moves.input('Pop all L2 information from packet?  Y or N [N]: ').lower()
+                    if pop_l2 in ('y', 'yes'):
                         actions = 'pop_l2,' + actions
                 if self.hardware == '4':
-                    pop_mpls = raw_input('Pop MPLS tags? In most cases you should also push L2. '
+                    pop_mpls = moves.input('Pop MPLS tags? In most cases you should also push L2. '
                                          'Y or N [N]: ').lower()
-                    if pop_mpls == 'y' or pop_mpls == 'yes':
+                    if pop_mpls in ('y', 'yes'):
                         actions = 'pop_all_mpls,' + actions
                 if self.hardware == '4':
-                    push_l2 = raw_input('Push L2 information to output packets? '
+                    push_l2 = moves.input('Push L2 information to output packets? '
                                         'Y or N [N]: ').lower()
-                    if push_l2 == 'y' or push_l2 == 'yes':
+                    if push_l2 in ('y', 'yes'):
                         print ("Be sure to modify destination MAC when prompted, "
                                "else an error will occur.")
                         actions = 'push_l2,' + actions
-                src_mac = raw_input('Modify source MAC address? '
+                src_mac = moves.input('Modify source MAC address? '
                                     'Enter new MAC address or leave blank for no: ').strip()
                 if src_mac != '':
                     actions = 'set_field:' + src_mac + '->eth_src,' + actions
-                dst_mac = raw_input('Modify destination MAC address? '
+                dst_mac = moves.input('Modify destination MAC address? '
                                     'Enter new MAC address or leave blank for no: ').strip()
                 if dst_mac != '':
                     actions = 'set_field:' + dst_mac + '->eth_dst,' + actions
-                dst_ip = raw_input('Modify destination IP address? '
+                dst_ip = moves.input('Modify destination IP address? '
                                    'Enter new IP address or leave blank for no: ').strip()
                 if dst_ip != '':
-                    try:
-                        dstip = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
-                        actions = 'set_field:' + dstip[0] + '->ip_dst,' + actions
-                    except TypeError as reason:
+                    if input_check.ipv4_mask(dst_ip) != 0:
+                        actions = 'set_field:' + input_check.ipv4_mask(dst_ip) + \
+                                  '->ip_dst,' + actions
+                    else:
                         return ("That is not a valid input for IP address, "
-                                "canceling Add Group.", reason)
+                                "canceling Add Group.")
                 if self.hardware == '4':
-                    src_udp = raw_input('Modify source UDP port? '
+                    src_udp = moves.input('Modify source UDP port? '
                                         'Enter new port number or leave blank for no: ').strip()
                     if src_udp != '':
-                        try:
-                            int(src_udp)
+                        if input_check.port(src_udp):
                             actions = 'set_field:' + src_udp + '->udp_src,' + actions
-                        except ValueError as reason:
+                        else:
                             return ("That is not a valid input for port number; "
-                                    "canceling Add Group.", reason)
-                dst_udp = raw_input('Modify destination UDP port? '
+                                    "canceling Add Group.")
+                dst_udp = moves.input('Modify destination UDP port? '
                                     'Enter new port number or leave blank for no: ').strip()
                 if dst_udp != '':
-                    try:
-                        int(dst_udp)
+                    if input_check.port(dst_udp):
                         actions = 'set_field:' + dst_udp + '->udp_dst,' + actions
-                    except ValueError as reason:
+                    else:
                         return ("That is not a valid input for port number; "
-                                "canceling Add Group.", reason)
+                                "canceling Add Group.")
                 if self.hardware == '4':
-                    src_tcp = raw_input('Modify source TCP port? '
+                    src_tcp = moves.input('Modify source TCP port? '
                                         'Enter new port number or leave blank for no: ').strip()
                     if src_tcp != '':
-                        try:
-                            int(src_tcp)
+                        if input_check.port(src_tcp):
                             actions = 'set_field:' + src_tcp + '->tcp_src,' + actions
-                        except ValueError as reason:
+                        else:
                             return ("That is not a valid input for port number; "
-                                    "canceling Add Group.", reason)
-                dst_tcp = raw_input('Modify destination TCP port? '
+                                    "canceling Add Group.")
+                dst_tcp = moves.input('Modify destination TCP port? '
                                     'Enter new port number or leave blank for no: ').strip()
                 if dst_tcp != '':
-                    try:
-                        int(dst_tcp)
+                    if input_check.port(dst_tcp):
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
-                    except ValueError as reason:
+                    else:
                         return ("That is not a valid input for port number; "
-                                "canceling Add Group.", reason)
+                                "canceling Add Group.")
                 if self.hardware != '4' or group_type == 3:
                     bucket_params = {'actions': actions,
                                      'watch_port': watch}
@@ -1842,7 +1839,7 @@ on QSFP ports of G4 devices. \n"""
                   'description': description
                  }
         check_params = json.dumps(params, indent=4)
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             Add Group Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
         if confirm.lower() in ('y', 'yes'):
@@ -1883,7 +1880,7 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_group_guided(self):
         """Interactive menu to modify a port group."""
-        name = raw_input("Enter the group ID of the group you would like to modify: ")
+        name = moves.input("Enter the group ID of the group you would like to modify: ")
         try:
             int(name)
         except ValueError as reason:
@@ -1900,10 +1897,10 @@ on QSFP ports of G4 devices. \n"""
         if name not in existing:
             return ("A group with this group ID does not exist; "
                     "use Add Group. Canceling Modify Group")
-        description = raw_input("Enter the new group description or "
+        description = moves.input("Enter the new group description or "
                                 "leave blank to retain original: ")
         bucket_list = []
-        buckets = raw_input("How many buckets in this port group? "
+        buckets = moves.input("How many buckets in this port group? "
                             "Must be at least 2 and no more than 16: ")
         try:
             buckets = int(buckets)
@@ -1911,9 +1908,9 @@ on QSFP ports of G4 devices. \n"""
             return ("That is not a valid bucket number; canceling Modify Group.", reason)
         if buckets >= 2 and buckets <= 16:
             for bucket in xrange(buckets):
-                print "\nConfigure settings for bucket %s" % bucket
+                print("\nConfigure settings for bucket %s" % bucket)
                 #Add check against number of ports on device
-                output = raw_input("Output on which port: ")
+                output = moves.input("Output on which port: ")
                 try:
                     int(output)
                     output = 'output:' + output
@@ -1921,12 +1918,12 @@ on QSFP ports of G4 devices. \n"""
                     return ("That is not a valid port number; canceling Modify Group", reason)
                 actions = output
                 if self.hardware != '4' or group_type == 'ff':
-                    watch = raw_input("Set watch port to: ")
+                    watch = moves.input("Set watch port to: ")
                     try:
                         int(watch)
                     except ValueError as reason:
                         return ("That is not a valid port number; canceling Modify Group", reason)
-                push_vlan = raw_input('Push VLAN ID to outout traffic? '
+                push_vlan = moves.input('Push VLAN ID to outout traffic? '
                                       'Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
                     try:
@@ -1936,7 +1933,7 @@ on QSFP ports of G4 devices. \n"""
                     except ValueError as reason:
                         return ("That is not a valid VLAN ID, canceling Modify Group.", reason)
                 else:
-                    mod_vlan = raw_input('Modify VLAN ID of output traffic? '
+                    mod_vlan = moves.input('Modify VLAN ID of output traffic? '
                                          'Enter VLAN ID or leave blank for no: ').strip()
                     if mod_vlan != '':
                         try:
@@ -1947,35 +1944,35 @@ on QSFP ports of G4 devices. \n"""
                             return ("That is not a valid input for VLAN ID, "
                                     "canceling Modify Group.", reason)
                     else:
-                        strip_vlan = raw_input('Strip VLAN ID from output traffic? '
+                        strip_vlan = moves.input('Strip VLAN ID from output traffic? '
                                                'Y or N [N]: ').lower()
                         if strip_vlan == 'y' or strip_vlan == 'yes':
                             actions = 'strip_vlan,' + actions
                 if self.hardware == '4':
-                    pop_l2 = raw_input('Pop all L2 information from packet?  Y or N [N]: ').lower()
+                    pop_l2 = moves.input('Pop all L2 information from packet?  Y or N [N]: ').lower()
                     if pop_l2 == 'y' or pop_l2 == 'yes':
                         actions = 'pop_l2,' + actions
                 if self.hardware == '4':
-                    pop_mpls = raw_input('Pop MPLS tags? In most cases you should also push L2. '
+                    pop_mpls = moves.input('Pop MPLS tags? In most cases you should also push L2. '
                                          'Y or N [N]: ').lower()
                     if pop_mpls == 'y' or pop_mpls == 'yes':
                         actions = 'pop_all_mpls,' + actions
                 if self.hardware == '4':
-                    push_l2 = raw_input('Push L2 information to output packets? '
+                    push_l2 = moves.input('Push L2 information to output packets? '
                                         'Y or N [N]: ').lower()
                     if push_l2 == 'y' or push_l2 == 'yes':
                         print ("Be sure to modify destination MAC when prompted, "
                                "else an error will occur.")
                         actions = 'push_l2,' + actions
-                src_mac = raw_input('Modify source MAC address? '
+                src_mac = moves.input('Modify source MAC address? '
                                     'Enter new MAC address or leave blank for no: ').strip()
                 if src_mac != '':
                     actions = 'set_field:' + src_mac + '->eth_src,' + actions
-                dst_mac = raw_input('Modify destination MAC address? '
+                dst_mac = moves.input('Modify destination MAC address? '
                                     'Enter new MAC address or leave blank for no: ').strip()
                 if dst_mac != '':
                     actions = 'set_field:' + dst_mac + '->eth_dst,' + actions
-                dst_ip = raw_input('Modify destination IP address? '
+                dst_ip = moves.input('Modify destination IP address? '
                                    'Enter new IP address or leave blank for no: ').strip()
                 if dst_ip != '':
                     try:
@@ -1985,7 +1982,7 @@ on QSFP ports of G4 devices. \n"""
                         return ("That is not a valid input for IP address, "
                                 "canceling Modify Group.", reason)
                 if self.hardware == '4':
-                    src_udp = raw_input('Modify source UDP port? '
+                    src_udp = moves.input('Modify source UDP port? '
                                         'Enter new port number or leave blank for no: ').strip()
                     if src_udp != '':
                         try:
@@ -1994,7 +1991,7 @@ on QSFP ports of G4 devices. \n"""
                         except ValueError as reason:
                             return ("That is not a valid input for port number; "
                                     "canceling Modify Group.", reason)
-                dst_udp = raw_input('Modify destination UDP port? '
+                dst_udp = moves.input('Modify destination UDP port? '
                                     'Enter new port number or leave blank for no: ').strip()
                 if dst_udp != '':
                     try:
@@ -2004,7 +2001,7 @@ on QSFP ports of G4 devices. \n"""
                         return ("That is not a valid input for port number; "
                                 "canceling Modify Group.", reason)
                 if self.hardware == '4':
-                    src_tcp = raw_input('Modify source TCP port? '
+                    src_tcp = moves.input('Modify source TCP port? '
                                         'Enter new port number or leave blank for no: ').strip()
                     if src_tcp != '':
                         try:
@@ -2013,7 +2010,7 @@ on QSFP ports of G4 devices. \n"""
                         except ValueError as reason:
                             return ("That is not a valid input for port number; "
                                     "canceling Modify Group.", reason)
-                dst_tcp = raw_input('Modify destination TCP port? '
+                dst_tcp = moves.input('Modify destination TCP port? '
                                     'Enter new port number or leave blank for no: ').strip()
                 if dst_tcp != '':
                     try:
@@ -2035,7 +2032,7 @@ on QSFP ports of G4 devices. \n"""
                   'type': group_type,
                   'description': description}
         check_params = json.dumps(params, indent=4)
-        confirm = raw_input("""Configuration change summary:
+        confirm = moves.input("""Configuration change summary:
                             Modified Group Parameters: %s
                             Confirm changes [y/n]: """ % check_params)
         if confirm.lower() in ('y', 'yes'):
@@ -2076,12 +2073,12 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_group_guided(self):
         """Interactive menu to delete a port group."""
-        name = raw_input("Enter the group ID of the group to be deleted: ")
+        name = moves.input("Enter the group ID of the group to be deleted: ")
         try:
             int(name)
         except ValueError as reason:
             return ("That is not a valid group ID, canceling Delete Group.", reason)
-        confirm = raw_input("""Configuration Change Summary:
+        confirm = moves.input("""Configuration Change Summary:
                             Delete Group ID: %s
                             Confirm changes [y/n]: """ % name)
         if confirm.lower() in ('y', 'yes'):
@@ -2135,8 +2132,8 @@ on QSFP ports of G4 devices. \n"""
 
     def set_port_savepoint_guided(self):
         """Interactive menu to activate a port save point."""
-        savename = raw_input('Name of port save point to make active: ')
-        confirm = raw_input("""Configuration Change Summary:
+        savename = moves.input('Name of port save point to make active: ')
+        confirm = moves.input("""Configuration Change Summary:
                             You are about to make port save point %s active.
                             Confirm changes [y/n]: """ % savename)
         if confirm.lower() in ('y', 'yes'):
@@ -2163,8 +2160,8 @@ on QSFP ports of G4 devices. \n"""
 
     def set_rule_savepoint_guided(self):
         """Interactive menu to activate a rule save point."""
-        savename = raw_input('Name of rule save point to make active: ')
-        confirm = raw_input("""Configuration Change Summary:
+        savename = moves.input('Name of rule save point to make active: ')
+        confirm = moves.input("""Configuration Change Summary:
                             You are about to make rule save point "%s" active.
                             Confirm changes [y/n]: """ % savename)
         if confirm.lower() in ('y', 'yes'):
@@ -2191,8 +2188,8 @@ on QSFP ports of G4 devices. \n"""
 
     def set_boot_savepoint_guided(self):
         """Interactive menu to set a save point as default boot configuration."""
-        savename = raw_input('Save point to set to default boot configuration: ')
-        confirm = raw_input("""Configuration Change Summary:
+        savename = moves.input('Save point to set to default boot configuration: ')
+        confirm = moves.input("""Configuration Change Summary:
                             You are about to set save point "%s" the default boot configuration.
                             Confirm changes [y/n]: """ % savename)
         if confirm.lower() in ('y', 'yes'):
@@ -2220,10 +2217,10 @@ on QSFP ports of G4 devices. \n"""
     #See note for method below
     def export_savepoint_guided(self):
         """Interactive menu to download a save point from the Packetmaster."""
-        rspname = raw_input('Name of rule save point to export (leave blank for none): ')
-        pspname = raw_input('Name of port save point to export (leave blank for none): ')
-        filename = raw_input("File name for savepoint export: ")
-        confirm = raw_input("""Savepoint Export Summary:
+        rspname = moves.input('Name of rule save point to export (leave blank for none): ')
+        pspname = moves.input('Name of port save point to export (leave blank for none): ')
+        filename = moves.input("File name for savepoint export: ")
+        confirm = moves.input("""Savepoint Export Summary:
                             Rule Save Point: %s
                             Port Save Point: %s
                             Saved to file: %s
@@ -2258,10 +2255,10 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_port_savepoint_guided(self):
         """Interactive menu to modify a port save point."""
-        oldname = raw_input("Name of port save point to modify: ")
-        newname = raw_input("New name for port save point: ")
-        desc = raw_input("Description of save point: ")
-        override = raw_input('Hit enter to save the current active ports '
+        oldname = moves.input("Name of port save point to modify: ")
+        newname = moves.input("New name for port save point: ")
+        desc = moves.input("Description of save point: ")
+        override = moves.input('Hit enter to save the current active ports '
                              'to this save point; type "false" to not save '
                              'them (This overwrites port '
                              'configuration of the save point): ')
@@ -2269,7 +2266,7 @@ on QSFP ports of G4 devices. \n"""
             override = False
         else:
             override = True
-        confirm = raw_input("""Modify Port Save Point Summary:
+        confirm = moves.input("""Modify Port Save Point Summary:
                             Save Point to Modify: %s
                             New Save Point Name: %s
                             New Description: %s
@@ -2309,17 +2306,17 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_rule_savepoint_guided(self):
         """Interactive menu to modify a rule save point."""
-        oldname = raw_input("Name of rule save point to modify: ")
-        newname = raw_input("New name for rule save point: ")
-        desc = raw_input("Description for save point: ")
-        override = raw_input('Hit enter to save the current active rules to this save point; '
+        oldname = moves.input("Name of rule save point to modify: ")
+        newname = moves.input("New name for rule save point: ")
+        desc = moves.input("Description for save point: ")
+        override = moves.input('Hit enter to save the current active rules to this save point; '
                              'type "false" to not save them '
                              '(This overwrites rule configuration of the save point): ')
         if override.lower() in ('false', 'f', 'n', 'no'):
             override = False
         else:
             override = True
-        confirm = raw_input("""Modify Rule Save Point Summary:
+        confirm = moves.input("""Modify Rule Save Point Summary:
                             Save Point to Modify: %s
                             New Save Point Name: %s
                             New Description: %s
@@ -2357,9 +2354,9 @@ on QSFP ports of G4 devices. \n"""
 
     def create_port_savepoint_guided(self):
         """Interactive menu to create port save point from current config."""
-        name = raw_input("Name for  newly created port savepoint: ")
-        desc = raw_input("Description for the port save point: ")
-        confirm = raw_input("""Create Port Save Point:
+        name = moves.input("Name for  newly created port savepoint: ")
+        desc = moves.input("Description for the port save point: ")
+        confirm = moves.input("""Create Port Save Point:
                             Save Point Name: %s
                             Description: %s
                             Confirm changes [y/n]: """ % (name, desc))
@@ -2401,9 +2398,9 @@ on QSFP ports of G4 devices. \n"""
 
     def create_rule_savepoint_guided(self):
         """Interactive menu to create rule save point from current config."""
-        name = raw_input("Name for newly created rule save point: ")
-        desc = raw_input("Description for the rule save point: ")
-        confirm = raw_input("""Create Rule Save Point:
+        name = moves.input("Name for newly created rule save point: ")
+        desc = moves.input("Description for the rule save point: ")
+        confirm = moves.input("""Create Rule Save Point:
                             Save Point Name: %s
                             Description: %s
                             Confirm changes [y/n]: """ % (name, desc))
@@ -2430,8 +2427,8 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_port_savepoint_guided(self):
         """Interactive menu to delete a port save point."""
-        name = raw_input("Port save point to delete: ")
-        confirm = raw_input("""Delete Port Save Point Summary:
+        name = moves.input("Port save point to delete: ")
+        confirm = moves.input("""Delete Port Save Point Summary:
                             Save Point Name: %s
                             Confirm changes [y/n]: """ % name)
         if confirm.lower() in ('y', 'yes'):
@@ -2458,8 +2455,8 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_rule_savepoint_guided(self):
         """Interactive menu to delete a rule save point."""
-        name = raw_input("Rule save point to delete:  ")
-        confirm = raw_input("""Delete Rule Save Point Summary:
+        name = moves.input("Rule save point to delete:  ")
+        confirm = moves.input("""Delete Rule Save Point Summary:
                             Save Point Name: %s
                             Confirm changes [y/n]: """ % name)
         if confirm.lower() in ('y', 'yes'):
@@ -2486,7 +2483,7 @@ on QSFP ports of G4 devices. \n"""
 
     def start_app_guided(self):
         """Interactive menu to start a new app instance."""
-        app = raw_input("""Select the App instance to start:
+        app = moves.input("""Select the App instance to start:
                             1 - NTP
                             2 - Arp Responder
                             3 - SNMP
@@ -2499,11 +2496,11 @@ on QSFP ports of G4 devices. \n"""
             app = int(app)
         except ValueError as reason:
             return ("That is not a valid input for App selection; canceling Start App.", reason)
-        description = raw_input("Custom description for the new App instance: ")
+        description = moves.input("Custom description for the new App instance: ")
         if app == 1:
-            server1 = raw_input("Enter NTP target IP or Host Name: ")
-            server2 = raw_input("Enter NTP backup IP or Host Name: ")
-            confirm = raw_input("""Start NTP App Summary:
+            server1 = moves.input("Enter NTP target IP or Host Name: ")
+            server2 = moves.input("Enter NTP backup IP or Host Name: ")
+            confirm = moves.input("""Start NTP App Summary:
                                 Server 1: %s
                                 Server 2: %s
                                 Description: %s
@@ -2513,17 +2510,17 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Canceling; no changes made.\n"
         elif app == 2:
-            interval = raw_input("Enter the check interval in milliseconds [5000]: ")
+            interval = moves.input("Enter the check interval in milliseconds [5000]: ")
             if interval == '':
                 interval = '5000'
-            in_port = raw_input("Physical source port of incoming ARP request (optional): ")
-            out_port = raw_input("Physical port for sending ARP response: ")
-            match_mac = raw_input("Enter source MAC address of incoming ARP request (optional): ")
-            src_mac = raw_input("Source MAC address of outgoing ARP response: ")
-            dst_mac = raw_input("Destination MAC address of outgoing ARP response: ")
-            src_ip = raw_input("Source IP address of outgoing ARP response: ")
-            dst_ip = raw_input("Destination IP of outgoing ARP response: ")
-            confirm = raw_input("""Start ARP Responder App Summary:
+            in_port = moves.input("Physical source port of incoming ARP request (optional): ")
+            out_port = moves.input("Physical port for sending ARP response: ")
+            match_mac = moves.input("Enter source MAC address of incoming ARP request (optional): ")
+            src_mac = moves.input("Source MAC address of outgoing ARP response: ")
+            dst_mac = moves.input("Destination MAC address of outgoing ARP response: ")
+            src_ip = moves.input("Source IP address of outgoing ARP response: ")
+            dst_ip = moves.input("Destination IP of outgoing ARP response: ")
+            confirm = moves.input("""Start ARP Responder App Summary:
                                 Check Interval: %s
                                 Port of incoming ARP packets: %s
                                 Port to send ARP packets: %s
@@ -2550,32 +2547,32 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Canceling; no changes made.\n"
         elif app == 3:
-            interval = raw_input("Enter the check interval in milliseconds [5000]: ")
+            interval = moves.input("Enter the check interval in milliseconds [5000]: ")
             if interval == '':
                 interval = '5000'
-            snmp_port = raw_input("Enter the SNMP port [161]: ")
+            snmp_port = moves.input("Enter the SNMP port [161]: ")
             if snmp_port == '':
                 snmp_port = '161'
-            community = raw_input("Enter the SNMP community [public]: ")
+            community = moves.input("Enter the SNMP community [public]: ")
             if community == '':
                 community = 'public'
-            trap_enable = raw_input("Enter SNMP traps?  Enter 'true' to enable "
+            trap_enable = moves.input("Enter SNMP traps?  Enter 'true' to enable "
                                     "or 'false' to keep disabled [true]: ")
             if trap_enable.lower() in ('false', 'f', 'n', 'no'):
                 trap_enable = False
             else:
                 trap_enable = True
             if trap_enable:
-                trap1 = raw_input('Enter IP address of SNMP trap: ')
-                trap1_port = raw_input('Enter port number for SNMP trap [162]: ')
+                trap1 = moves.input('Enter IP address of SNMP trap: ')
+                trap1_port = moves.input('Enter port number for SNMP trap [162]: ')
                 if trap1_port == '':
                     trap1_port = '162'
-                trap2 = raw_input('Enter IP address for additional SNMP trap '
+                trap2 = moves.input('Enter IP address for additional SNMP trap '
                                   'or leave blank for none: ')
-                trap2_port = raw_input('Enter port number for additional SNMP trap [162]: ')
+                trap2_port = moves.input('Enter port number for additional SNMP trap [162]: ')
                 if trap2_port == '':
                     trap2_port = '162'
-                confirm = raw_input("""Start SNMP App Summary:
+                confirm = moves.input("""Start SNMP App Summary:
                                     Check Interval: %s
                                     SNMP Port: %s
                                     SNMP Community: %s
@@ -2601,7 +2598,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             else:
-                confirm = raw_input("""Start SNMP App Summary:
+                confirm = moves.input("""Start SNMP App Summary:
                                     Check Interval: %s
                                     SNMP Port: %s
                                     SNMP Community: %s
@@ -2618,58 +2615,58 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
         elif app == 4:
-            conn_type = raw_input('''Control Bypass Switch using:
+            conn_type = moves.input('''Control Bypass Switch using:
                                     1 - IP Address
                                     2 - RS232 Console Cable
                                     Enter selection [1]: ''')
             if conn_type in ('', '1'):
                 conn_type = 'IP'
-                bypass_ip = raw_input("IP address of Bypass Switch: ")
+                bypass_ip = moves.input("IP address of Bypass Switch: ")
             elif int(conn_type) == 2:
                 conn_type = 'RS232'
             else:
                 return "That is not a valid input for Connection Type; canceling HeartbeatBypass."
-            bypass_port1 = raw_input("Port number of first port connected to the Bypass Switch: ")
-            bypass_port2 = raw_input("Port number of the second port "
+            bypass_port1 = moves.input("Port number of first port connected to the Bypass Switch: ")
+            bypass_port2 = moves.input("Port number of the second port "
                                      "connected to the Bypass Switch: ")
-            hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
-            hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
-            interval = raw_input("Check interval time in milliseconds that the "
+            hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
+            hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
+            interval = moves.input("Check interval time in milliseconds that the "
                                  "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
-            proto = raw_input('''Protocol to use for heartbeat packets:
+            proto = moves.input('''Protocol to use for heartbeat packets:
                                  1 - UDP
                                  2 - ICMP
                                  Enter selection [1]: ''')
             if proto in ('', '1'):
                 proto = 'UDP'
-                src_port = raw_input("Enter source port for UDP heartbeat packets [5555]: ")
+                src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
                 if src_port == '':
                     src_port = '5555'
-                dst_port = raw_input("Enter destination port for UDP heartbeat packets [5556]: ")
+                dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
                 if dst_port == '':
                     dst_port = '5556'
             elif int(proto) == 2:
                 proto = 'ICMP'
             else:
                 return "That is not a valid input for Protocol; canceling HeartbeatBypass."
-            src_mac = raw_input("Enter source MAC address for heartbeat "
+            src_mac = moves.input("Enter source MAC address for heartbeat "
                                 "packets [00:00:00:00:00:01]: ")
             if src_mac == '':
                 src_mac = '00:00:00:00:00:01'
-            dst_mac = raw_input("Enter destination MAC address for heartbeat "
+            dst_mac = moves.input("Enter destination MAC address for heartbeat "
                                 "packets [00:00:00:00:00:02]: ")
             if dst_mac == '':
                 dst_mac = '00:00:00:00:00:02'
-            src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+            src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
             if src_ip == '':
                 src_ip = '0.0.0.1'
-            dst_ip = raw_input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+            dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
             if dst_ip == '':
                 dst_ip = '0.0.0.2'
             if conn_type == 'IP' and proto == 'UDP':
-                confirm = raw_input("""Start Heartbeat Bypass App Summary:
+                confirm = moves.input("""Start Heartbeat Bypass App Summary:
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
@@ -2712,7 +2709,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'IP' and proto == 'ICMP':
-                confirm = raw_input("""Start Heartbeat Bypass App Summary:
+                confirm = moves.input("""Start Heartbeat Bypass App Summary:
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
@@ -2750,7 +2747,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'UDP':
-                confirm = raw_input("""Start Heartbeat Bypass App Summary:
+                confirm = moves.input("""Start Heartbeat Bypass App Summary:
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
@@ -2791,7 +2788,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'ICMP':
-                confirm = raw_input("""Start Heartbeat Bypass App Summary:
+                confirm = moves.input("""Start Heartbeat Bypass App Summary:
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
@@ -2829,11 +2826,11 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Something went wrong."
         elif app == 5:
-            server_ip = raw_input("IP address of the syslog server: ")
-            port = raw_input("Server port [514]: ")
+            server_ip = moves.input("IP address of the syslog server: ")
+            port = moves.input("Server port [514]: ")
             if port == '':
                 port = '514'
-            confirm = raw_input("""Start Syslog App Summary:
+            confirm = moves.input("""Start Syslog App Summary:
                                 Syslog Server IP: %s
                                 Syslog Server Port: %s
                                 Description: %s
@@ -2843,23 +2840,23 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Canceling; no changes made.\n"
         elif app == 6:
-            conn_type = raw_input('''Bypass Switch connection type:
+            conn_type = moves.input('''Bypass Switch connection type:
                                     1 - IP Address
                                     2 - RS232 Console Cable
                                     Enter selection [1]: ''')
             if conn_type in ('', '1'):
                 conn_type = 'IP'
-                bypass_ip = raw_input("IP address of Bypass Switch: ")
+                bypass_ip = moves.input("IP address of Bypass Switch: ")
             elif int(conn_type) == 2:
                 conn_type = 'RS232'
             else:
                 return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
-            interval = raw_input("Check interval time in milliseconds that the "
+            interval = moves.input("Check interval time in milliseconds that the "
                                  "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
             if conn_type == 'IP':
-                confirm = raw_input('''Start Bypass Keepalive Summary:
+                confirm = moves.input('''Start Bypass Keepalive Summary:
                                     Connection Type: %s
                                     Bypass Switch IP: %s
                                     Check Interval: %s
@@ -2874,7 +2871,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             else:
-                confirm = raw_input('''Start Bypass Keepalive Summary:
+                confirm = moves.input('''Start Bypass Keepalive Summary:
                                     Connection Type: %s
                                     Check Interval: %s
                                     Description: %s
@@ -2884,46 +2881,46 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
         elif app == 7:
-            hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
-            act_comm = raw_input("Command to run when heartbeat packets are detected: ")
-            hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
-            deact_comm = raw_input("Command to run when heartbeat packets are not detected: ")
-            interval = raw_input("Check interval time in milliseconds that the "
+            hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
+            act_comm = moves.input("Command to run when heartbeat packets are detected: ")
+            hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
+            deact_comm = moves.input("Command to run when heartbeat packets are not detected: ")
+            interval = moves.input("Check interval time in milliseconds that the "
                                  "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
-            proto = raw_input('''Protocol to use for heartbeat packets:
+            proto = moves.input('''Protocol to use for heartbeat packets:
                                  1 - UDP
                                  2 - ICMP
                                  Enter selection [1]: ''')
             if proto in ('', '1'):
                 proto = 'UDP'
-                src_port = raw_input("Enter source port for UDP heartbeat packets [5555]: ")
+                src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
                 if src_port == '':
                     src_port = '5555'
-                dst_port = raw_input("Enter destination port for UDP heartbeat packets [5556]: ")
+                dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
                 if dst_port == '':
                     dst_port = '5556'
             elif int(proto) == 2:
                 proto = 'ICMP'
             else:
                 return "That is not a valid input for Protocol; canceling Heartbeat."
-            src_mac = raw_input("Enter source MAC address for heartbeat "
+            src_mac = moves.input("Enter source MAC address for heartbeat "
                                 "packets [00:00:00:00:00:01]: ")
             if src_mac == '':
                 src_mac = '00:00:00:00:00:01'
-            dst_mac = raw_input("Enter destination MAC address for heartbeat "
+            dst_mac = moves.input("Enter destination MAC address for heartbeat "
                                 "packets [00:00:00:00:00:02]: ")
             if dst_mac == '':
                 dst_mac = '00:00:00:00:00:02'
-            src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+            src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
             if src_ip == '':
                 src_ip = '0.0.0.1'
-            dst_ip = raw_input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+            dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
             if dst_ip == '':
                 dst_ip = '0.0.0.2'
             if proto == 'UDP':
-                confirm = raw_input("""Start Heartbeat App Summary:
+                confirm = moves.input("""Start Heartbeat App Summary:
                                     Port to receive Heartbeat packets: %s
                                     Activation Command: %s
                                     Port to send Heartbeat packets: %s
@@ -2959,7 +2956,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             elif proto == 'ICMP':
-                confirm = raw_input("""Start Heartbeat App Summary:
+                confirm = moves.input("""Start Heartbeat App Summary:
                                     Port to receive Heartbeat packets: %s
                                     Activation Command: %s
                                     Port to send heartbeat packets: %s
@@ -3384,7 +3381,7 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_app_guided(self):
         """Interactive menu to modify an app instance."""
-        pid = raw_input("What is the PID of the app instance: ")
+        pid = moves.input("What is the PID of the app instance: ")
         try:
             app = int(pid)
         except ValueError as reason:
@@ -3399,11 +3396,11 @@ on QSFP ports of G4 devices. \n"""
                 instance = None
         if not instance:
             return "That PID doesn't exist; use Start App to start an app instance."
-        description = raw_input("New description for the modified App instance: ")
+        description = moves.input("New description for the modified App instance: ")
         if instance == 'NTP':
-            server1 = raw_input("Enter NTP target IP or Host Name: ")
-            server2 = raw_input("Enter NTP backup IP or Host Name: ")
-            confirm = raw_input("""Modify NTP App Summary:
+            server1 = moves.input("Enter NTP target IP or Host Name: ")
+            server2 = moves.input("Enter NTP backup IP or Host Name: ")
+            confirm = moves.input("""Modify NTP App Summary:
                                 Server 1: %s
                                 Server 2: %s
                                 Description: %s
@@ -3413,17 +3410,17 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Canceling; no changes made.\n"
         elif instance == 'ArpResponder':
-            interval = raw_input("Enter the check interval in milliseconds [5000]: ")
+            interval = moves.input("Enter the check interval in milliseconds [5000]: ")
             if interval == '':
                 interval = '5000'
-            in_port = raw_input("Physical source port of incoming ARP request (optional): ")
-            out_port = raw_input("Physical port for sending ARP response: ")
-            match_mac = raw_input("Enter source MAC address of incoming ARP request (optional): ")
-            src_mac = raw_input("Source MAC address of outgoing ARP response: ")
-            dst_mac = raw_input("Destination MAC address of outgoing ARP response: ")
-            src_ip = raw_input("Source IP address of outgoing ARP response: ")
-            dst_ip = raw_input("Destination IP of outgoing ARP response: ")
-            confirm = raw_input("""Modify ARP Responder App Summary:
+            in_port = moves.input("Physical source port of incoming ARP request (optional): ")
+            out_port = moves.input("Physical port for sending ARP response: ")
+            match_mac = moves.input("Enter source MAC address of incoming ARP request (optional): ")
+            src_mac = moves.input("Source MAC address of outgoing ARP response: ")
+            dst_mac = moves.input("Destination MAC address of outgoing ARP response: ")
+            src_ip = moves.input("Source IP address of outgoing ARP response: ")
+            dst_ip = moves.input("Destination IP of outgoing ARP response: ")
+            confirm = moves.input("""Modify ARP Responder App Summary:
                                 Check Interval: %s
                                 Port of incoming ARP packets: %s
                                 Port to send ARP packets: %s
@@ -3450,32 +3447,32 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Canceling; no changes made.\n"
         elif instance == 'SNMP':
-            interval = raw_input("Enter the check interval in milliseconds [5000]: ")
+            interval = moves.input("Enter the check interval in milliseconds [5000]: ")
             if interval == '':
                 interval = '5000'
-            snmp_port = raw_input("Enter the SNMP port [161]: ")
+            snmp_port = moves.input("Enter the SNMP port [161]: ")
             if snmp_port == '':
                 snmp_port = '161'
-            community = raw_input("Enter the SNMP community [public]: ")
+            community = moves.input("Enter the SNMP community [public]: ")
             if community == '':
                 community = 'public'
-            trap_enable = raw_input("Enter SNMP traps?  Enter 'true' to "
+            trap_enable = moves.input("Enter SNMP traps?  Enter 'true' to "
                                     "enable or 'false' to keep disabled [true]: ")
             if trap_enable.lower() in ('false', 'f', 'n', 'no'):
                 trap_enable = False
             else:
                 trap_enable = True
             if trap_enable:
-                trap1 = raw_input('Enter IP address of SNMP trap: ')
-                trap1_port = raw_input('Enter port number for SNMP trap [162]: ')
+                trap1 = moves.input('Enter IP address of SNMP trap: ')
+                trap1_port = moves.input('Enter port number for SNMP trap [162]: ')
                 if trap1_port == '':
                     trap1_port = '162'
-                trap2 = raw_input('Enter IP address for additional SNMP trap '
+                trap2 = moves.input('Enter IP address for additional SNMP trap '
                                   'or leave blank for none: ')
-                trap2_port = raw_input('Enter port number for additional SNMP trap [162]: ')
+                trap2_port = moves.input('Enter port number for additional SNMP trap [162]: ')
                 if trap2_port == '':
                     trap2_port = '162'
-                confirm = raw_input("""Modify SNMP App Summary:
+                confirm = moves.input("""Modify SNMP App Summary:
                                     Check Interval: %s
                                     SNMP Port: %s
                                     SNMP Community: %s
@@ -3502,7 +3499,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             else:
-                confirm = raw_input("""Modify SNMP App Summary:
+                confirm = moves.input("""Modify SNMP App Summary:
                                     Check Interval: %s
                                     SNMP Port: %s
                                     SNMP Community: %s
@@ -3519,59 +3516,59 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
         elif instance == 'HeartbeatBypass':
-            conn_type = raw_input('''Control Bypass Switch using:
+            conn_type = moves.input('''Control Bypass Switch using:
                                     1 - IP Address
                                     2 - RS232 Console Cable
                                     Enter selection [1]: ''')
             if conn_type in ('', '1'):
                 conn_type = 'IP'
-                bypass_ip = raw_input("IP address of Bypass Switch: ")
+                bypass_ip = moves.input("IP address of Bypass Switch: ")
             elif int(conn_type) == 2:
                 conn_type = 'RS232'
             else:
                 return ("That is not a valid input for Connection Type; "
                         "canceling Modify HeartbeatBypass.")
-            bypass_port1 = raw_input("Port number of first port connected to the Bypass Switch: ")
-            bypass_port2 = raw_input("Port number of the second port "
+            bypass_port1 = moves.input("Port number of first port connected to the Bypass Switch: ")
+            bypass_port2 = moves.input("Port number of the second port "
                                      "connected to the Bypass Switch: ")
-            hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
-            hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
-            interval = raw_input("Check interval time in milliseconds that the "
+            hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
+            hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
+            interval = moves.input("Check interval time in milliseconds that the "
                                  "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
-            proto = raw_input('''Protocol to use for heartbeat packets:
+            proto = moves.input('''Protocol to use for heartbeat packets:
                                  1 - UDP
                                  2 - ICMP
                                  Enter selection [1]: ''')
             if proto in ('', '1'):
                 proto = 'UDP'
-                src_port = raw_input("Enter source port for UDP heartbeat packets [5555]: ")
+                src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
                 if src_port == '':
                     src_port = '5555'
-                dst_port = raw_input("Enter destination port for UDP heartbeat packets [5556]: ")
+                dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
                 if dst_port == '':
                     dst_port = '5556'
             elif int(proto) == 2:
                 proto = 'ICMP'
             else:
                 return "That is not a valid input for Protocol; canceling modify HeartbeatBypass."
-            src_mac = raw_input("Enter source MAC address for "
+            src_mac = moves.input("Enter source MAC address for "
                                 "heartbeat packets [00:00:00:00:00:01]: ")
             if src_mac == '':
                 src_mac = '00:00:00:00:00:01'
-            dst_mac = raw_input("Enter destination MAC address for "
+            dst_mac = moves.input("Enter destination MAC address for "
                                 "heartbeat packets [00:00:00:00:00:02]: ")
             if dst_mac == '':
                 dst_mac = '00:00:00:00:00:02'
-            src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+            src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
             if src_ip == '':
                 src_ip = '0.0.0.1'
-            dst_ip = raw_input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+            dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
             if dst_ip == '':
                 dst_ip = '0.0.0.2'
             if conn_type == 'IP' and proto == 'UDP':
-                confirm = raw_input("""Modify Heartbeat Bypass App Summary:
+                confirm = moves.input("""Modify Heartbeat Bypass App Summary:
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
@@ -3614,7 +3611,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'IP' and proto == 'ICMP':
-                confirm = raw_input("""Modify Heartbeat Bypass App Summary:
+                confirm = moves.input("""Modify Heartbeat Bypass App Summary:
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
@@ -3651,7 +3648,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'UDP':
-                confirm = raw_input("""Modify Heartbeat Bypass App Summary:
+                confirm = moves.input("""Modify Heartbeat Bypass App Summary:
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
@@ -3691,7 +3688,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             elif conn_type == 'RS232' and proto == 'ICMP':
-                confirm = raw_input("""Modify Heartbeat Bypass App Summary:
+                confirm = moves.input("""Modify Heartbeat Bypass App Summary:
                                     First Port connected to Bypass Switch: %s
                                     Second Port connected to Bypass Switch: %s
                                     Port to receive Heartbeat packets: %s
@@ -3728,11 +3725,11 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Something went wrong."
         elif instance == 'Syslog':
-            server_ip = raw_input("IP address of the syslog server: ")
-            port = raw_input("Server port [514]: ")
+            server_ip = moves.input("IP address of the syslog server: ")
+            port = moves.input("Server port [514]: ")
             if port == '':
                 port = '514'
-            confirm = raw_input("""Modify Syslog App Summary:
+            confirm = moves.input("""Modify Syslog App Summary:
                                 Syslog Server IP: %s
                                 Syslog Server Port: %s
                                 Description: %s
@@ -3742,23 +3739,23 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Canceling; no changes made.\n"
         elif instance == 'BypassKeepalive':
-            conn_type = raw_input('''Bypass Switch connection type:
+            conn_type = moves.input('''Bypass Switch connection type:
                                     1 - IP Address
                                     2 - RS232 Console Cable
                                     Enter selection [1]: ''')
             if conn_type in ('', '1'):
                 conn_type = 'IP'
-                bypass_ip = raw_input("IP address of Bypass Switch: ")
+                bypass_ip = moves.input("IP address of Bypass Switch: ")
             elif int(conn_type) == 2:
                 conn_type = 'RS232'
             else:
                 return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
-            interval = raw_input("Check interval time in milliseconds that the "
+            interval = moves.input("Check interval time in milliseconds that the "
                                  "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
             if conn_type == 'IP':
-                confirm = raw_input('''Modify Bypass Keepalive Summary:
+                confirm = moves.input('''Modify Bypass Keepalive Summary:
                                     Connection Type: %s
                                     Bypass Switch IP: %s
                                     Check Interval: %s
@@ -3774,7 +3771,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             else:
-                confirm = raw_input('''Modify Bypass Keepalive Summary:
+                confirm = moves.input('''Modify Bypass Keepalive Summary:
                                     Connection Type: %s
                                     Check Interval: %s
                                     Description: %s
@@ -3784,46 +3781,46 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
         elif instance == 'Heartbeat':
-            hb_in = raw_input("Port number on which the App expects heartbeat packets to arrive: ")
-            act_comm = raw_input("Command to run when heartbeat packets are detected: ")
-            hb_out = raw_input("Port number on which the App sends heartbeat packets: ")
-            deact_comm = raw_input("Command to run when heartbeat packets are not detected: ")
-            interval = raw_input("Check interval time in milliseconds that the "
+            hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
+            act_comm = moves.input("Command to run when heartbeat packets are detected: ")
+            hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
+            deact_comm = moves.input("Command to run when heartbeat packets are not detected: ")
+            interval = moves.input("Check interval time in milliseconds that the "
                                  "App should check for heartbeat packets [2000]: ")
             if interval == '':
                 interval = '2000'
-            proto = raw_input('''Protocol to use for heartbeat packets:
+            proto = moves.input('''Protocol to use for heartbeat packets:
                                  1 - UDP
                                  2 - ICMP
                                  Enter selection [1]: ''')
             if proto in ('', '1'):
                 proto = 'UDP'
-                src_port = raw_input("Enter source port for UDP heartbeat packets [5555]: ")
+                src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
                 if src_port == '':
                     src_port = '5555'
-                dst_port = raw_input("Enter destination port for UDP heartbeat packets [5556]: ")
+                dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
                 if dst_port == '':
                     dst_port = '5556'
             elif int(proto) == 2:
                 proto = 'ICMP'
             else:
                 return "That is not a valid input for Protocol; canceling Modify Heartbeat."
-            src_mac = raw_input("Enter source MAC address for "
+            src_mac = moves.input("Enter source MAC address for "
                                 "heartbeat packets [00:00:00:00:00:01]: ")
             if src_mac == '':
                 src_mac = '00:00:00:00:00:01'
-            dst_mac = raw_input("Enter destination MAC address for "
+            dst_mac = moves.input("Enter destination MAC address for "
                                 "heartbeat packets [00:00:00:00:00:02]: ")
             if dst_mac == '':
                 dst_mac = '00:00:00:00:00:02'
-            src_ip = raw_input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+            src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
             if src_ip == '':
                 src_ip = '0.0.0.1'
-            dst_ip = raw_input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+            dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
             if dst_ip == '':
                 dst_ip = '0.0.0.2'
             if proto == 'UDP':
-                confirm = raw_input("""Modify Heartbeat App Summary:
+                confirm = moves.input("""Modify Heartbeat App Summary:
                                     Port to receive Heartbeat packets: %s
                                     Activation Command: %s
                                     Port to send Heartbeat packets: %s
@@ -3859,7 +3856,7 @@ on QSFP ports of G4 devices. \n"""
                 else:
                     return "Canceling; no changes made.\n"
             elif proto == 'ICMP':
-                confirm = raw_input("""Modify Heartbeat App Summary:
+                confirm = moves.input("""Modify Heartbeat App Summary:
                                     Port to receive Heartbeat packets: %s
                                     Activation Command: %s
                                     Port to send heartbeat packets: %s
@@ -4326,9 +4323,9 @@ on QSFP ports of G4 devices. \n"""
 
     def call_app_action_guided(self):
         """Interactive menu to call a custom app action."""
-        pid = raw_input('Enter the PID of the app instance: ')
-        name = raw_input('Enter the name of the custom app action: ')
-        confirm = raw_input("""Call App Action Summary:
+        pid = moves.input('Enter the PID of the app instance: ')
+        name = moves.input('Enter the name of the custom app action: ')
+        confirm = moves.input("""Call App Action Summary:
                             Process ID: %s
                             Action Name: %s
                             Confirm changes [y/n]: """ % (pid, name))
@@ -4360,8 +4357,8 @@ on QSFP ports of G4 devices. \n"""
 
     def kill_app_guided(self):
         """Interactive menu to stop an active app instance."""
-        pid = raw_input('What is the process ID of the app to kill: ')
-        confirm = raw_input("""Kill App Summary:
+        pid = moves.input('What is the process ID of the app to kill: ')
+        confirm = moves.input("""Kill App Summary:
                             Process ID: %s
                             Confirm changes [y/n]: """ % pid)
         if confirm.lower() in ('y', 'yes'):
@@ -4392,20 +4389,20 @@ on QSFP ports of G4 devices. \n"""
     def set_hash_algorithms_guided(self):
         """Interactive menu to set group hash algorithms."""
         if self.hardware in ('4', '2'):
-            macsa = raw_input('Type "true" to use MAC source address; '
+            macsa = moves.input('Type "true" to use MAC source address; '
                               'type "false" to ignore [true]: ')
-            macda = raw_input('Type "true" to use MAC destination address; '
+            macda = moves.input('Type "true" to use MAC destination address; '
                               'type "false" to ignore [true]: ')
-            ether = raw_input('Type "true" to use ether type; type '
+            ether = moves.input('Type "true" to use ether type; type '
                               '"false" to ignore [true]: ')
-            ipsa = raw_input('Type "true" to use IP source address; '
+            ipsa = moves.input('Type "true" to use IP source address; '
                              'type "false" to ignore [true]: ')
-            ipda = raw_input('Type "true" to use IP destination address; '
+            ipda = moves.input('Type "true" to use IP destination address; '
                              'type "false" to ignore [true]: ')
-            proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
-            src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
-            dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
-            confirm = raw_input("""Set Hash Algorithms Summary:
+            proto = moves.input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
+            src = moves.input('Type "true" to use source port; type "false" to ignore [true]: ')
+            dst = moves.input('Type "true" to use destination port; type "false" to ignore [true]: ')
+            confirm = moves.input("""Set Hash Algorithms Summary:
                                 Use Source MAC Address: %s
                                 Use Destination MAC Address: %s
                                 Use Ethertype:%s
@@ -4427,14 +4424,14 @@ on QSFP ports of G4 devices. \n"""
             else:
                 return "Canceling; no changes made.\n"
         else:
-            ipsa = raw_input('Type "true" to use IP source address; '
+            ipsa = moves.input('Type "true" to use IP source address; '
                              'type "false" to ignore [true]: ')
-            ipda = raw_input('Type "true" to use IP destination address; '
+            ipda = moves.input('Type "true" to use IP destination address; '
                              'type "false" to ignore [true]: ')
-            proto = raw_input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
-            src = raw_input('Type "true" to use source port; type "false" to ignore [true]: ')
-            dst = raw_input('Type "true" to use destination port; type "false" to ignore [true]: ')
-            confirm = raw_input("""Set Hash Algorithms Summary:
+            proto = moves.input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
+            src = moves.input('Type "true" to use source port; type "false" to ignore [true]: ')
+            dst = moves.input('Type "true" to use destination port; type "false" to ignore [true]: ')
+            confirm = moves.input("""Set Hash Algorithms Summary:
                                 Use Source IP Address: %s
                                 Use Destination IP Address: %s
                                 Use IP Protocol: %s
@@ -4521,9 +4518,9 @@ on QSFP ports of G4 devices. \n"""
 
     def set_rule_permanence_guided(self):
         """Interactive menu to set Rule Mode Permanance."""
-        perm = raw_input('type "true" to enable permanent rules; '
+        perm = moves.input('type "true" to enable permanent rules; '
                          'type "false" disable them [false]: ').lower()
-        confirm = raw_input("""Set Rule Permamence Summary:
+        confirm = moves.input("""Set Rule Permamence Summary:
                             Permanance Enabled: %s
                             Confirm changes [y/n]: """ % perm)
         if confirm.lower() in ('y', 'yes'):
@@ -4557,7 +4554,7 @@ on QSFP ports of G4 devices. \n"""
 
     def set_storage_mode_guided(self):
         """Interactive menu to set Rule Storage Mode."""
-        mode = raw_input('''Select the rule storage mode:
+        mode = moves.input('''Select the rule storage mode:
                         1 - Simple
                         2 - IPv6
                         Enter the number of your selection: ''')
@@ -4573,7 +4570,7 @@ on QSFP ports of G4 devices. \n"""
         else:
             return ("That is not a valid selection; "
                     "canceling set rule storage mode.")
-        confirm = raw_input("""Set Rule Storage Summary:
+        confirm = moves.input("""Set Rule Storage Summary:
                             Rule Storage Mode: %s
                             Confirm changes [y/n]: """ % mode)
         if confirm.lower() in ('y', 'yes'):
@@ -4611,16 +4608,16 @@ on QSFP ports of G4 devices. \n"""
 
     def add_user_guided(self):
         """Interactive menu to add a user account to the Packetmaster."""
-        username = raw_input('Enter a username: ').strip()
-        access_level = raw_input("""Choose an access level for the user:
+        username = moves.input('Enter a username: ').strip()
+        access_level = moves.input("""Choose an access level for the user:
                                 1 - Read only
                                 7 - Write
                                31 - Super User
                                Enter the numeric value for the access level: """).strip()
-        passwd = raw_input("Enter a password for the user: ")
-        description = raw_input("Add a description for this user: ")
-        rad = raw_input("Use RADIUS authentication?  Y or N [N]: ").lower()
-        confirm = raw_input("""Add User Summary:
+        passwd = moves.input("Enter a password for the user: ")
+        description = moves.input("Add a description for this user: ")
+        rad = moves.input("Use RADIUS authentication?  Y or N [N]: ").lower()
+        confirm = moves.input("""Add User Summary:
                             Username: %s
                             Access Level: %s
                             Password Hidden
@@ -4682,18 +4679,18 @@ on QSFP ports of G4 devices. \n"""
 
     def mod_user_guided(self):
         """Interactive menu to modify a user account on the Packetmaster."""
-        cur_name = raw_input('What is the username you would like to modify: ')
-        new_name = raw_input('Enter a new username: ')
-        description = raw_input("Enter a new description; "
+        cur_name = moves.input('What is the username you would like to modify: ')
+        new_name = moves.input('Enter a new username: ')
+        description = moves.input("Enter a new description; "
                                 "this will overwrite the old description: ")
-        access_level = raw_input("""Choose an access level for the user:
+        access_level = moves.input("""Choose an access level for the user:
                                 1 - Read only
                                 7 - Write
                                31 - Super User
                                Enter the numeric value for the access level: """).strip()
-        passwd = raw_input("Enter a new password for the user: ")
-        rad = raw_input("Use RADIUS authentication?  Y or N [N]: ").lower()
-        confirm = raw_input("""Modify User Summary:
+        passwd = moves.input("Enter a new password for the user: ")
+        rad = moves.input("Use RADIUS authentication?  Y or N [N]: ").lower()
+        confirm = moves.input("""Modify User Summary:
                             Modify User: %s
                             New Username: %s
                             Access Level: %s
@@ -4760,8 +4757,8 @@ on QSFP ports of G4 devices. \n"""
 
     def delete_user_guided(self):
         """Interactive menu to delete a user account from the Packetmaster."""
-        username = raw_input('What is the user name to delete: ')
-        confirm = raw_input("""Delete User Summary:
+        username = moves.input('What is the user name to delete: ')
+        confirm = moves.input("""Delete User Summary:
                             Delete User: %s
                             Confirm changes [y/n]: """ % username)
         if confirm.lower() in ('y', 'yes'):
@@ -4795,9 +4792,9 @@ on QSFP ports of G4 devices. \n"""
 
     def set_uac_guided(self):
         """Interactive menu to enable/disable user authentication."""
-        access = raw_input(('type "true" to turn on UAC; '
+        access = moves.input(('type "true" to turn on UAC; '
                             'type "false" to turn it off [false]: ').lower())
-        confirm = raw_input("""UAC Summary:
+        confirm = moves.input("""UAC Summary:
                             User Access Control On: %s
                             Confirm changes [y/n]: """ % access)
         if confirm.lower() in ('y', 'yes'):
@@ -4830,13 +4827,13 @@ on QSFP ports of G4 devices. \n"""
 
     def set_radius_guided(self):
         """Interactive menu to set RADIUS configuration."""
-        server = raw_input('Enter the IP address '
+        server = moves.input('Enter the IP address '
                            'of the RADIUS server: ').strip()
-        print "Enter the RADIUS secret."
+        print("Enter the RADIUS secret.")
         secret = getpass()
-        refresh = raw_input("Enter the refresh rate of the "
+        refresh = moves.input("Enter the refresh rate of the "
                             "RADIUS session in seconds: ")
-        level = raw_input('''Enter the RADIUS login level.
+        level = moves.input('''Enter the RADIUS login level.
         Determines the user access level that a user has
         logging in via RADIUS but without a local user account.
                              0 - no access
@@ -4844,10 +4841,10 @@ on QSFP ports of G4 devices. \n"""
                              7 - write access
                             31 - super user access
                             [0]: ''')
-        port = raw_input('Enter the UDP port of the RADIUS server [1812]: ')
+        port = moves.input('Enter the UDP port of the RADIUS server [1812]: ')
         if port == '':
             port = 1812
-        confirm = raw_input("""RADIUS Summary:
+        confirm = moves.input("""RADIUS Summary:
                             RADIUS Server: %s
                             Secret Hidden
                             Refresh Rate: %s
@@ -4902,15 +4899,15 @@ on QSFP ports of G4 devices. \n"""
 
     def set_https_guided(self):
         """Interactive menu to enable/disable HTTPS web interface."""
-        enabled = raw_input(('Type "true" to enable HTTPS on web interface; '
+        enabled = moves.input(('Type "true" to enable HTTPS on web interface; '
                              'type "false" to turn it off [false]: ').lower())
         if enabled == 'true':
-            print "Please enter the SSL password"
+            print("Please enter the SSL password")
             ssl = getpass()
         else:
             enabled = False
             ssl = 'none'
-        confirm = raw_input("""Set HTTPS Summary:
+        confirm = moves.input("""Set HTTPS Summary:
                             HTTPS Secure Web Server On: %s
                             Confirm changes [y/n]: """ % enabled)
         if confirm.lower() in ('y', 'yes'):
@@ -4942,9 +4939,9 @@ on QSFP ports of G4 devices. \n"""
 
     def set_telnet_guided(self):
         """Interactive menu to enable/disable Telnet service."""
-        enabled = raw_input(('Type "true" to enable Telnet; '
+        enabled = moves.input(('Type "true" to enable Telnet; '
                              'type "false" to turn it off [false]: ').lower())
-        confirm = raw_input("""Set Telnet Summary:
+        confirm = moves.input("""Set Telnet Summary:
                             Telnet Service On: %s
                             Confirm changes [y/n]: """ % enabled)
         if confirm.lower() in ('y', 'yes'):
@@ -4991,14 +4988,14 @@ on QSFP ports of G4 devices. \n"""
 
     def set_dns_guided(self):
         """Interactive menu to set DNS configuration."""
-        print 'You may set up to three DNS servers.'
-        dns1 = raw_input(('Enter the IP address of the first DNS '
+        print('You may set up to three DNS servers.')
+        dns1 = moves.input(('Enter the IP address of the first DNS '
                           'server or leave blank for none [none]: ').strip())
-        dns2 = raw_input(('Enter the IP address of the second DNS '
+        dns2 = moves.input(('Enter the IP address of the second DNS '
                           'server or leave blank for none [none]: ').strip())
-        dns3 = raw_input(('Enter the IP address of the third DNS '
+        dns3 = moves.input(('Enter the IP address of the third DNS '
                           'server or leave blank for none [none]: ').strip())
-        confirm = raw_input("""Set DNS Summary:
+        confirm = moves.input("""Set DNS Summary:
                             DNS Server 1: %s
                             DNS Server 2: %s
                             DNS Server 3: %s
@@ -5036,9 +5033,9 @@ on QSFP ports of G4 devices. \n"""
 
     def set_id_led_guided(self):
         """Interactive menu to enable/disable ID LED."""
-        led = raw_input(('type "true" to turn the ID LED on; '
+        led = moves.input(('type "true" to turn the ID LED on; '
                          'type "false" to turn it off [false]: ').lower())
-        confirm = raw_input("""Set ID LED Summary:
+        confirm = moves.input("""Set ID LED Summary:
                             ID LED On: %s
                             Confirm changes [y/n]: """ % led)
         if confirm.lower() in ('y', 'yes'):
@@ -5074,7 +5071,6 @@ on QSFP ports of G4 devices. \n"""
             uri = 'https://' + self._address + '/rest/device/restartwebserver?'
         else:
             uri = 'http://' + self._address + '/rest/device/restartwebserver?'
-
         try:
             response = requests.post(uri, auth=(self.username, self.password))
             content = response.content
