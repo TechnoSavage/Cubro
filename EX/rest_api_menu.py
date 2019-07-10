@@ -1,11 +1,13 @@
 #!/usr/bin/python
 
-""" Use with firmware version 2.2.5 or later. Python2.7
+""" Use with firmware version 2.2.5 or later. 
 Cubro Packetmaster REST API demo. Menu driven interface for interacting with
 a Cubro Packetmaster via the REST API. """
 
 #Import necessary Python libraries for interacting with the REST API
+from __future__ import print_function #Requires Python 2.6 or later
 from getpass import getpass
+from six import moves
 import input_check
 from packetmaster_ex_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
@@ -14,31 +16,31 @@ def set_ip():
     """Validates then sets an IP address for a Cubro PacketmasterEX device."""
     fail_count = 0
     while fail_count < 3:
-        address = raw_input('What is the IP address of the Packetmaster you want to access?: ')
+        address = moves.input('What is the IP address of the Packetmaster you want to access?: ')
         if input_check.ipv4(address) != 0:
             address = input_check.ipv4(address)
             return address
         else:
-            print "That is not a valid IPv4 address."
+            print("That is not a valid IPv4 address.")
             fail_count += 1
-    print "That is not a valid IPv4 address.  Exiting"
+    print("That is not a valid IPv4 address.  Exiting")
     exit()
 
 if __name__ == '__main__':
     #Welcome statement
-    print '''
+    print('''
                 ________  ______  ____  ____     _____  ______ _____ _______   ____   ____   __
                / ____/ / / / __ )/ __ \/ __ \   / __  \/ ____//  __//_  ___/  / __ \ / __ \ / /
               / /   / / / / /_/ / /_/ / / / /  / /_/  / __/  / /__   / /     / /_/ // /_/ // /
              / /___/ /_/ / /_/ / _, _/ /_/ /  / _,  _/ /___  \__  \ / /     / __  //  ___// /
              \____/\____/_____/_/ |_|\____/  /_/ \_\/_____//______//_/     /_/ /_//_/    /_/
            ###################################################################################
-        \n'''
+        \n''')
 
     #IP address to access REST data of device
     ADDRESS = set_ip()
     #Device credentials
-    USERNAME = raw_input('Enter your username: ')
+    USERNAME = moves.input('Enter your username: ')
     PASSWORD = getpass()
     #Initialize Packetmaster object
     PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
@@ -46,42 +48,42 @@ if __name__ == '__main__':
     def topmenu():
         """Top menu in hierarchy for device management."""
         global ADDRESS, USERNAME, PASSWORD, PACKETMASTER
-        print '\nOptions for %s at %s acting as user %s' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        print '''
+        print('\nOptions for %s at %s acting as user %s' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        print('''
             1 - Change My working device
             2 - Change My user credentials
             3 - Manage Device
-            4 - Quit \n'''
+            4 - Quit \n''')
 
-        option = raw_input('Enter selection number: ')
+        option = moves.input('Enter selection number: ')
         try:
             option = int(option)
         except ValueError as reason:
-            print reason
+            print(reason)
             topmenu()
         if option == 1:
             ADDRESS = set_ip()
             PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
             topmenu()
         elif option == 2:
-            USERNAME = raw_input('Username: ')
+            USERNAME = moves.input('Username: ')
             PASSWORD = getpass()
             PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
             topmenu()
         elif option == 3:
             manage()
         elif option == 4:
-            print 'Goodbye'
+            print('Goodbye')
             exit()
         else:
-            print 'That is not a valid selection \n'
+            print('That is not a valid selection \n')
             topmenu()
 
     def manage():
         """Menu for managing Cubro PacketmasterEX device."""
-        print '''\n%s at %s acting as user %s
-\nDevice Management Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nDevice Management Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                   1 - Hardware Configuration Menu
                   2 - Rule and Port Group Configuration Menu
                   3 - App Configuration Menu
@@ -93,7 +95,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             manage()
         menus = {1: hardwareconfig,
                  2: ruleconfig,
@@ -106,14 +108,14 @@ if __name__ == '__main__':
             select = menus[choice]
             select()
         except KeyError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             manage()
 
     def hardwareconfig():
         """Menu for configuring hardware and management related settings."""
-        print '''\n%s at %s acting as user %s
-\nHardware Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nHardware Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Model
                  2 - Serial Number
                  3 - Hardware Generation
@@ -142,7 +144,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             hardwareconfig()
         execute = {1: PACKETMASTER.device_model,
                    2: PACKETMASTER.serial_number,
@@ -172,19 +174,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 hardwareconfig()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             hardwareconfig()
 
     def notesmenu():
         """Submenu for device label and device notes settings."""
-        print '''\n%s at %s acting as user %s
-\nDevice Label and Notes Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nDevice Label and Notes Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Get Label and Notes
                  2 - Change Label only
                  3 - Change Label and Notes
@@ -194,7 +196,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             notesmenu()
         execute = {1: PACKETMASTER.device_label,
                    2: PACKETMASTER.set_name_guided,
@@ -205,19 +207,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 notesmenu()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             notesmenu()
 
     def ipconfig():
         """Submenu for IP configuration settings."""
-        print '''\n%s at %s acting as user %s
-\nIP Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nIP Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Get current IP configuration
                  2 - Change IP configuration
                  3 - Back
@@ -226,7 +228,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             ipconfig()
         execute = {1: PACKETMASTER.ip_config,
                    2: PACKETMASTER.set_ip_config_guided,
@@ -236,19 +238,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 ipconfig()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             ipconfig()
 
     def dns():
         """Submenu for DNS settings."""
-        print '''\n%s at %s acting as user %s
-\nDNS Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nDNS Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Get current DNS configuration
                  2 - Change DNS configuration
                  3 - Back
@@ -257,7 +259,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             dns()
         execute = {1: PACKETMASTER.get_dns,
                    2: PACKETMASTER.set_dns_guided,
@@ -267,19 +269,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 dns()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             dns()
 
     def portconfig():
         """Submenu for port configuration settings."""
-        print '''\n%s at %s acting as user %s
-\nPort Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nPort Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Get current port configuration
                  2 - Get current port status
                  3 - Get current port counters
@@ -293,7 +295,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             portconfig()
         execute = {1: PACKETMASTER.port_config,
                    2: PACKETMASTER.port_info,
@@ -308,19 +310,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 portconfig()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             portconfig()
 
     def web():
         """Submenu for Web Server settings."""
-        print '''\n%s at %s acting as user %s
-\nWebserver Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nWebserver Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Web logs
                  2 - Delete web Logs
                  3 - Restart webserver
@@ -331,7 +333,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             web()
         execute = {1: PACKETMASTER.web_log,
                    2: PACKETMASTER.del_web_log,
@@ -343,19 +345,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 web()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             web()
 
     def telnet():
         """Submneu for Telnet service settings."""
-        print '''\n%s at %s acting as user %s
-\nTelnet Service Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nTelnet Service Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Get current Telnet status
                  2 - Enable or Disable Telnet service
                  3 - Back
@@ -364,7 +366,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             telnet()
         execute = {1: PACKETMASTER.get_telnet,
                    2: PACKETMASTER.set_telnet_guided,
@@ -374,19 +376,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 telnet()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             telnet()
 
     def controller():
         """Submenu for Vitrum Controller settings."""
-        print '''\n%s at %s acting as user %s
-\nController Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nController Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Get current Controller configuration
                  2 - Configure Controller
                  3 - Delete Controller
@@ -396,7 +398,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             controller()
         execute = {1: PACKETMASTER.get_controller,
                    2: PACKETMASTER.set_controller_guided,
@@ -407,19 +409,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 controller()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             controller()
 
     def ruleconfig():
         """Menu for configuring rules/filters and port groups."""
-        print '''\n%s at %s acting as user %s
-\nRule and Port Group Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nRule and Port Group Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - Show Rules and Rule Counters
                  2 - Add Rule
                  3 - Modify Rule
@@ -443,7 +445,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             ruleconfig()
         execute = {1: PACKETMASTER.rules_active,
                    2: PACKETMASTER.add_rule_guided,
@@ -468,19 +470,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 ruleconfig()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             ruleconfig()
 
     def appconfig():
         """Menu for configuring App settings."""
-        print '''\n%s at %s acting as user %s
-\nApp Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nApp Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - List Apps
                  2 - List Running Apps
                  3 - Start an App instance
@@ -493,7 +495,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             appconfig()
         execute = {1: PACKETMASTER.device_apps,
                    2: PACKETMASTER.apps_active,
@@ -507,19 +509,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 appconfig()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             appconfig()
 
     def saveconfig():
         """Menu for save point configuration settings."""
-        print '''\n%s at %s acting as user %s
-\nSave Point Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nSave Point Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - List Save Points
                  2 - Activate a save point for ports
                  3 - Activate a save point for rules
@@ -538,7 +540,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             saveconfig()
         execute = {1: PACKETMASTER.save_points,
                    2: PACKETMASTER.set_port_savepoint_guided,
@@ -558,19 +560,19 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 saveconfig()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             saveconfig()
 
     def userconfig():
         """Menu for user account related settings."""
-        print '''\n%s at %s acting as user %s
-\nUser Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME)
-        choice = raw_input('''
+        print('''\n%s at %s acting as user %s
+\nUser Configuration Menu''' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        choice = moves.input('''
                  1 - List Users
                  2 - Add User
                  3 - Modify User
@@ -585,7 +587,7 @@ if __name__ == '__main__':
         try:
             choice = int(choice)
         except ValueError as reason:
-            print ("That is not a valid selection.", reason)
+            print("That is not a valid selection.", reason)
             userconfig()
         execute = {1: PACKETMASTER.get_users,
                    2: PACKETMASTER.add_user_guided,
@@ -601,11 +603,11 @@ if __name__ == '__main__':
             try:
                 select = execute[choice]
                 run = select()
-                print run
+                print(run)
                 userconfig()
             except KeyError as reason:
-                print reason
+                print(reason)
         else:
-            print "That is not a valid selection."
+            print("That is not a valid selection.")
             userconfig()
 topmenu()
