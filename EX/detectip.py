@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-""" Use with firmware version 2.2.5 or later. Python2.7 Cubro Packetmaster
+""" Use with firmware version 2.2.5 or later. Cubro Packetmaster
 REST API demo. Use a Packetmaster 'A' to detect the presence of traffic from
 a specified IP address and, upon detection, create a rule on Packetmater 'B'
 to block all traffic from that IP address. Prerequisites are that Packetmaster
@@ -9,9 +9,11 @@ User should edit the 'execute' function in this script as desired for his
 rule parameters. """
 
 #Import necessary Python libraries
+from __future__ import print_function #Requires Python 2.6 or later
 import json
 import time
 from getpass import getpass
+from six import moves
 from packetmaster_ex_rest import PacketmasterEX
 
 #Function to query for the existence of the specified IP address on Packetmaster 'A' (detector)
@@ -54,15 +56,15 @@ if __name__ == '__main__':
     #TTL represents that this program will run for an hour until it expires or
     #the match criteria is found
     TTL = 3600
-    DETECT_IP = raw_input("What is the IP address to be detected: ")
-    ADDRESS_DETECTOR = raw_input('What is the IP address of the Packetmaster '
+    DETECT_IP = moves.input("What is the IP address to be detected: ")
+    ADDRESS_DETECTOR = moves.input('What is the IP address of the Packetmaster '
                                  'detecting the IP Address: ')
-    USERNAME_DETECTOR = raw_input('What is the username for detecting Packetmaster (if required): ')
+    USERNAME_DETECTOR = moves.input('What is the username for detecting Packetmaster (if required): ')
     PASSWORD_DETECTOR = getpass()
     DETECTOR = PacketmasterEX(ADDRESS_DETECTOR, USERNAME_DETECTOR, PASSWORD_DETECTOR)
-    ADDRESS_BLOCKER = raw_input('What is the IP address of the Packetmaster '
+    ADDRESS_BLOCKER = moves.input('What is the IP address of the Packetmaster '
                                 'where the blocking rule will be created: ')
-    USERNAME_BLOCKER = raw_input('What is the username for the Packetmaster '
+    USERNAME_BLOCKER = moves.input('What is the username for the Packetmaster '
                                  'where the blocking rule will be created (if required): ')
     PASSWORD_BLOCKER = getpass()
     BLOCKER = PacketmasterEX(ADDRESS_BLOCKER, USERNAME_BLOCKER, PASSWORD_BLOCKER)
@@ -73,9 +75,9 @@ if __name__ == '__main__':
     #while loop executes 'query' so long as ttl value is greater than zero
     while TTL > 0:
         query(DETECTOR, BLOCKER, DETECT_IP)
-        print TTL
+        print(TTL)
         time.sleep(1)
 
     #Once ttl value reaches zero the program will close
-    print 'Program has expired'
+    print('Program has expired')
     exit()

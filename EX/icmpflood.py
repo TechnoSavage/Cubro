@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-""" Use with firmware version 2.2.5 or later. Python2.7
+""" Use with firmware version 2.2.5 or later.
     Cubro Packetmaster REST API demo. Use a Packetmaster to detect the presence
     of an excessive amount of ICMP packets on a link and drop ICMP packets for
     one minute if they exceed threshold. Prerequisites for using this script
@@ -10,9 +10,11 @@
 
 
 #Import necessary Python libraries for interacting with the REST API
+from __future__ import print_function #Requires Python 2.6 or later
 import json
 import time
 from getpass import getpass
+from six import moves
 from packetmaster_ex_rest import PacketmasterEX
 
 def query(packetmaster, interface, priority1, priority2, limit):
@@ -37,13 +39,13 @@ def query(packetmaster, interface, priority1, priority2, limit):
     if float(field[0]) > limit and 'Kbit' in datarate:
         dropicmp(packetmaster, interface, output, priority1, priority2, limit)
     else:
-        print datarate
+        print(datarate)
         query(packetmaster, interface, priority1, priority2, limit)
 
 def dropicmp(packetmaster, interface, output, priority1, priority2, limit):
     """ Creates two rules: One that drops all ICMP packets and another that
         passes all other traffic.  Calls recreate function after 60 seconds. """
-    print 'ICMP flood detected; blocking ICMP packets for the next 60 seconds'
+    print('ICMP flood detected; blocking ICMP packets for the next 60 seconds')
     params1 = {'name': 'ICMP Flood Mode',
                'description': 'Drop all ICMP packets for 60 seconds following creation of rule',
                'priority': priority1,
@@ -76,38 +78,38 @@ def recreate(packetmaster, interface, output, priority1, priority2, limit):
                'actions': output}
     packetmaster.add_rule(params1)
     packetmaster.add_rule(params2)
-    print 'Returning to standard traffic flow'
+    print('Returning to standard traffic flow')
     time.sleep(10)
     query(packetmaster, interface, priority1, priority2, limit)
 
 if __name__ == '__main__':
-    ADDRESS = raw_input('IP address of the Packetmaster to monitor: ')
-    USERNAME = raw_input('Username for Packetmaster: ')
+    ADDRESS = moves.input('IP address of the Packetmaster to monitor: ')
+    USERNAME = moves.input('Username for Packetmaster: ')
     PASSWORD = getpass()
     PACKETMASTER = PacketmasterEX(ADDRESS, USERNAME, PASSWORD)
-    INTERFACE = raw_input(""""What is(are) the port number(s) or range of ports
+    INTERFACE = moves.input(""""What is(are) the port number(s) or range of ports
                               for the ICMP monitoring rule set
                               e.g. '5' or '1,2,5' or '5-10'
                               (Must match the rule set on the Packetmaster exactly): """)
-    PRIORITY1 = raw_input("What is the priority of the rule monitoring ICMP traffic: ")
+    PRIORITY1 = moves.input("What is the priority of the rule monitoring ICMP traffic: ")
     try:
         PRIORITY1 = int(PRIORITY1)
     except ValueError as reason:
-        print ("That is not a valid input for ICMP monitor priority; canceling program.", reason)
+        print("That is not a valid input for ICMP monitor priority; canceling program.", reason)
         exit()
-    PRIORITY2 = raw_input("What is the priority of the rule passing all "
+    PRIORITY2 = moves.input("What is the priority of the rule passing all "
                           "other traffic (Must be lower): ")
     try:
         PRIORITY2 = int(PRIORITY2)
     except ValueError as reason:
-        print ("That is not a valid input for rule priority; canceling program.", reason)
+        print("That is not a valid input for rule priority; canceling program.", reason)
         exit()
-    LIMIT = raw_input("""What is the datarate limit in Kbits/sec for allowable
+    LIMIT = moves.input("""What is the datarate limit in Kbits/sec for allowable
                         ICMP traffic on these ports
                         e.g. '10.0' or '250.7': """)
     try:
         LIMIT = float(LIMIT)
     except ValueError as reason:
-        print ("That is not a valid input for datarate limit; canceling program.", reason)
+        print("That is not a valid input for datarate limit; canceling program.", reason)
         exit()
     query(PACKETMASTER, INTERFACE, PRIORITY1, PRIORITY2, LIMIT)
