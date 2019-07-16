@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-""" Use with firmware version 2.2.5 or later. Python2.7
+""" Use with firmware version 2.2.5 or later.
     Cubro Packetmaster REST API demo. Shows conceptually how the ReST API can
     be used to perform a mass password reset for all users across all provided
     device IPs and output a text file containing the users and new passwords.
@@ -8,6 +8,7 @@
     password file. """
 
 #Import necessary Python libraries
+from __future__ import print_function #Requires Python 2.6 or later
 import json
 import sys
 import string
@@ -16,7 +17,7 @@ from packetmaster_ex_rest import PacketmasterEX
 
 def usage():
     """ Display usage and help. """
-    print """Usage:
+    print("""Usage:
              -r, --random FILE   Provide a JSON formatted text file of device IPs and admin credentials.
                                  All users on provided devices will have current password replaced with
                                  a random password.  A file of usernames and corresponding new passwords
@@ -55,7 +56,7 @@ def usage():
                                              {"ip": "192.168.0.2", "admin": "username", "passwd": "password"},
                                              {"ip": "192.168.0.3", "admin": "username", "passwd": "password"}
                                              ]
-                             }"""
+                             }""")
 
 def rand_reset(device_ip, admin_username, admin_pass):
     """ Replace all non-admin users passwords with randomly generated
@@ -163,7 +164,7 @@ if __name__ == '__main__':
                 try:
                     USER_LIST.append(run["users"])
                 except (NameError, KeyError) as reason:
-                    print reason
+                    print(reason)
         OUTPUT_FILE["Successfully Changed"] = SUCCESS
         OUTPUT_FILE["Failed to connect"] = FAILED
         OUTPUT_FILE["New User Passwords"] = USER_LIST
@@ -214,7 +215,7 @@ if __name__ == '__main__':
                 try:
                     USER_LIST.append(run["users"])
                 except (NameError, KeyError) as reason:
-                    print reason
+                    print(reason)
         OUTPUT_FILE["Successfully Changed"] = SUCCESS
         OUTPUT_FILE["Failed to connect"] = FAILED
         OUTPUT_FILE["New User Passwords"] = USER_LIST

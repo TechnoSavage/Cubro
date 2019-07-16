@@ -2,13 +2,14 @@
 ''' created for testing purpose; creates 1000 TCP filters
     for source ports 1000 through 1999.'''
 
+from __future__ import print_function #Requires Python 2.6 or later
 from sys import argv
 from packetmaster_ex_rest import PacketmasterEX
 
 def usage():
     ''' Explain use of script.'''
-    print ''' Supply arguments IP address, Username, and Password.
-              e.g. mask_test.py 192.168.1.200 admin cubro'''
+    print(''' Supply arguments IP address, Username, and Password.
+              e.g. mask_test.py 192.168.1.200 admin cubro''')
 
 if __name__ == '__main__':
     if len(argv) <= 0:
@@ -24,4 +25,4 @@ if __name__ == '__main__':
                       'match[tcp_src]': n,
                       'actions': 'output:4'}
             result = PACKETMASTER.add_rule(params)
-            print result
+            print(result)
