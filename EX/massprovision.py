@@ -1,19 +1,21 @@
 #!/usr/bin/python
 
-""" Use with firmware version 2.2.5 or later. Python2.7
+""" Use with firmware version 2.2.5 or later.
 Cubro Packetmaster REST API demo. Shows conceptually how the ReST API can
 be used to mass provision a set of devices."""
 
 #Import necessary Python libraries
+from __future__ import print_function #Requires Python 2.6 or later
 import json
 import sys
 import re
 from getpass import getpass
+from six import moves
 from packetmaster_ex_rest import PacketmasterEX
 
 def usage():
     """ Display usage and help. """
-    print """Usage:
+    print("""Usage:
              -f, --filename FILE   Provide a JSON formatted text file of device IPs and admin credentials
                                    that the configuration should be applied to.
                                  Format:
@@ -30,7 +32,7 @@ def usage():
                               IP addresses passed to -l option.
 
              This script will apply a preset baseline configuration to each
-             Packetmaster IP address provided."""
+             Packetmaster IP address provided.""")
 
 def apply_config(device_ip, admin_username=None, password=None):
     """ Applies all 'PacketmasterEX' method calls listed to Packetmaster device.
@@ -73,10 +75,10 @@ if __name__ == '__main__':
                 admin_user = item["admin"]
                 admin_password = item["passwd"]
                 run = apply_config(ip, admin_user, admin_password)
-                print run
+                print(run)
     elif len(sys.argv) > 1 and str(sys.argv[1]) in ('-l', '--list'):
         if '-u' in sys.argv or '--username' in sys.argv:
-            ADMIN_USER = raw_input("Administrator Username: ")
+            ADMIN_USER = moves.input("Administrator Username: ")
             ADMIN_PASS = getpass()
         IP_LIST = sys.argv[2:]
         for item in IP_LIST:
@@ -85,6 +87,6 @@ if __name__ == '__main__':
                 run = apply_config(address[0], ADMIN_USER, ADMIN_PASS)
             else:
                 run = apply_config(address[0])
-            print run
+            print(run)
     else:
         usage()
