@@ -2,6 +2,7 @@
 
 import requests
 from requests.exceptions import ConnectionError
+from six import moves
 
 #TO-DO Implement chacks against valid input for config settings
 class BypassSwitch(object):
@@ -51,19 +52,19 @@ class BypassSwitch(object):
 
     def set_config_guided(self):
         """Interactive menu to set management configuration."""
-        ip_address = raw_input("Enter Management IP Address [192.168.0.201]: ")
+        ip_address = moves.input("Enter Management IP Address [192.168.0.201]: ")
         if len(ip_address) <= 0:
             ip_address = '192.168.0.201'
-        subnet_mask = raw_input("Enter Subnet Mask [255.255.255.0]: ")
+        subnet_mask = moves.input("Enter Subnet Mask [255.255.255.0]: ")
         if len(subnet_mask) <= 0:
             subnet_mask = '255.255.255.0'
-        gateway = raw_input("Enter Management Gateway [192.168.0.1]: ")
+        gateway = moves.input("Enter Management Gateway [192.168.0.1]: ")
         if len(gateway) <= 0:
             gateway = '192.168.0.1'
-        mac = raw_input("Enter a new MAC Address [D8-20-9F-00-01-64]: ")
+        mac = moves.input("Enter a new MAC Address [D8-20-9F-00-01-64]: ")
         if len(mac) <= 0:
             mac = 'D8-20-9F-00-01-64'
-        time_out = raw_input("Enter a Timeout value [10]: ")
+        time_out = moves.input("Enter a Timeout value [10]: ")
         if len(time_out) <= 0:
             time_out = '10'
         uri = 'http://' + self.address + '/setConfig?'
