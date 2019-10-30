@@ -26,15 +26,15 @@ def dropsmb(packetmaster, interface, duration):
     """ Sets rule on Packetmaster to drop SMB traffic for specified duration
         of time. """
     timeout = "hard_timeout=" + duration
-    params = {"name": "dropsmb temporary",
-              "description": "This rule will drop SMB traffic for the specified duration",
-              "priority": 65535,
-              "match[in_port]": interface,
-              "match[protocol]": "tcp",
-              "match[tcp_dst]": "445",
-              "match[extra]": timeout,
-              "actions": "drop"}
-    run = packetmaster.add_rule(params)
+    data = {"name": "dropsmb temporary",
+            "description": "This rule will drop SMB traffic for the specified duration",
+            "priority": 65535,
+            "match[in_port]": interface,
+            "match[protocol]": "tcp",
+            "match[tcp_dst]": "445",
+            "match[extra]": timeout,
+            "actions": "drop"}
+    run = packetmaster.add_rule(data)
     print(run)
 
 if __name__ == '__main__':

@@ -17,12 +17,12 @@ if __name__ == '__main__':
     else:
         PACKETMASTER = PacketmasterEX(argv[1], argv[2], argv[3])
         for n in range(1000, 2000):
-            params = {'name': 'test' + str(n),
+            data = {'name': 'test' + str(n),
                       'priority': 32768,
                       'match[in_port]': '1',
                       'match[protocol]': 'tcp',
                       'match[nw_src]': '131.151.32.129',
                       'match[tcp_src]': n,
                       'actions': 'output:4'}
-            result = PACKETMASTER.add_rule(params)
+            result = PACKETMASTER.add_rule(data)
             print(result)

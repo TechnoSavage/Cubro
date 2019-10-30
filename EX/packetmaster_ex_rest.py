@@ -22,7 +22,7 @@ class PacketmasterEX(object):
 
     :param address: A string, Management IP of Packetmaster.
     :param username: A string, username of an account on the Packetmaster.
-    :param password: A string, password for the user accountself.
+    :param password: A string, password for the user account.
     """
 
 
@@ -43,12 +43,12 @@ class PacketmasterEX(object):
         """
         try:
             gen_test = self.hardware_generation()
-            data = json.loads(gen_test)
-            for item in data:
+            info = json.loads(gen_test)
+            for item in info:
                 if item == 'error':
-                    print(data['error'])
+                    print(info['error'])
                     return "Connection test failed"
-                self.hardware = data['generation']
+                self.hardware = info['generation']
                 self.get_port_count()
                 self.device_model()
                 return "Connection established"
@@ -57,12 +57,12 @@ class PacketmasterEX(object):
             try:
                 self.__https = True
                 gen_test = self.hardware_generation()
-                data = json.loads(gen_test)
-                for item in data:
+                info = json.loads(gen_test)
+                for item in info:
                     if item == 'error':
-                        print(data['error'])
+                        print(info['error'])
                         return "Connection test failed"
-                    self.hardware = data['generation']
+                    self.hardware = info['generation']
                     self.get_port_count()
                     self.device_model()
                     return "Connection established"
@@ -81,10 +81,10 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
+            info = json.loads(content)
             count = 0
-            for port in data['port_config']:
-                ports.append(data['port_config'][count]['if_name'])
+            for port in info['port_config']:
+                ports.append(info['port_config'][count]['if_name'])
                 count += 1
             #Exclude all logical ports
             self.ports = len(ports)
@@ -101,9 +101,9 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            self.firmware = data['version']
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            self.firmware = info['version']
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -117,8 +117,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -132,10 +132,10 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            self.netmask = data['current_netmask']
-            self.gateway = data['current_gateway']
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            self.netmask = info['current_netmask']
+            self.gateway = info['current_gateway']
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -149,13 +149,13 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            self.model = data['model']
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            self.model = info['model']
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
-        self.model = data['model']
+        self.model = info['model']
 
     def device_name(self):
         """Return name of Packetmaster."""
@@ -166,9 +166,9 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            self.name = data['name']
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            self.name = info['name']
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -182,10 +182,10 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            self.name = data['name']
-            self.notes = data['notes']
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            self.name = info['name']
+            self.notes = info['notes']
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -199,8 +199,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -214,9 +214,9 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            self.serial = data['serial']
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            self.serial = info['serial']
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -230,8 +230,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -245,8 +245,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -260,8 +260,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -275,8 +275,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            result = data['result']
+            info = json.loads(content)
+            result = info['result']
             return json.dumps(result, indent=4)
         except ConnectionError as error:
             content = 'No Response'
@@ -291,8 +291,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -306,8 +306,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -321,8 +321,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -336,8 +336,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -351,8 +351,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -366,8 +366,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -381,8 +381,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -396,8 +396,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -411,8 +411,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -426,8 +426,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -441,8 +441,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -456,8 +456,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -471,8 +471,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -486,8 +486,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -501,8 +501,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -516,8 +516,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -531,8 +531,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -546,8 +546,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -561,8 +561,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -576,8 +576,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -591,8 +591,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -641,12 +641,12 @@ class PacketmasterEX(object):
             return "That is not a valid IP address; canceling Set Controller. \n"
         if not input_check.port(port):
             return "That is not a valid TCP port number; canceling Set Controller. \n"
-        params = {'connection': conn, 'ip': ipadd, 'port': port}
+        data = {'connection': conn, 'ip': ipadd, 'port': port}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -695,12 +695,12 @@ class PacketmasterEX(object):
             return "That is not a valid IP address; canceling Delete Controller. \n"
         if not input_check.port(port):
             return "That is not a valid TCP port number; canceling Delete Controller. \n"
-        params = {'connection': conn, 'ip': ipadd, 'port': port}
+        data = {'connection': conn, 'ip': ipadd, 'port': port}
         try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            response = requests.delete(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -714,8 +714,8 @@ class PacketmasterEX(object):
         try:
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -777,12 +777,12 @@ class PacketmasterEX(object):
             gateway = input_check.ipv4(gateway)
         else:
             return "That is not a valid Gateway Address; canceling Set IP Configuration. \n"
-        params = {'ip': address, 'mask': netmask, 'gw': gateway}
+        data = {'ip': address, 'mask': netmask, 'gw': gateway}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -804,12 +804,12 @@ class PacketmasterEX(object):
             uri = 'https://' + self._address + '/rest/device/name?'
         else:
             uri = 'http://' + self._address + '/rest/device/name?'
-        params = {'name': name}
+        data = {'name': name}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -833,13 +833,13 @@ class PacketmasterEX(object):
             uri = 'https://' + self._address + '/rest/device/customident?'
         else:
             uri = 'http://' + self._address + '/rest/device/customident?'
-        params = {'name': name,
-                  'notes': notes}
+        data = {'name': name,
+                'notes': notes}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -1016,39 +1016,39 @@ on QSFP ports of G4 devices. \n""")
         else:
             split = 'no'
         if self.hardware == '4' and speed in ('40G', '100G'):
-            params = {'if_name': interface,
-                      'description': description,
-                      'unidirectional': forcetx,
-                      'crc_check': check,
-                      'crc_recalculation': recalc,
-                      'shutdown': 'false',
-                      'split': split}
+            data = {'if_name': interface,
+                    'description': description,
+                    'unidirectional': forcetx,
+                    'crc_check': check,
+                    'crc_recalculation': recalc,
+                    'shutdown': 'false',
+                    'split': split}
         elif self.hardware == '4':
-            params = {'if_name': interface,
-                      'description': description,
-                      'speed': speed,
-                      'duplex': duplex,
-                      'unidirectional': forcetx,
-                      'crc_check': check,
-                      'crc_recalculation': recalc}
+            data = {'if_name': interface,
+                    'description': description,
+                    'speed': speed,
+                    'duplex': duplex,
+                    'unidirectional': forcetx,
+                    'crc_check': check,
+                    'crc_recalculation': recalc}
         elif self.hardware == '3.1' and speed in ('1G', 'XG'):
-            params = {'if_name': interface,
-                      'description': description,
-                      'speed': 'auto',
-                      'duplex': duplex,
-                      'xg_speed': speed,
-                      'shutdown': 'false'}
+            data = {'if_name': interface,
+                    'description': description,
+                    'speed': 'auto',
+                    'duplex': duplex,
+                    'xg_speed': speed,
+                    'shutdown': 'false'}
         else:
-            params = {'if_name': interface,
-                      'description': description,
-                      'speed': speed,
-                      'duplex': duplex,
-                      'shutdown': 'false'}
+            data = {'if_name': interface,
+                    'description': description,
+                    'speed': speed,
+                    'duplex': duplex,
+                    'shutdown': 'false'}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -1080,12 +1080,12 @@ on QSFP ports of G4 devices. \n""")
             updown = True
         else:
             updown = False
-        params = {'if_name': interface, 'shutdown': updown}
+        data = {'if_name': interface, 'shutdown': updown}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -1122,24 +1122,24 @@ on QSFP ports of G4 devices. \n""")
 
     def add_rule_guided(self):
         """Interactive menu to add a rule/filter."""
-        params = {}
+        data = {}
         rulename = moves.input('Enter a name for the rule [none]: ')
-        params['name'] = rulename
+        data['name'] = rulename
         ruledescrip = moves.input('Enter a description for the rule [none]: ')
-        params['description'] = ruledescrip
+        data['description'] = ruledescrip
         priority = moves.input('Enter the priority level of the rule; '
                              '0 - 65535 higher number = higher priority [32768]: ')
         if priority != '':
             if input_check.pm_pri(priority):
-                params['priority'] = int(priority)
+                data['priority'] = int(priority)
             else:
                 return "That is not a valid input for priority; canceling Add Rule."
         else:
-            params['priority'] = 32768
+            data['priority'] = 32768
         portin = moves.input('Enter the port number or numbers for incoming traffic; '
                            'multiple ports separated by a comma: ')
         #Implement valid port number check against device
-        params['match[in_port]'] = portin
+        data['match[in_port]'] = portin
         print('''\nMatch VLAN tag?
                 1 - No, match all tagged and untagged traffic
                 2 - No, match only untagged traffic
@@ -1148,19 +1148,19 @@ on QSFP ports of G4 devices. \n""")
         if trafmatch == '' or int(trafmatch) == 1:
             pass
         elif int(trafmatch) == 2:
-            params['match[vlan]'] = 'neg_match'
+            data['match[vlan]'] = 'neg_match'
         elif int(trafmatch) == 3:
-            params['match[vlan]'] = 'match'
+            data['match[vlan]'] = 'match'
             matchid = moves.input('Enter the VLAN ID to filter on: ')
             if input_check.vlan(matchid):
-                params['match[vlan_id]'] = matchid
+                data['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Add Rule."
             vpri = moves.input('Enter a VLAN priority? Enter 0-7 orleave blank for none: ')
             if vpri != '' and input_check.vlan_pri(vpri):
-                params['match[vlan_priority]'] = vpri
+                data['match[vlan_priority]'] = vpri
             elif vpri == '':
-                params['match[vlan_priority]'] = '0'
+                data['match[vlan_priority]'] = '0'
             else:
                 return "That is not a valid VLAN Priority; canceling Add Rule."
         else:
@@ -1169,12 +1169,12 @@ on QSFP ports of G4 devices. \n""")
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
         #MAC Address input check
-            params['match[dl_src]'] = macsrc
+            data['match[dl_src]'] = macsrc
         macdst = moves.input('Filter by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
         #MAC Address input check
-            params['match[dl_dst]'] = macdst
+            data['match[dl_dst]'] = macdst
         proto_options = {2: 'ip',
                          3: 'tcp',
                          4: 'udp',
@@ -1198,19 +1198,19 @@ on QSFP ports of G4 devices. \n""")
         else:
             try:
                 if int(proto) in range(2, 9):
-                    params['match[protocol]'] = proto_options[int(proto)]
+                    data['match[protocol]'] = proto_options[int(proto)]
                 else:
                     return "That is not a valid selection; canceling Add Rule \n"
             except ValueError as reason:
                 return("That is not a valid input; canceling Add Rule", reason)
-            if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
+            if data['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
                 nwsrc = moves.input('Filter on source IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwsrc != '':
                     if input_check.ipv4_mask(nwsrc) != 0:
-                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                        data['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
                 nwdst = moves.input('Filter on destination IP address? '
@@ -1219,111 +1219,111 @@ on QSFP ports of G4 devices. \n""")
                                   'or "192.168.1.5/24"): ')
                 if nwdst != '':
                     if input_check.ipv4_mask(nwdst) != 0:
-                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                        data['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
-            if params['match[protocol]'] == 'ip':
+            if data['match[protocol]'] == 'ip':
                 nwproto = moves.input('Enter protocol number '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
-                    params['match[nw_proto]'] = nwproto
-            if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
+                    data['match[nw_proto]'] = nwproto
+            if data['match[protocol]'] in ('tcp', 'udp', 'sctp'):
                 tp_src = moves.input('Filter on source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
                     if input_check.port(tp_src):
-                        params['match[' + params['match[protocol]'] + '_src]'] = tp_src
+                        data['match[' + data['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Add Rule."
                 tp_dst = moves.input('Filter on destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
                     if input_check.port(tp_dst):
-                        params['match[' + params['match[protocol]'] + '_dst]'] = tp_dst
+                        data['match[' + data['match[protocol]'] + '_dst]'] = tp_dst
                     else:
                         return "That is not a valid port number; canceling Add Rule."
-            if params['match[protocol]'] == 'icmp':
+            if data['match[protocol]'] == 'icmp':
                 icmpt = moves.input('Filter on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
                     if input_check.icmp_type(icmpt):
-                        params['match[icmp_type]'] = icmpt
+                        data['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Add Rule."
                 icmpc = moves.input('Filter on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
                     if input_check.icmp_code(icmpc):
-                        params['match[icmp_code]'] = icmpc
+                        data['match[icmp_code]'] = icmpc
                     else:
                         return "That is not a valid ICMP Code; canceling Add Rule."
-            if params['match[protocol]'] == 'custom':
+            if data['match[protocol]'] == 'custom':
                 ether = moves.input('Enter Ethertype e.g. 0x0800: ')
                 if ether != '':
-                    params['match[dl_type]'] = ether
+                    data['match[dl_type]'] = ether
                 nwproto = moves.input('Enter protocol number '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
-                    params['match[nw_proto]'] = nwproto
+                    data['match[nw_proto]'] = nwproto
         print('''\nAdd Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
         Improper syntax will cause Add Rule to fail \n''')
         extra = moves.input('Enter Extra Custom Match String: ')
         if extra != '':
-            params['match[extra]'] = extra
+            data['match[extra]'] = extra
         ruleaction = moves.input('\nEnter the desired output actions separated by commas; '
                                'order matters - improper syntax will cause Add Rule to fail: ')
-        params['actions'] = ruleaction
-        check_params = json.dumps(params, indent=4)
+        data['actions'] = ruleaction
+        check_data = json.dumps(data, indent=4)
         confirm = moves.input("""Configuration change summary:
                             Rule Parameters: %s
-                            Confirm changes [y/n]: """ % check_params)
+                            Confirm changes [y/n]: """ % check_data)
         if confirm.lower() in ('y', 'yes'):
-            run = self.add_rule(params)
+            run = self.add_rule(data)
             return run
         return "Canceling; no changes made.\n"
 
-    def add_rule(self, params):
+    def add_rule(self, data):
         """Add a rule/filter to the Packetmaster."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
             uri = 'http://' + self._address + '/rest/rules?'
-        if not isinstance(params, dict):
+        if not isinstance(data, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
 
     def mod_rule_guided(self):
         """Interactive menu to modify a rule/filter on the Packetmaster."""
-        params = {}
+        data = {}
         name = moves.input('Enter a new name for the rule: ')
-        params['name'] = name
+        data['name'] = name
         cookie = moves.input('Enter the cookie of the rule to modify: ')
-        params['cookie'] = cookie
+        data['cookie'] = cookie
         description = moves.input('Enter a new description for the rule: ')
-        params['description'] = description
+        data['description'] = description
         priority = moves.input('Enter the priority of the rule (priority cannot be changed; '
                              'must match rule to be modified)[32768]: ')
         if priority != '':
             if input_check.pm_pri(priority):
-                params['priority'] = int(priority)
+                data['priority'] = int(priority)
             else:
                 return "That is not a valid input for priority; canceling Modify Rule."
         else:
             priority = 32768
         in_port = moves.input("What is (are) the input port(s)for the rule separated by commas: ")
-        params['match[in_port]'] = in_port
+        data['match[in_port]'] = in_port
         print("For the following input filters the selected option must match "
               "the rule being modified; these fields cannot be changed.")
         print('''\nIs the rule matching a VLAN tag?
@@ -1334,19 +1334,19 @@ on QSFP ports of G4 devices. \n""")
         if trafmatch == '' or int(trafmatch) == 1:
             pass
         elif int(trafmatch) == 2:
-            params['match[vlan]'] = 'neg_match'
+            data['match[vlan]'] = 'neg_match'
         elif int(trafmatch) == 3:
-            params['match[vlan]'] = 'match'
+            data['match[vlan]'] = 'match'
             matchid = moves.input('Enter the VLAN ID the rule is filtering: ')
             if input_check.vlan(matchid):
-                params['match[vlan_id]'] = matchid
+                data['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Modify Rule."
             vpri = moves.input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
             if vpri != '' and input_check.vlan_pri(vpri):
-                params['match[vlan_priority]'] = vpri
+                data['match[vlan_priority]'] = vpri
             elif vpri == '':
-                params['match[vlan_priority]'] = '0'
+                data['match[vlan_priority]'] = '0'
             else:
                 return "That is not a valid VLAN Priority; canceling Modify Rule."
         else:
@@ -1354,11 +1354,11 @@ on QSFP ports of G4 devices. \n""")
         macsrc = moves.input('Filtering by source MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
-            params['match[dl_src]'] = macsrc
+            data['match[dl_src]'] = macsrc
         macdst = moves.input('Filtering by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
-            params['match[dl_dst]'] = macdst
+            data['match[dl_dst]'] = macdst
         proto_options = {2: 'ip',
                          3: 'tcp',
                          4: 'udp',
@@ -1382,19 +1382,19 @@ on QSFP ports of G4 devices. \n""")
         else:
             try:
                 if int(proto) in range(2, 9):
-                    params['match[protocol]'] = proto_options[int(proto)]
+                    data['match[protocol]'] = proto_options[int(proto)]
                 else:
                     return "That is not a valid selection; canceling Modify Rule \n"
             except ValueError as reason:
                 return("That is not a valid input; canceling Modify Rule", reason)
-            if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
+            if data['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
                 nwsrc = moves.input('Filtering on a source IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwsrc != '':
                     if input_check.ipv4_mask(nwsrc) != 0:
-                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                        data['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
                 nwdst = moves.input('Filtering on a destination IP address? '
@@ -1403,87 +1403,87 @@ on QSFP ports of G4 devices. \n""")
                                   'or "192.168.1.5/24"): ')
                 if nwdst != '':
                     if input_check.ipv4_mask(nwdst) != 0:
-                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                        data['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
-            if params['match[protocol]'] == 'ip':
+            if data['match[protocol]'] == 'ip':
                 nwproto = moves.input('Filtering on a protocol number? '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
-                    params['match[nw_proto]'] = nwproto
-            if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
+                    data['match[nw_proto]'] = nwproto
+            if data['match[protocol]'] in ('tcp', 'udp', 'sctp'):
                 tp_src = moves.input('Filtering on a source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
                     if input_check.port(tp_src):
-                        params['match[' + params['match[protocol]'] + '_src]'] = tp_src
+                        data['match[' + data['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Modify Rule."
                 tp_dst = moves.input('Filtering on a destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
                     if input_check.port(tp_dst):
-                        params['match[' + params['match[protocol]'] + '_dst]'] = tp_dst
+                        data['match[' + data['match[protocol]'] + '_dst]'] = tp_dst
                     else:
                         return "That is not a valid port number; canceling Modify Rule."
-            if params['match[protocol]'] == 'icmp':
+            if data['match[protocol]'] == 'icmp':
                 icmpt = moves.input('Filtering on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
                     if input_check.icmp_type(icmpt):
-                        params['match[icmp_type]'] = icmpt
+                        data['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Modify Rule."
                 icmpc = moves.input('Filtering on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
                     if input_check.icmp_code(icmpc):
-                        params['match[icmp_code]'] = icmpc
+                        data['match[icmp_code]'] = icmpc
                     else:
                         return "That is not a valid ICMP Code; canceling Modify Rule."
-            if params['match[protocol]'] == 'custom':
+            if data['match[protocol]'] == 'custom':
                 ether = moves.input('Enter Ethertype e.g. 0x0800: ')
                 if ether != '':
-                    params['match[dl_type]'] = ether
+                    data['match[dl_type]'] = ether
                 nwproto = moves.input('Enter protocol number '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
-                    params['match[nw_proto]'] = nwproto
+                    data['match[nw_proto]'] = nwproto
         print('''\nUsing Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
         Improper syntax will cause Delete Rule to fail \n''')
         extra = moves.input('Enter Extra Custom Match String: ')
         if extra != '':
-            params['match[extra]'] = extra
+            data['match[extra]'] = extra
         ruleaction = moves.input('Enter the new output actions separated by commas; '
                                'order matters - improper syntax will cause Modify Rule to fail: ')
-        params['actions'] = ruleaction
-        check_params = json.dumps(params, indent=4)
+        data['actions'] = ruleaction
+        check_data = json.dumps(data, indent=4)
         confirm = moves.input("""Configuration change summary:
                             Modified Rule Parameters: %s
-                            Confirm changes [y/n]: """ % check_params)
+                            Confirm changes [y/n]: """ % check_data)
         if confirm.lower() in ('y', 'yes'):
-            run = self.mod_rule(params)
+            run = self.mod_rule(data)
             return run
         return "Canceling; no changes made.\n"
 
-    def mod_rule(self, params):
+    def mod_rule(self, data):
         """Modify a rule/filter on the Packetmaster."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
             uri = 'http://' + self._address + '/rest/rules?'
-        if not isinstance(params, dict):
+        if not isinstance(data, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -1498,7 +1498,7 @@ on QSFP ports of G4 devices. \n""")
         if priority < 0 or priority > 65535:
             print("That is not a valid input for rule priority; canceling Delete Rule.")
         in_port = moves.input("What is (are) the input port(s)for the rule separated by commas: ")
-        params = {'priority': priority,
+        data = {'priority': priority,
                   'match[in_port]': in_port}
         print('''\nIs the rule matching a VLAN tag?
                 1 - No, matching all tagged and untagged traffic
@@ -1508,19 +1508,19 @@ on QSFP ports of G4 devices. \n""")
         if trafmatch == '' or int(trafmatch) == 1:
             pass
         elif int(trafmatch) == 2:
-            params['match[vlan]'] = 'neg_match'
+            data['match[vlan]'] = 'neg_match'
         elif int(trafmatch) == 3:
-            params['match[vlan]'] = 'match'
+            data['match[vlan]'] = 'match'
             matchid = moves.input('Enter the VLAN ID the rule is filtering: ')
             if input_check.vlan(matchid):
-                params['match[vlan_id]'] = matchid
+                data['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Delete Rule."
             vpri = moves.input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
             if vpri != '' and input_check.vlan_pri(vpri):
-                params['match[vlan_priority]'] = vpri
+                data['match[vlan_priority]'] = vpri
             elif vpri == '':
-                params['match[vlan_priority]'] = '0'
+                data['match[vlan_priority]'] = '0'
             else:
                 return "That is not a valid VLAN Priority; canceling Delete Rule."
         else:
@@ -1528,11 +1528,11 @@ on QSFP ports of G4 devices. \n""")
         macsrc = moves.input('Filtering by source MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
-            params['match[dl_src]'] = macsrc
+            data['match[dl_src]'] = macsrc
         macdst = moves.input('Filtering by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
-            params['match[dl_dst]'] = macdst
+            data['match[dl_dst]'] = macdst
         proto_options = {2: 'ip',
                          3: 'tcp',
                          4: 'udp',
@@ -1556,19 +1556,19 @@ on QSFP ports of G4 devices. \n""")
         else:
             try:
                 if int(proto) in range(2, 9):
-                    params['match[protocol]'] = proto_options[int(proto)]
+                    data['match[protocol]'] = proto_options[int(proto)]
                 else:
                     return "That is not a valid selection; canceling Delete Rule \n"
             except ValueError as reason:
                 return("That is not a valid input; canceling Delete Rule", reason)
-            if params['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
+            if data['match[protocol]'] in ('ip', 'tcp', 'udp', 'sctp', 'icmp'):
                 nwsrc = moves.input('Filtering on a source IP address? '
                                   'Leave blank for no or enter IP address + optional mask'
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwsrc != '':
                     if input_check.ipv4_mask(nwsrc) != 0:
-                        params['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                        data['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Delete Rule."
                 nwdst = moves.input('Filtering on a destination IP address? '
@@ -1577,84 +1577,84 @@ on QSFP ports of G4 devices. \n""")
                                   'or "192.168.1.5/24"): ')
                 if nwdst != '':
                     if input_check.ipv4_mask(nwdst) != 0:
-                        params['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                        data['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Delete Rule."
-            if params['match[protocol]'] == 'ip':
+            if data['match[protocol]'] == 'ip':
                 nwproto = moves.input('Filtering on a protocol number? '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
-                    params['match[nw_proto]'] = nwproto
-            if params['match[protocol]'] in ('tcp', 'udp', 'sctp'):
+                    data['match[nw_proto]'] = nwproto
+            if data['match[protocol]'] in ('tcp', 'udp', 'sctp'):
                 tp_src = moves.input('Filtering on a source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
                     if input_check.port(tp_src):
-                        params['match[' + params['match[protocol]'] + '_src]'] = tp_src
+                        data['match[' + data['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Delete Rule."
                 tp_dst = moves.input('Filtering on a destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
                     if input_check.port(tp_dst):
-                        params['match[' + params['match[protocol]'] + '_dst]'] = tp_dst
+                        data['match[' + data['match[protocol]'] + '_dst]'] = tp_dst
                     else:
                         return "That is not a valid port number; canceling Delete Rule."
-            if params['match[protocol]'] == 'icmp':
+            if data['match[protocol]'] == 'icmp':
                 icmpt = moves.input('Filtering on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
                     if input_check.icmp_type(icmpt):
-                        params['match[icmp_type]'] = icmpt
+                        data['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Delete Rule."
                 icmpc = moves.input('Filtering on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
                     if input_check.icmp_code(icmpc):
-                        params['match[icmp_code]'] = icmpc
+                        data['match[icmp_code]'] = icmpc
                     else:
                         return "That is not a valid ICMP Code; canceling Delete Rule."
-            if params['match[protocol]'] == 'custom':
+            if data['match[protocol]'] == 'custom':
                 ether = moves.input('Enter Ethertype e.g. 0x0800: ')
                 if ether != '':
-                    params['match[dl_type]'] = ether
+                    data['match[dl_type]'] = ether
                 nwproto = moves.input('Enter protocol number '
                                     '(protocol number in IPv4, header type in IPv6, opcode in ARP) '
                                     'or leave blank for none: ')
                 if nwproto != '':
-                    params['match[nw_proto]'] = nwproto
+                    data['match[nw_proto]'] = nwproto
         print('''\nUsing Custom Extra Match?
         e.g. hard_timeout, idle_timeout, tcp_flags, Q in Q
         Leave blank for none
         Improper syntax will cause Delete Rule to fail \n''')
         extra = moves.input('Enter Extra Custom Match String: ')
         if extra != '':
-            params['match[extra]'] = extra
-        check_params = json.dumps(params, indent=4)
+            data['match[extra]'] = extra
+        check_data = json.dumps(data, indent=4)
         confirm = moves.input("""Configuration change summary:
                             Delete Rule Matching: %s
-                            Confirm changes [y/n]: """ % check_params)
+                            Confirm changes [y/n]: """ % check_data)
         if confirm.lower() in ('y', 'yes'):
-            run = self.del_rule(params)
+            run = self.del_rule(data)
             return run
         return "Canceling; no changes made.\n"
 
-    def del_rule(self, params):
+    def del_rule(self, data):
         """Delete a rule/filter from the Packetmaster."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
             uri = 'http://' + self._address + '/rest/rules?'
-        if not isinstance(params, dict):
+        if not isinstance(data, dict):
             return ("That is not a valid format for rule; "
                     "please provide a dictionary object with valid rule parameters.")
         try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            response = requests.delete(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -1668,8 +1668,8 @@ on QSFP ports of G4 devices. \n""")
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -1826,24 +1826,24 @@ on QSFP ports of G4 devices. \n""")
                         return ("That is not a valid input for port number; "
                                 "canceling Add Group.")
                 if self.hardware != '4' or group_type == 3:
-                    bucket_params = {'actions': actions,
+                    bucket_data = {'actions': actions,
                                      'watch_port': watch}
                 else:
-                    bucket_params = {'actions': actions}
-                bucket_list.append(bucket_params)
+                    bucket_data = {'actions': actions}
+                bucket_list.append(bucket_data)
         else:
             return "That is not a valid bucket number; canceling Add Group."
-        params = {'buckets': bucket_list,
+        data = {'buckets': bucket_list,
                   'group_id': name,
                   'type': type_group,
                   'description': description
                  }
-        check_params = json.dumps(params, indent=4)
+        check_data = json.dumps(data, indent=4)
         confirm = moves.input("""Configuration change summary:
                             Add Group Parameters: %s
-                            Confirm changes [y/n]: """ % check_params)
+                            Confirm changes [y/n]: """ % check_data)
         if confirm.lower() in ('y', 'yes'):
-            run = self.add_group(name, params)
+            run = self.add_group(name, data)
             return run
         return "Canceling; no changes made.\n"
 
@@ -1872,8 +1872,8 @@ on QSFP ports of G4 devices. \n""")
         try:
             response = requests.post(uri, json=json_app, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2020,23 +2020,23 @@ on QSFP ports of G4 devices. \n""")
                         return ("That is not a valid input for port number; "
                                 "canceling Modify Group.", reason)
                 if self.hardware != '4' or group_type == 'ff':
-                    bucket_params = {'actions': actions,
+                    bucket_data = {'actions': actions,
                                      'watch_port': watch}
                 else:
-                    bucket_params = {'actions': actions}
-                bucket_list.append(bucket_params)
+                    bucket_data = {'actions': actions}
+                bucket_list.append(bucket_data)
         else:
             return "That is not a valid bucket number; canceling Modify Group."
-        params = {'buckets': bucket_list,
+        data = {'buckets': bucket_list,
                   'group_id': name,
                   'type': group_type,
                   'description': description}
-        check_params = json.dumps(params, indent=4)
+        check_data = json.dumps(data, indent=4)
         confirm = moves.input("""Configuration change summary:
                             Modified Group Parameters: %s
-                            Confirm changes [y/n]: """ % check_params)
+                            Confirm changes [y/n]: """ % check_data)
         if confirm.lower() in ('y', 'yes'):
-            run = self.mod_group(name, params)
+            run = self.mod_group(name, data)
             return run
         return "Canceling; no changes made.\n"
 
@@ -2065,8 +2065,8 @@ on QSFP ports of G4 devices. \n""")
         try:
             response = requests.put(uri, json=json_app, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2105,12 +2105,12 @@ on QSFP ports of G4 devices. \n""")
             count += 1
         if gid not in existing:
             return "A group with this group ID does not exist; canceling Delete Group"
-        params = {'group_id': gid}
+        data = {'group_id': gid}
         try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            response = requests.delete(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2124,8 +2124,8 @@ on QSFP ports of G4 devices. \n""")
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2148,12 +2148,12 @@ on QSFP ports of G4 devices. \n""")
         else:
             uri = 'http://' + self._address + '/rest/savepoints/activeportsavepoint?'
         #Add check against system savepoints
-        params = {'name': savename}
+        data = {'name': savename}
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2176,12 +2176,12 @@ on QSFP ports of G4 devices. \n""")
         else:
             uri = 'http://' + self._address + '/rest/savepoints/activerulesavepoint?'
         #Add check against system savepoints
-        params = {'name': savename}
+        data = {'name': savename}
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2204,12 +2204,12 @@ on QSFP ports of G4 devices. \n""")
         else:
             uri = 'http://' + self._address + '/rest/savepoints/defaultrulesavepoint?'
         #Add check against system savepoints
-        params = {'name': savename}
+        data = {'name': savename}
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2238,17 +2238,17 @@ on QSFP ports of G4 devices. \n""")
         else:
             uri = 'http://' + self._address + '/rest/savepoints/export?'
         #Add checks to see if names exist
-        params = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
+        data = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
         try:
-            response = requests.get(uri, data=params, auth=(self.username, self.password))
+            response = requests.get(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
+            info = json.loads(content)
             try:
                 with open(filename, "w") as save:
                     save.write(content)
             except (NameError, TypeError, IOError, OSError) as reason:
                 return ("Invalid filename.", reason)
-            return json.dumps(data, indent=4)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2289,17 +2289,16 @@ on QSFP ports of G4 devices. \n""")
             override = False
         else:
             override = True
-        params = {'old_name': oldname,
-                  'new_name': newname,
-                  'description': description,
-                  'override': override
-                 }
+        data = {'old_name': oldname,
+                'new_name': newname,
+                'description': description,
+                'override': override}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2339,15 +2338,15 @@ on QSFP ports of G4 devices. \n""")
             override = False
         else:
             override = True
-        params = {'old_name': oldname,
-                  'new_name': newname,
-                  'description': description,
-                  'override': override}
+        data = {'old_name': oldname,
+                'new_name': newname,
+                'description': description,
+                'override': override}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2371,12 +2370,12 @@ on QSFP ports of G4 devices. \n""")
             uri = 'https://' + self._address + '/rest/savepoints/portsavepoint?'
         else:
             uri = 'http://' + self._address + '/rest/savepoints/portsavepoint?'
-        params = {'name': name, 'description': description}
+        data = {'name': name, 'description': description}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2390,8 +2389,8 @@ on QSFP ports of G4 devices. \n""")
         try:
             response = requests.put(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2415,12 +2414,12 @@ on QSFP ports of G4 devices. \n""")
             uri = 'https://' + self._address + '/rest/savepoints/rulesavepoint?'
         else:
             uri = 'http://' + self._address + '/rest/savepoints/rulesavepoint?'
-        params = {'name': name, 'description': description}
+        data = {'name': name, 'description': description}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2443,12 +2442,12 @@ on QSFP ports of G4 devices. \n""")
         else:
             uri = 'http://' + self._address + '/rest/savepoints/portsavepoint?'
         #Add check to see if port savepoint exists
-        params = {'name': name}
+        data = {'name': name}
         try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            response = requests.delete(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2471,12 +2470,12 @@ on QSFP ports of G4 devices. \n""")
         else:
             uri = 'http://' + self._address + '/rest/savepoints/rulesavepoint?'
         #Add check to see if rule savepoint exists
-        params = {'name': name}
+        data = {'name': name}
         try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            response = requests.delete(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -2675,12 +2674,12 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
-                                    Heartbeat Source Port: %S
+                                    Heartbeat Destination IP: %s
+                                    Heartbeat Source Port: %s
                                     Heartbeat Destination Port: %s
-                                    Bypass Switch IP: %S
+                                    Bypass Switch IP: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1,
                                                                   bypass_port2,
@@ -2718,10 +2717,10 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
-                                    Bypass Switch IP: %S
+                                    Heartbeat Destination IP: %s
+                                    Bypass Switch IP: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1,
                                                                   bypass_port2,
@@ -2756,10 +2755,10 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
-                                    Heartbeat Source Port: %S
+                                    Heartbeat Destination IP: %s
+                                    Heartbeat Source Port: %s
                                     Heartbeat Destination Port: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1,
@@ -2797,9 +2796,9 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
+                                    Heartbeat Destination IP: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1,
                                                                   bypass_port2,
@@ -2924,15 +2923,15 @@ on QSFP ports of G4 devices. \n""")
                                     Port to receive Heartbeat packets: %s
                                     Activation Command: %s
                                     Port to send Heartbeat packets: %s
-                                    Deactivation Command: %S
+                                    Deactivation Command: %s
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
+                                    Heartbeat Destination IP: %s
                                     Heartbeat Source Port: %s
-                                    Heartbeat Destination Port: %S
+                                    Heartbeat Destination Port: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (hb_in,
                                                                   act_comm,
@@ -2964,9 +2963,9 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
+                                    Heartbeat Destination IP: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (hb_in,
                                                                   act_comm,
@@ -2998,16 +2997,16 @@ on QSFP ports of G4 devices. \n""")
             uri = 'https://' + self._address + '/rest/apps?'
         else:
             uri = 'http://' + self._address + '/rest/apps?'
-        params = {'name': 'NTP',
-                  'description': 'Syncs time with remote NTP servers.',
-                  'server1': server1,
-                  'server2': server2,
-                  'userDescription': user_description}
+        data = {'name': 'NTP',
+                'description': 'Syncs time with remote NTP servers.',
+                'server1': server1,
+                'server2': server2,
+                'userDescription': user_description}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -3032,14 +3031,14 @@ on QSFP ports of G4 devices. \n""")
         except ValueError as reason:
             return ("That is not an valid input for output port; "
                     "canceling start ArpResponder.", reason)
-        params = {'name': 'ArpResponder',
-                  'description': 'Responds to an arbotrary packet with an ARP response',
-                  'interval': interval,
-                  'outPort': outport,
-                  'macSrc': src_mac,
-                  'macDst': dst_mac,
-                  'ipSrc': src_ip,
-                  'ipDst': dst_ip}
+        data = {'name': 'ArpResponder',
+                'description': 'Responds to an arbotrary packet with an ARP response',
+                'interval': interval,
+                'outPort': outport,
+                'macSrc': src_mac,
+                'macDst': dst_mac,
+                'ipSrc': src_ip,
+                'ipDst': dst_ip}
         if inport:
             try:
                 input_check = int(inport)
@@ -3048,16 +3047,16 @@ on QSFP ports of G4 devices. \n""")
             except ValueError as reason:
                 return ("That is not a valid input for input port; "
                         "canceling ArpResponder.", reason)
-            params['inPort'] = inport
+            data['inPort'] = inport
         if match_srcmac:
-            params['matchMacSrc'] = match_srcmac
+            data['matchMacSrc'] = match_srcmac
         if user_description:
-            params['userDescription'] = user_description
+            data['userDescription'] = user_description
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -3100,33 +3099,33 @@ on QSFP ports of G4 devices. \n""")
                 int(trap2_port)
             except ValueError as reason:
                 return ("That is not valid input for Trap Port 2; canceling SNMP.", reason)
-            params = {'name': 'SNMP',
-                      'description': 'Runs an SNMP Server.  The server uses [url=',
-                      'interval': interval,
-                      'snmpCommunity': community,
-                      'snmpPort': snmp_port,
-                      'trapEnabled': trap_enable,
-                      'trapPort': trap1_port,
-                      'trapPort2': trap2_port,
-                      'trapReceiver': trap1,
-                      'trapReceiver2': trap2,
-                      'userDescription': user_description}
+            data = {'name': 'SNMP',
+                    'description': 'Runs an SNMP Server.  The server uses [url=',
+                    'interval': interval,
+                    'snmpCommunity': community,
+                    'snmpPort': snmp_port,
+                    'trapEnabled': trap_enable,
+                    'trapPort': trap1_port,
+                    'trapPort2': trap2_port,
+                    'trapReceiver': trap1,
+                    'trapReceiver2': trap2,
+                    'userDescription': user_description}
         elif trap_enable or trap_enable.lower() in ('false', 'f', 'no', 'n'):
             trap_enable = False
-            params = {'name': 'SNMP',
-                      'description': 'Runs an SNMP Server.  The server uses [url=',
-                      'interval': interval,
-                      'snmpCommunity': community,
-                      'snmpPort': snmp_port,
-                      'trapEnabled': trap_enable,
-                      'userDescription': user_description}
+            data = {'name': 'SNMP',
+                    'description': 'Runs an SNMP Server.  The server uses [url=',
+                    'interval': interval,
+                    'snmpCommunity': community,
+                    'snmpPort': snmp_port,
+                    'trapEnabled': trap_enable,
+                    'userDescription': user_description}
         else:
             return "That is not a valid input for Enable Trap; canceling SNMP."
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -3186,29 +3185,29 @@ on QSFP ports of G4 devices. \n""")
         except TypeError as reason:
             return ("That is not a valid input for Destination IP; "
                     "canceling HeartbeatBypass.", reason)
-        params = {'bypassPort1': bypass_port1,
-                  'bypassPort2': bypass_port2,
-                  'connectionType': conn_type,
-                  'description': 'This app is used to control a Cubro Bypass Switch device.',
-                  'inport': hb_in,
-                  'interval': interval,
-                  'ipDst': dst_ip,
-                  'ipSrc': src_ip,
-                  'macDst': dst_mac,
-                  'macSrc': src_mac,
-                  'name': 'HeartbeatBypass',
-                  'outport': hb_out,
-                  'protocol': proto,
-                  'userDescription': user_description}
+        data = {'bypassPort1': bypass_port1,
+                'bypassPort2': bypass_port2,
+                'connectionType': conn_type,
+                'description': 'This app is used to control a Cubro Bypass Switch device.',
+                'inport': hb_in,
+                'interval': interval,
+                'ipDst': dst_ip,
+                'ipSrc': src_ip,
+                'macDst': dst_mac,
+                'macSrc': src_mac,
+                'name': 'HeartbeatBypass',
+                'outport': hb_out,
+                'protocol': proto,
+                'userDescription': user_description}
         if conn_type.upper() in ('IP', 'RS232'):
-            params['connectionType'] = conn_type.upper()
+            data['connectionType'] = conn_type.upper()
             if conn_type == 'RS232' and self.hardware_generation == '4':
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
-                    params['bypassIP'] = ip_check[0]
+                    data['bypassIP'] = ip_check[0]
                 except TypeError as reason:
                     return ("That is not a valid input for Bypass Switch IP; "
                             "canceling HeartbeatBypass.", reason)
@@ -3221,18 +3220,18 @@ on QSFP ports of G4 devices. \n""")
             except ValueError as reason:
                 return ("That is not a valid input for Source Port; "
                         "canceling HeartbeatBypass.", reason)
-            params['portSrc'] = src_port
+            data['portSrc'] = src_port
             try:
                 int(dst_port)
             except ValueError as reason:
                 return ("That is not a valid input for Destination Port; "
                         "canceling HeartbeatBypass.", reason)
-            params['portDst'] = dst_port
+            data['portDst'] = dst_port
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -3252,16 +3251,16 @@ on QSFP ports of G4 devices. \n""")
             int(port)
         except ValueError as reason:
             return ("That is not a valid input for port number; canceling Syslog.", reason)
-        params = {'description': 'Logs syslog data to a remote server',
-                  'name': 'Syslog',
-                  'port': port,
-                  'server': server,
-                  'userDescription': user_description}
+        data = {'description': 'Logs syslog data to a remote server',
+                'name': 'Syslog',
+                'port': port,
+                'server': server,
+                'userDescription': user_description}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -3278,19 +3277,19 @@ on QSFP ports of G4 devices. \n""")
         except ValueError as reason:
             return ("That is not a valid input for Check Interval; "
                     "canceling Bypass Keepalive.", reason)
-        params = {'description': 'This app is used to control a Cubro Bypass Switch device.',
-                  'interval': interval,
-                  'userDescription': description,
-                  'name': 'BypassKeepalive'}
+        data = {'description': 'This app is used to control a Cubro Bypass Switch device.',
+                'interval': interval,
+                'userDescription': description,
+                'name': 'BypassKeepalive'}
         if conn_type.upper() in ('IP', 'RS232'):
-            params['connectionType'] = conn_type.upper()
+            data['connectionType'] = conn_type.upper()
             if conn_type == 'RS232' and self.hardware_generation == '4':
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
-                    params['bypassIP'] = ip_check[0]
+                    data['bypassIP'] = ip_check[0]
                 except TypeError as reason:
                     return ("That is not a valid input for Bypass Switch IP; "
                             "canceling Bypass Keepalive.", reason)
@@ -3298,10 +3297,10 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not a valid input for Connection Type; "
                     "must be IP or RS232.  Canceling Bypass Keepalive.")
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -3355,26 +3354,26 @@ on QSFP ports of G4 devices. \n""")
             int(dst_port)
         except ValueError as reason:
             return ("That is not a valid input for Destination Port; canceling Heartbeat.", reason)
-        params = {'activateCommand': act_comm,
-                  'deactivateCommand': deact_comm,
-                  'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
-                  'inport': hb_in,
-                  'interval': interval,
-                  'ipDst': dst_ip,
-                  'ipSrc': src_ip,
-                  'macDst': dst_mac,
-                  'macSrc': src_mac,
-                  'name': 'Heartbeat',
-                  'outport': hb_out,
-                  'protocol': proto,
-                  'portSrc': src_port,
-                  'portDst': dst_port,
-                  'userDescription': user_description}
+        data = {'activateCommand': act_comm,
+                'deactivateCommand': deact_comm,
+                'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
+                'inport': hb_in,
+                'interval': interval,
+                'ipDst': dst_ip,
+                'ipSrc': src_ip,
+                'macDst': dst_mac,
+                'macSrc': src_mac,
+                'name': 'Heartbeat',
+                'outport': hb_out,
+                'protocol': proto,
+                'portSrc': src_port,
+                'portDst': dst_port,
+                'userDescription': user_description}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -3577,12 +3576,12 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
-                                    Heartbeat Source Port: %S
+                                    Heartbeat Destination IP: %s
+                                    Heartbeat Source Port: %s
                                     Heartbeat Destination Port: %s
-                                    Bypass Switch IP: %S
+                                    Bypass Switch IP: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1,
                                                                   bypass_port2,
@@ -3620,10 +3619,10 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
-                                    Bypass Switch IP: %S
+                                    Heartbeat Destination IP: %s
+                                    Bypass Switch IP: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1,
                                                                   bypass_port2,
@@ -3657,10 +3656,10 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
-                                    Heartbeat Source Port: %S
+                                    Heartbeat Destination IP: %s
+                                    Heartbeat Source Port: %s
                                     Heartbeat Destination Port: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1,
@@ -3697,9 +3696,9 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
+                                    Heartbeat Destination IP: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (bypass_port1,
                                                                   bypass_port2,
@@ -3824,15 +3823,15 @@ on QSFP ports of G4 devices. \n""")
                                     Port to receive Heartbeat packets: %s
                                     Activation Command: %s
                                     Port to send Heartbeat packets: %s
-                                    Deactivation Command: %S
+                                    Deactivation Command: %s
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
+                                    Heartbeat Destination IP: %s
                                     Heartbeat Source Port: %s
-                                    Heartbeat Destination Port: %S
+                                    Heartbeat Destination Port: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (hb_in,
                                                                   act_comm,
@@ -3864,9 +3863,9 @@ on QSFP ports of G4 devices. \n""")
                                     Check Interval: %s
                                     Heartbeat Protocol: %s
                                     Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %S
+                                    Heartbeat Destination MAC: %s
                                     Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %S
+                                    Heartbeat Destination IP: %s
                                     Description: %s
                                     Confirm changes [y/n]: """ % (hb_in,
                                                                   act_comm,
@@ -3902,17 +3901,17 @@ on QSFP ports of G4 devices. \n""")
             int(pid)
         except ValueError as reason:
             return ("That is not a valid input for PID; canceling Modify NTP.", reason)
-        params = {'name': 'NTP',
-                  'description': 'Syncs time with remote NTP servers.',
-                  'pid': pid,
-                  'server1': server1,
-                  'server2': server2,
-                  'userDescription': user_description}
+        data = {'name': 'NTP',
+                'description': 'Syncs time with remote NTP servers.',
+                'pid': pid,
+                'server1': server1,
+                'server2': server2,
+                'userDescription': user_description}
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -3941,15 +3940,15 @@ on QSFP ports of G4 devices. \n""")
         except ValueError as reason:
             return ("That is not an valid input for output port; "
                     "canceling Modify ArpResponder.", reason)
-        params = {'name': 'ArpResponder',
-                  'description': 'Responds to an arbotrary packet with an ARP response',
-                  'pid': pid,
-                  'interval': interval,
-                  'outPort': outport,
-                  'macSrc': src_mac,
-                  'macDst': dst_mac,
-                  'ipSrc': src_ip,
-                  'ipDst': dst_ip}
+        data = {'name': 'ArpResponder',
+                'description': 'Responds to an arbotrary packet with an ARP response',
+                'pid': pid,
+                'interval': interval,
+                'outPort': outport,
+                'macSrc': src_mac,
+                'macDst': dst_mac,
+                'ipSrc': src_ip,
+                'ipDst': dst_ip}
         if inport:
             try:
                 input_check = int(inport)
@@ -3958,16 +3957,16 @@ on QSFP ports of G4 devices. \n""")
             except ValueError as reason:
                 return ("That is not a valid input for input port; "
                         "canceling ArpResponder.", reason)
-            params['inPort'] = inport
+            data['inPort'] = inport
         if match_srcmac:
-            params['matchMacSrc'] = match_srcmac
+            data['matchMacSrc'] = match_srcmac
         if user_description:
-            params['userDescription'] = user_description
+            data['userDescription'] = user_description
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4015,35 +4014,35 @@ on QSFP ports of G4 devices. \n""")
                 int(trap2_port)
             except ValueError as reason:
                 return ("That is not valid input for Trap Port 2; canceling Modify SNMP.", reason)
-            params = {'name': 'SNMP',
-                      'description': 'Runs an SNMP Server.  The server uses [url=',
-                      'pid': pid,
-                      'interval': interval,
-                      'snmpCommunity': community,
-                      'snmpPort': snmp_port,
-                      'trapEnabled': trap_enable,
-                      'trapPort': trap1_port,
-                      'trapPort2': trap2_port,
-                      'trapReceiver': trap1,
-                      'trapReceiver2': trap2,
-                      'userDescription': user_description}
+            data = {'name': 'SNMP',
+                    'description': 'Runs an SNMP Server.  The server uses [url=',
+                    'pid': pid,
+                    'interval': interval,
+                    'snmpCommunity': community,
+                    'snmpPort': snmp_port,
+                    'trapEnabled': trap_enable,
+                    'trapPort': trap1_port,
+                    'trapPort2': trap2_port,
+                    'trapReceiver': trap1,
+                    'trapReceiver2': trap2,
+                    'userDescription': user_description}
         elif trap_enable is False or trap_enable.lower() in ('false', 'f', 'no', 'n'):
             trap_enable = False
-            params = {'name': 'SNMP',
-                      'description': 'Runs an SNMP Server.  The server uses [url=',
-                      'pid': pid,
-                      'interval': interval,
-                      'snmpCommunity': community,
-                      'snmpPort': snmp_port,
-                      'trapEnabled': trap_enable,
-                      'userDescription': user_description}
+            data = {'name': 'SNMP',
+                    'description': 'Runs an SNMP Server.  The server uses [url=',
+                    'pid': pid,
+                    'interval': interval,
+                    'snmpCommunity': community,
+                    'snmpPort': snmp_port,
+                    'trapEnabled': trap_enable,
+                    'userDescription': user_description}
         else:
             return "That is not a valid input for Enable Trap; canceling SNMP."
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4107,30 +4106,30 @@ on QSFP ports of G4 devices. \n""")
         except TypeError as reason:
             return ("That is not a valid input for Destination IP; "
                     "canceling Modify HeartbeatBypass.", reason)
-        params = {'bypassPort1': bypass_port1,
-                  'bypassPort2': bypass_port2,
-                  'connectionType': conn_type,
-                  'description': 'This app is used to control a Cubro Bypass Switch device.',
-                  'inport': hb_in,
-                  'interval': interval,
-                  'ipDst': dst_ip,
-                  'ipSrc': src_ip,
-                  'macDst': dst_mac,
-                  'macSrc': src_mac,
-                  'name': 'HeartbeatBypass',
-                  'outport': hb_out,
-                  'pid': pid,
-                  'protocol': proto,
-                  'userDescription': user_description}
+        data = {'bypassPort1': bypass_port1,
+                'bypassPort2': bypass_port2,
+                'connectionType': conn_type,
+                'description': 'This app is used to control a Cubro Bypass Switch device.',
+                'inport': hb_in,
+                'interval': interval,
+                'ipDst': dst_ip,
+                'ipSrc': src_ip,
+                'macDst': dst_mac,
+                'macSrc': src_mac,
+                'name': 'HeartbeatBypass',
+                'outport': hb_out,
+                'pid': pid,
+                'protocol': proto,
+                'userDescription': user_description}
         if conn_type.upper() in ('IP', 'RS232'):
-            params['connectionType'] = conn_type.upper()
+            data['connectionType'] = conn_type.upper()
             if conn_type == 'RS232' and self.hardware_generation == '4':
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
-                    params['bypassIP'] = ip_check[0]
+                    data['bypassIP'] = ip_check[0]
                 except TypeError as reason:
                     return ("That is not a valid input for Bypass Switch IP; "
                             "canceling Modify HeartbeatBypass.", reason)
@@ -4143,18 +4142,18 @@ on QSFP ports of G4 devices. \n""")
             except ValueError as reason:
                 return ("That is not a valid input for Source Port; "
                         "canceling Modify HeartbeatBypass.", reason)
-            params['portSrc'] = src_port
+            data['portSrc'] = src_port
             try:
                 int(dst_port)
             except ValueError as reason:
                 return ("That is not a valid input for Destination Port; "
                         "canceling Modify HeartbeatBypass.", reason)
-            params['portDst'] = dst_port
+            data['portDst'] = dst_port
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4178,17 +4177,17 @@ on QSFP ports of G4 devices. \n""")
             int(port)
         except ValueError as reason:
             return ("That is not a valid input for port number; canceling Modify Syslog.", reason)
-        params = {'description': 'Logs syslog data to a remote server',
-                  'name': 'Syslog',
-                  'pid': pid,
-                  'port': port,
-                  'server': server,
-                  'userDescription': user_description}
+        data = {'description': 'Logs syslog info to a remote server',
+                'name': 'Syslog',
+                'pid': pid,
+                'port': port,
+                'server': server,
+                'userDescription': user_description}
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4209,20 +4208,20 @@ on QSFP ports of G4 devices. \n""")
         except ValueError as reason:
             return ("That is not a valid input for Check Interval; "
                     "canceling Bypass Keepalive.", reason)
-        params = {'pid': pid,
-                  'description': 'This app is used to control a Cubro Bypass Switch device.',
-                  'interval': interval,
-                  'userDescription': description,
-                  'name': 'BypassKeepalive'}
+        data = {'pid': pid,
+                'description': 'This app is used to control a Cubro Bypass Switch device.',
+                'interval': interval,
+                'userDescription': description,
+                'name': 'BypassKeepalive'}
         if conn_type.upper() in ('IP', 'RS232'):
-            params['connectionType'] = conn_type.upper()
+            data['connectionType'] = conn_type.upper()
             if conn_type == 'RS232' and self.hardware_generation == '4':
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
-                    params['bypassIP'] = ip_check[0]
+                    data['bypassIP'] = ip_check[0]
                 except TypeError as reason:
                     return ("That is not a valid input for Bypass Switch IP; "
                             "canceling Modify Bypass Keepalive.", reason)
@@ -4230,10 +4229,10 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not a valid input for Connection Type; "
                     "must be IP or RS232.  Canceling Modify Bypass Keepalive.")
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4296,27 +4295,27 @@ on QSFP ports of G4 devices. \n""")
         except ValueError as reason:
             return ("That is not a valid input for Destination Port; "
                     "canceling Modify Heartbeat.", reason)
-        params = {'activateCommand': act_comm,
-                  'deactivateCommand': deact_comm,
-                  'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
-                  'inport': hb_in,
-                  'interval': interval,
-                  'ipDst': dst_ip,
-                  'ipSrc': src_ip,
-                  'macDst': dst_mac,
-                  'macSrc': src_mac,
-                  'name': 'Heartbeat',
-                  'outport': hb_out,
-                  'pid': pid,
-                  'protocol': proto,
-                  'portSrc': src_port,
-                  'portDst': dst_port,
-                  'userDescription': user_description}
+        data = {'activateCommand': act_comm,
+                'deactivateCommand': deact_comm,
+                'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
+                'inport': hb_in,
+                'interval': interval,
+                'ipDst': dst_ip,
+                'ipSrc': src_ip,
+                'macDst': dst_mac,
+                'macSrc': src_mac,
+                'name': 'Heartbeat',
+                'outport': hb_out,
+                'pid': pid,
+                'protocol': proto,
+                'portSrc': src_port,
+                'portDst': dst_port,
+                'userDescription': user_description}
         try:
-            response = requests.put(uri, data=params, auth=(self.username, self.password))
+            response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4344,13 +4343,13 @@ on QSFP ports of G4 devices. \n""")
             pid = int(pid)
         except ValueError as reason:
             return ("That is not a valid PID; canceling Call App Action.", reason)
-        params = {'pid': pid,
-                  'action_name': name}
+        data = {'pid': pid,
+                'action_name': name}
         try:
-            response = requests.post(uri, data=params, auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4376,12 +4375,12 @@ on QSFP ports of G4 devices. \n""")
             pid = int(pid)
         except ValueError as reason:
             return ("That is not a valid input for PID; canceling Kill App.", reason)
-        params = {'pid': pid}
+        data = {'pid': pid}
         try:
-            response = requests.delete(uri, data=params, auth=(self.username, self.password))
+            response = requests.delete(uri, data=data, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4490,28 +4489,28 @@ on QSFP ports of G4 devices. \n""")
         else:
             dst = True
         if self.hardware in ('4', '2'):
-            params = {'macsa': macsa,
-                      'macda': macda,
-                      'ether_type': ether,
-                      'ipsa': ipsa,
-                      'ipda': ipda,
-                      'ip_protocol': proto,
-                      'src_port': src,
-                      'dst_port': dst}
+            data = {'macsa': macsa,
+                    'macda': macda,
+                    'ether_type': ether,
+                    'ipsa': ipsa,
+                    'ipda': ipda,
+                    'ip_protocol': proto,
+                    'src_port': src,
+                    'dst_port': dst}
         else:
             #May need to become 'elif self.hardware == '3.1'' with new
             #elif statements for gen 3.  Need EX5-2 and EX12 to verify
-            params = {'ipsa': ipsa,
+            data = {'ipsa': ipsa,
                       'ipda': ipda,
                       'ip_protocol': proto,
                       'src_port': src,
                       'dst_port': dst}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4541,13 +4540,13 @@ on QSFP ports of G4 devices. \n""")
             permanence = True
         else:
             permanence = False
-        params = {'state': permanence}
+        data = {'state': permanence}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4590,18 +4589,18 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not a valid setting; "
                     "canceling set rule storage mode.", reason)
         if mode == 'simple':
-            params = {'mode': 'simple'}
+            data = {'mode': 'simple'}
         elif mode == 'ipv6':
-            params = {'mode': 'ipv6'}
+            data = {'mode': 'ipv6'}
         else:
             return ("That is not a valid selection; "
                     "canceling set rule storage mode.")
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4662,17 +4661,17 @@ on QSFP ports of G4 devices. \n""")
             rad = True
         else:
             rad = False
-        params = {'username': username,
-                  'accesslevel': access_level,
-                  'password': passwd,
-                  'description': description,
-                  'radius': rad}
+        data = {'username': username,
+                'accesslevel': access_level,
+                'password': passwd,
+                'description': description,
+                'radius': rad}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4739,18 +4738,18 @@ on QSFP ports of G4 devices. \n""")
             rad = True
         else:
             rad = False
-        params = {'username': cur_name,
-                  'new_username': new_name,
-                  'accesslevel': access_level,
-                  'password': passwd,
-                  'description': description,
-                  'radius': rad}
+        data = {'username': cur_name,
+                'new_username': new_name,
+                'accesslevel': access_level,
+                'password': passwd,
+                'description': description,
+                'radius': rad}
         try:
-            response = requests.put(uri, data=params,
+            response = requests.put(uri, data=data,
                                     auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4779,13 +4778,13 @@ on QSFP ports of G4 devices. \n""")
             user_list.append(json_users[user]['username'])
         if username not in user_list:
             return "That username does not exist"
-        params = {'name': username}
+        data = {'name': username}
         try:
-            response = requests.delete(uri, data=params,
+            response = requests.delete(uri, data=data,
                                        auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4814,13 +4813,13 @@ on QSFP ports of G4 devices. \n""")
             uac = True
         else:
             uac = False
-        params = {'state': uac}
+        data = {'state': uac}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4882,17 +4881,17 @@ on QSFP ports of G4 devices. \n""")
         except ValueError as reason:
             return ("That is not a valid port input; "
                     "canceling RADIUS settings call.", reason)
-        params = {'server': server,
-                  'port': port,
-                  'secret': secret,
-                  'radius_login_level': level,
-                  'refresh_rate': refresh}
+        data = {'server': server,
+                'port': port,
+                'secret': secret,
+                'radius_login_level': level,
+                'refresh_rate': refresh}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -4925,14 +4924,14 @@ on QSFP ports of G4 devices. \n""")
             enabled = True
         else:
             enabled = False
-        params = {'https_enabled': enabled,
-                  'ssl_password': ssl}
+        data = {'https_enabled': enabled,
+                'ssl_password': ssl}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = "No Response"
             raise error
@@ -4959,13 +4958,13 @@ on QSFP ports of G4 devices. \n""")
             enabled = True
         else:
             enabled = False
-        params = {'activated': enabled}
+        data = {'activated': enabled}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return (json.dumps(data, indent=4),
+            info = json.loads(content)
+            return (json.dumps(info, indent=4),
                     "Device must be rebooted for change to take effect")
         except ConnectionError as error:
             content = "No Response"
@@ -4980,8 +4979,8 @@ on QSFP ports of G4 devices. \n""")
         try:
             response = requests.delete(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -5011,20 +5010,20 @@ on QSFP ports of G4 devices. \n""")
             uri = 'https://' + self._address + '/rest/device/nameresolution?'
         else:
             uri = 'http://' + self._address + '/rest/device/nameresolution?'
-        params = {}
+        data = {}
         if dns1 != '':
-            params['dns1'] = dns1
+            data['dns1'] = dns1
         if dns2 != '':
-            params['dns2'] = dns2
+            data['dns2'] = dns2
         if dns3 != '':
-            params['dns3'] = dns3
-        if len(params) > 0:
+            data['dns3'] = dns3
+        if len(data) > 0:
             try:
-                response = requests.post(uri, data=params,
+                response = requests.post(uri, data=data,
                                          auth=(self.username, self.password))
                 content = response.content
-                data = json.loads(content)
-                return json.dumps(data, indent=4)
+                info = json.loads(content)
+                return json.dumps(info, indent=4)
             except ConnectionError as error:
                 content = 'No Response'
                 raise error
@@ -5054,13 +5053,13 @@ on QSFP ports of G4 devices. \n""")
             led = True
         else:
             led = False
-        params = {'activated': led}
+        data = {'activated': led}
         try:
-            response = requests.post(uri, data=params,
+            response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error
@@ -5074,8 +5073,8 @@ on QSFP ports of G4 devices. \n""")
         try:
             response = requests.post(uri, auth=(self.username, self.password))
             content = response.content
-            data = json.loads(content)
-            return json.dumps(data, indent=4)
+            info = json.loads(content)
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'
             raise error

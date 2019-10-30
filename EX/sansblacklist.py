@@ -22,7 +22,7 @@ def createblacklist(match, packet_master, interface):
         priority -= 1
         rulename = 'Auto Blacklist ' + str(count)
         rulepriority = str(priority)
-        params = {
+        data = {
             'name': rulename,
             'description': 'This rule was created by blacklist.py',
             'priority': rulepriority,
@@ -32,7 +32,7 @@ def createblacklist(match, packet_master, interface):
             'match[extra]': 'idle_timeout=65535',
             'actions': 'drop'
         }
-        packet_master.add_rule(params)
+        packet_master.add_rule(data)
 
 if __name__ == '__main__':
     ADDRESS = moves.input('IP address of Packetmaster to apply blacklist to: ')

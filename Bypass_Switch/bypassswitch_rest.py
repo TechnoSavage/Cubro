@@ -69,14 +69,12 @@ class BypassSwitch(object):
             time_out = '10'
         uri = 'http://' + self.address + '/setConfig?'
         try:
-            params = {
-                'ip': ip_address,
-                'subnet': subnet_mask,
-                'gateway': gateway,
-                'mac': mac,
-                'timeout': time_out
-                }
-            response = requests.post(uri, data=params)
+            data = {'ip': ip_address,
+                    'subnet': subnet_mask,
+                    'gateway': gateway,
+                    'mac': mac,
+                    'timeout': time_out}
+            response = requests.post(uri, data=data)
             code = response.status_code
             content = response.content
             return (code, content)
@@ -88,14 +86,12 @@ class BypassSwitch(object):
         """Set management configuration of Bypass Switch."""
         uri = 'http://' + self.address + '/setConfig?'
         try:
-            params = {
-                'ip': address,
-                'subnet': subnet,
-                'gateway': gateway,
-                'mac': mac,
-                'timeout': timeout
-                }
-            response = requests.post(uri, data=params)
+            data = {'ip': address,
+                    'subnet': subnet,
+                    'gateway': gateway,
+                    'mac': mac,
+                    'timeout': timeout}
+            response = requests.post(uri, data=data)
             code = response.status_code
             content = response.content
             return (code, content)

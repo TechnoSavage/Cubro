@@ -46,38 +46,38 @@ def dropicmp(packetmaster, interface, output, priority1, priority2, limit):
     """ Creates two rules: One that drops all ICMP packets and another that
         passes all other traffic.  Calls recreate function after 60 seconds. """
     print('ICMP flood detected; blocking ICMP packets for the next 60 seconds')
-    params1 = {'name': 'ICMP Flood Mode',
+    data1 = {'name': 'ICMP Flood Mode',
                'description': 'Drop all ICMP packets for 60 seconds following creation of rule',
                'priority': priority1,
                'match[in_port]': interface,
                'match[protocol]': 'icmp',
                'actions': 'drop'}
-    params2 = {'name': 'ICMP Flood Mode traffic',
+    data2 = {'name': 'ICMP Flood Mode traffic',
                'description': 'Pass remaining traffic after ICMP drop to standard output port',
                'priority': priority2,
                'match[in_port]': interface,
                'actions': output}
-    packetmaster.add_rule(params1)
-    packetmaster.add_rule(params2)
+    packetmaster.add_rule(data1)
+    packetmaster.add_rule(data2)
     time.sleep(60)
     recreate(packetmaster, interface, output, priority1, priority2, limit)
 
 def recreate(packetmaster, interface, output, priority1, priority2, limit):
     """ Recreates the original rules present on the EX device prior to dropicmp
         function.  Calls query function. """
-    params1 = {'name': 'Watch ICMP',
+    data1 = {'name': 'Watch ICMP',
                'description': 'Pass ICMP packets',
                'priority': priority1,
                'match[in_port]': interface,
                'match[protocol]': 'icmp',
                'actions': output}
-    params2 = {'name': 'Pass traffic',
+    data2 = {'name': 'Pass traffic',
                'description': 'Pass all non-ICMP traffic',
                'priority': priority2,
                'match[in_port]': interface,
                'actions': output}
-    packetmaster.add_rule(params1)
-    packetmaster.add_rule(params2)
+    packetmaster.add_rule(data1)
+    packetmaster.add_rule(data2)
     print('Returning to standard traffic flow')
     time.sleep(10)
     query(packetmaster, interface, priority1, priority2, limit)
