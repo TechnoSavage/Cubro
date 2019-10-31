@@ -42,30 +42,24 @@ class PacketmasterEX(object):
         Hardware generation of Packetmaster
         """
         try:
-            gen_test = self.hardware_generation()
-            info = json.loads(gen_test)
-            for item in info:
-                if item == 'error':
-                    print(info['error'])
-                    return "Connection test failed"
-                self.hardware = info['generation']
-                self.get_port_count()
-                self.device_model()
-                return "Connection established"
+            port_test = self.get_port_count()
+            if not isinstance(port_test, (int, long)):
+                print(port_test['error'])
+                return "Connection test failed"
+            self.hardware_generation()
+            self.device_model()
+            return "Connection established"
         except ConnectionError as fail:
             print(fail)
             try:
                 self.__https = True
-                gen_test = self.hardware_generation()
-                info = json.loads(gen_test)
-                for item in info:
-                    if item == 'error':
-                        print(info['error'])
-                        return "Connection test failed"
-                    self.hardware = info['generation']
-                    self.get_port_count()
-                    self.device_model()
-                    return "Connection established"
+                port_test = self.get_port_count()
+                if not isinstance(port_test, (int, long)):
+                    print(port_test['error'])
+                    return "Connection test failed"
+                self.hardware_generation()
+                self.device_model()
+                return "Connection established"
             except ConnectionError as fail:
                 print("Unable to establish connection; check if IP address is correct.", fail)
 
@@ -82,6 +76,9 @@ class PacketmasterEX(object):
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
             info = json.loads(content)
+            for i in info:
+                if 'error' in i:
+                    return info
             count = 0
             for port in info['port_config']:
                 ports.append(info['port_config'][count]['if_name'])
@@ -200,6 +197,7 @@ class PacketmasterEX(object):
             response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
             info = json.loads(content)
+            self.hardware = info['generation']
             return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = 'No Response'

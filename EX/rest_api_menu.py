@@ -48,7 +48,10 @@ if __name__ == '__main__':
     def topmenu():
         """Top menu in hierarchy for device management."""
         global ADDRESS, USERNAME, PASSWORD, PACKETMASTER
-        print('\nOptions for %s at %s acting as user %s' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        try:
+            print('\nOptions for %s at %s acting as user %s' % (PACKETMASTER.model, ADDRESS, USERNAME))
+        except AttributeError as error:
+            exit()
         print('''
             1 - Change My working device
             2 - Change My user credentials
