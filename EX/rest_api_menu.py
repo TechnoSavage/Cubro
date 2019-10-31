@@ -529,7 +529,7 @@ if __name__ == '__main__':
                  2 - Activate a save point for ports
                  3 - Activate a save point for rules
                  4 - Set the rule save point to be loaded on boot
-                 5 - Export a save point
+                 5 - Export save points
                  6 - Modify a save point for port configuration
                  7 - Modify a save point for rules
                  8 - Create save point from current port configuration

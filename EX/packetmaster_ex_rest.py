@@ -2212,11 +2212,14 @@ on QSFP ports of G4 devices. \n""")
             content = 'No Response'
             raise error
 
-    #See note for method below
     def export_savepoint_guided(self):
         """Interactive menu to download a save point from the Packetmaster."""
-        rspname = moves.input('Name of rule save point to export (leave blank for none): ')
-        pspname = moves.input('Name of port save point to export (leave blank for none): ')
+        rspname = moves.input('Name of rule save point(s) to export (leave blank for none)'
+                              'to enter multiple save points separate names by "," with no spaces: ')
+        rspname = rspname.split(',')
+        pspname = moves.input('Name of port save point(s) to export (leave blank for none): '
+                              'to enter multiple save points separate names by "," with no spaces: ')
+        pspname = pspname.split(',')
         filename = moves.input("File name for savepoint export: ")
         confirm = moves.input("""Savepoint Export Summary:
                             Rule Save Point: %s
@@ -2228,17 +2231,21 @@ on QSFP ports of G4 devices. \n""")
             return run
         return "Canceling; save points not exported.\n"
 
-    #This still needs worked out; Packetmaster returns empty save points
     def export_savepoint(self, rspname, pspname, filename):
         """Download a save point from the Packetmaster."""
         if self.__https:
-            uri = 'https://' + self._address + '/rest/savepoints/export?'
+            base_uri = 'https://' + self._address + '/rest/savepoints/export?'
         else:
-            uri = 'http://' + self._address + '/rest/savepoints/export?'
-        #Add checks to see if names exist
-        data = {'rule_save_point_names': rspname, 'port_save_point_names': pspname}
+            base_uri = 'http://' + self._address + '/rest/savepoints/export?'
+        #Add checks to see if names exist and if names are lists
+        if not rspname == "" and pspname == "":
+            uri = base_uri + 'rule_save_point_names=' + json.dumps(rspname)  
+        elif rspname == "" and not pspname == "":
+            uri = base_uri + 'port_save_point_names=' + json.dumps(pspname)
+        else:
+            uri = base_uri + 'rule_save_point_names=' + json.dumps(rspname) + '&port_save_point_names=' + json.dumps(pspname)
         try:
-            response = requests.get(uri, data=data, auth=(self.username, self.password))
+            response = requests.get(uri, auth=(self.username, self.password))
             content = response.content
             info = json.loads(content)
             try:
