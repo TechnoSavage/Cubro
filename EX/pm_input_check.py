@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
-""" A collection of fucntions to perform input validation on various
- networking parameters. """
+""" A collection of functions to perform input validation on various arguments
+passed to the Packetmaster ReST API. """
 
 import re
-#Implement logging
+from datetime import datetime
+
 def mac(test):
     '''Check for valid MAC address and return if found.'''
     mac = re.findall("pattern", test)
@@ -17,6 +18,7 @@ def vlan(test):
         if test in range(0, 4097):
             return True
     except ValueError as reason:
+        log_event(reason)
         return False
     return False
 
@@ -27,6 +29,7 @@ def vlan_pri(test):
         if test in range(0, 8):
             return True
     except ValueError as reason:
+        log_event(reason)
         return False
     return False
 
@@ -37,6 +40,7 @@ def ipv4(test):
         if len(ipv4_address) == 1:
             return ipv4_address[0]
     except TypeError as reason:
+        log_event(reason)
         return 0
     return 0
 
@@ -57,6 +61,7 @@ def ipv4_mask(test):
             ipv4_subnet = ipv4_address[0] + '/' + ipv4_address[1]
             return ipv4_subnet
     except TypeError as reason:
+        log_event(reason)
         return 0
     return 0
 
@@ -71,6 +76,7 @@ def port(test):
         if test in range(1, 65536):
             return True
     except ValueError as reason:
+        log_event(reason)
         return False
     return False
 
@@ -81,6 +87,7 @@ def pm_pri(test):
         if test in range(0, 65536):
             return True
     except ValueError as reason:
+        log_event(reason)
         return False
     return False
 
@@ -91,6 +98,7 @@ def icmp_type(test):
         if test in range(0, 256):
             return True
     except ValueError as reason:
+        log_event(reason)
         return False
     return False
 
@@ -101,9 +109,20 @@ def icmp_code(test):
         if test in range(0, 16):
             return True
     except ValueError as reason:
+        log_event(reason)
         return False
     return False
 
 def ethertype(test):
     '''Test if input is a valid Ethertype.'''
     pass
+
+def log_event(reason):
+    '''Write errors to file if logging is enabled.'''
+    #Change logging to True to write errors to log file specified under log_location variable
+    logging = False
+    #Alter log_location to reflect desired file path and name
+    log_location = "pm_rest_log"
+    if logging:
+        with open(log_location, 'a') as f:
+            f.write(datetime.now() + ': ' + reason)

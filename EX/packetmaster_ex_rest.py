@@ -1,5 +1,5 @@
 """ Packetmaster EX device class for REST API interaction,
-    Use with firmware version 2.2.5 or newer and up to G4 NPB. """
+    Use with firmware version 2.2.5 or newer and up to G4 NPB."""
 
 from __future__ import print_function #Requires Python 2.6 or later
 from getpass import getpass
@@ -8,7 +8,7 @@ import re
 import requests
 from requests.exceptions import ConnectionError
 from six import moves
-import input_check
+import pm_input_check
 
 
 #TO-DO Add code to handle case and verify input in all areas where needed
@@ -66,7 +66,9 @@ class PacketmasterEX(object):
     #This will currently return both Physical and Logical ports.
     #Find way to list Physical ports only.
     def get_port_count(self):
-        """Return the number of ports on the device."""
+        """Return the number of ports on the device.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/config?'
         else:
@@ -90,7 +92,9 @@ class PacketmasterEX(object):
             raise error
 
     def firmware_version(self):
-        """Return firmware version of Packetmaster and set as property."""
+        """Return firmware version of Packetmaster and set as property.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/imageversion?'
         else:
@@ -106,7 +110,9 @@ class PacketmasterEX(object):
             raise error
 
     def api_level(self):
-        """Return API level of Packetmaster."""
+        """Return API level of Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/apilevel?'
         else:
@@ -121,7 +127,9 @@ class PacketmasterEX(object):
             raise error
 
     def ip_config(self):
-        """Return IP config of device and set netmask and gateway properties."""
+        """Return IP config of device and set netmask and gateway properties.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/ipconfig?'
         else:
@@ -138,7 +146,9 @@ class PacketmasterEX(object):
             raise error
 
     def device_model(self):
-        """Return model of Packetmaster and set model property."""
+        """Return model of Packetmaster and set model property.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/model?'
         else:
@@ -155,7 +165,9 @@ class PacketmasterEX(object):
         self.model = info['model']
 
     def device_name(self):
-        """Return name of Packetmaster."""
+        """Return name of Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/name?'
         else:
@@ -171,7 +183,9 @@ class PacketmasterEX(object):
             raise error
 
     def device_label(self):
-        """Return name and notes of Packetmaster and set them as properties."""
+        """Return name and notes of Packetmaster and set them as properties.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/customident?'
         else:
@@ -188,7 +202,9 @@ class PacketmasterEX(object):
             raise error
 
     def hardware_generation(self):
-        """Return hardware generation of Packetmaster."""
+        """Return hardware generation of Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/generation?'
         else:
@@ -204,7 +220,9 @@ class PacketmasterEX(object):
             raise error
 
     def serial_number(self):
-        """Return serial number of Packetmaster and set as property."""
+        """Return serial number of Packetmaster and set as property.
+           
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/serialno?'
         else:
@@ -220,7 +238,9 @@ class PacketmasterEX(object):
             raise error
 
     def port_config(self):
-        """Return port configuration of Packetmaster."""
+        """Return port configuration of Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/config?'
         else:
@@ -235,7 +255,9 @@ class PacketmasterEX(object):
             raise error
 
     def port_info(self):
-        """Return port information of Packetmaster."""
+        """Return port information of Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/info?'
         else:
@@ -250,7 +272,9 @@ class PacketmasterEX(object):
             raise error
 
     def port_statistics(self):
-        """Return port counters of Packetmaster."""
+        """Return port counters of Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/stats?'
         else:
@@ -265,7 +289,9 @@ class PacketmasterEX(object):
             raise error
 
     def sfp_info(self):
-        """Return SFP information of any installed transceivers."""
+        """Return SFP information of any installed transceivers.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/sfpstatus?'
         else:
@@ -281,7 +307,9 @@ class PacketmasterEX(object):
             raise error
 
     def rules_active(self):
-        """Return any active rules/filters on the Packetmaster."""
+        """Return any active rules/filters on the Packetmaster.
+           
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules/all?'
         else:
@@ -296,7 +324,9 @@ class PacketmasterEX(object):
             raise error
 
     def groups_active(self):
-        """Return any active port groups on the Packetmaster."""
+        """Return any active port groups on the Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups/all?'
         else:
@@ -311,7 +341,9 @@ class PacketmasterEX(object):
             raise error
 
     def device_apps(self):
-        """Return all Apps on Packetmaster."""
+        """Return all Apps on Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -326,7 +358,9 @@ class PacketmasterEX(object):
             raise error
 
     def apps_active(self):
-        """Return any running Apps on Packetmaster."""
+        """Return any running Apps on Packetmaster.
+           
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps/running?'
         else:
@@ -341,7 +375,9 @@ class PacketmasterEX(object):
             raise error
 
     def hash_algorithms(self):
-        """Return load balancing hash algorithm configuration."""
+        """Return load balancing hash algorithm configuration.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/grouphash?'
         else:
@@ -356,7 +392,9 @@ class PacketmasterEX(object):
             raise error
 
     def rule_permanence(self):
-        """Return state of Rule Permanance setting."""
+        """Return state of Rule Permanance setting.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/permanentrulesmode?'
         else:
@@ -371,7 +409,9 @@ class PacketmasterEX(object):
             raise error
 
     def storage_mode(self):
-        """Return setting of Rule Storage Mode."""
+        """Return setting of Rule Storage Mode.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/rulestoragemode?'
         else:
@@ -386,7 +426,9 @@ class PacketmasterEX(object):
             raise error
 
     def env_info(self):
-        """Return environmental information of Packetmaster."""
+        """Return environmental information of Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/environment?'
         else:
@@ -401,7 +443,9 @@ class PacketmasterEX(object):
             raise error
 
     def id_led(self):
-        """Return status of ID LED setting."""
+        """Return status of ID LED setting.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/idled?'
         else:
@@ -416,7 +460,9 @@ class PacketmasterEX(object):
             raise error
 
     def load_info(self):
-        """Return load information."""
+        """Return load information.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/loadaverage?'
         else:
@@ -431,7 +477,9 @@ class PacketmasterEX(object):
             raise error
 
     def tcam(self):
-        """Return the max and currently used TCAM flows."""
+        """Return the max and currently used TCAM flows.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/flownumbers?'
         else:
@@ -446,7 +494,9 @@ class PacketmasterEX(object):
             raise error
 
     def mem_free(self):
-        """Return memory usage."""
+        """Return memory usage.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/memoryusage?'
         else:
@@ -461,7 +511,9 @@ class PacketmasterEX(object):
             raise error
 
     def server_revision(self):
-        """Return CCH machinery server revision."""
+        """Return CCH machinery server revision.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/serverrevision?'
         else:
@@ -476,7 +528,9 @@ class PacketmasterEX(object):
             raise error
 
     def save_points(self):
-        """Return all available save points."""
+        """Return all available save points.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints?'
         else:
@@ -491,7 +545,9 @@ class PacketmasterEX(object):
             raise error
 
     def web_log(self):
-        """Return web server log."""
+        """Return web server log.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/weblog?'
         else:
@@ -506,7 +562,9 @@ class PacketmasterEX(object):
             raise error
 
     def get_users(self):
-        """Return all user accounts on Packetmaster."""
+        """Return all user accounts on Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users?'
         else:
@@ -521,7 +579,9 @@ class PacketmasterEX(object):
             raise error
 
     def user_uac(self):
-        """Return status of User Authentication setting."""
+        """Return status of User Authentication setting.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users/uac?'
         else:
@@ -536,7 +596,9 @@ class PacketmasterEX(object):
             raise error
 
     def get_radius(self):
-        """Return RADIUS settings."""
+        """Return RADIUS settings.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users/radius?'
         else:
@@ -551,7 +613,9 @@ class PacketmasterEX(object):
             raise error
 
     def get_dns(self):
-        """Return DNS server settings."""
+        """Return DNS server settings.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/nameresolution?'
         else:
@@ -566,7 +630,9 @@ class PacketmasterEX(object):
             raise error
 
     def get_telnet(self):
-        """Return status of Telnet service setting."""
+        """Return status of Telnet service setting.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/telnet?'
         else:
@@ -581,7 +647,9 @@ class PacketmasterEX(object):
             raise error
 
     def get_controller(self):
-        """Return Vitrum Controller configuration."""
+        """Return Vitrum Controller configuration.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/controller?'
         else:
@@ -608,12 +676,12 @@ class PacketmasterEX(object):
         else:
             return "That is not a valid selection; canceling Set Controller. \n"
         ipadd = moves.input("What is the IP address of the controller: ")
-        if input_check.ipv4(ipadd) != 0:
-            ipadd = input_check.ipv4(ipadd)
+        if pm_input_check.ipv4(ipadd) != 0:
+            ipadd = pm_input_check.ipv4(ipadd)
         else:
             return "That is not a valid IP address; canceling Set Controller. \n"
         port = moves.input("What is the TCP Port of the controller: ")
-        if not input_check.port(port):
+        if not pm_input_check.port(port):
             return "That is not a valid TCP port number; canceling Set Controller. \n"
         confirm = moves.input("""Configuration change summary:
                             Controller connection type: %s
@@ -626,18 +694,23 @@ class PacketmasterEX(object):
         return "Canceling; no changes made.\n"
 
     def set_controller(self, conn, ipadd, port):
-        """Set Vitrum Controller configuration."""
+        """Set Vitrum Controller configuration.
+
+           :param conn: A string, connection type; either 'tcp' or 'ssl'.
+           :param ipadd: A string, controller IP address.
+           :param port: A string, TCP port number for controller.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/controller?'
         else:
             uri = 'http://' + self._address + '/rest/device/controller?'
         if conn.lower() not in ('tcp', 'ssl'):
             return "That is not a valid connection type; canceling Set Controller. \n"
-        if input_check.ipv4(ipadd) != 0:
-            ipadd = input_check.ipv4(ipadd)
+        if pm_input_check.ipv4(ipadd) != 0:
+            ipadd = pm_input_check.ipv4(ipadd)
         else:
             return "That is not a valid IP address; canceling Set Controller. \n"
-        if not input_check.port(port):
+        if not pm_input_check.port(port):
             return "That is not a valid TCP port number; canceling Set Controller. \n"
         data = {'connection': conn, 'ip': ipadd, 'port': port}
         try:
@@ -662,12 +735,12 @@ class PacketmasterEX(object):
         else:
             return "That is not a valid selection; canceling Delete Controller. \n"
         ipadd = moves.input("What is the IP address of the controller: ")
-        if input_check.ipv4(ipadd) != 0:
-            ipadd = input_check.ipv4(ipadd)
+        if pm_input_check.ipv4(ipadd) != 0:
+            ipadd = pm_input_check.ipv4(ipadd)
         else:
             return "That is not a valid IP address; canceling Delete Controller. \n"
         port = moves.input("What is the TCP Port of the controller: ")
-        if not input_check.port(port):
+        if not pm_input_check.port(port):
             return "That is not a valid TCP port number; canceling Delete Controller. \n"
         confirm = moves.input("""Configuration change summary:
                             Controller connection type: %s
@@ -680,18 +753,23 @@ class PacketmasterEX(object):
         return "Canceling; no changes made.\n"
 
     def del_controller(self, conn, ipadd, port):
-        """Remove a Vitrum Controller."""
+        """Remove a Vitrum Controller.
+        
+           :param conn: A string, connection type; either 'tcp' or 'ssl'.
+           :param ipadd: A string, controller IP address.
+           :param port: A string, TCP port number for controller.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/controller?'
         else:
             uri = 'http://' + self._address + '/rest/device/controller?'
         if conn.lower() not in ('tcp', 'ssl'):
             return "That is not a valid connection type; canceling Delete Controller. \n"
-        if input_check.ipv4(ipadd) != 0:
-            ipadd = input_check.ipv4(ipadd)
+        if pm_input_check.ipv4(ipadd) != 0:
+            ipadd = pm_input_check.ipv4(ipadd)
         else:
             return "That is not a valid IP address; canceling Delete Controller. \n"
-        if not input_check.port(port):
+        if not pm_input_check.port(port):
             return "That is not a valid TCP port number; canceling Delete Controller. \n"
         data = {'connection': conn, 'ip': ipadd, 'port': port}
         try:
@@ -704,7 +782,9 @@ class PacketmasterEX(object):
             raise error
 
     def get_dpid(self):
-        """Return Device OpenFlow Datapath ID."""
+        """Return Device OpenFlow Datapath ID.
+        
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/dpid?'
         else:
@@ -723,26 +803,32 @@ class PacketmasterEX(object):
         pass
 
     def set_license(self, controller_id, valid_until, serial_no, sig):
-        """Set Vitrum License information."""
+        """Set Vitrum License information.
+        
+           :param controller_id: A string, 
+           :param valid_until: A string, 
+           :param serial_no: A string,
+           :param sig: A string, 
+           :returns: A string, JSON-formatted"""
         pass
 
     def set_ip_config_guided(self):
         """Interactive menu for configuring management IP settings."""
         address = moves.input('Enter IP Address (e.g. 192.168.0.200): ')
-        if input_check.ipv4(address) != 0:
-            address = input_check.ipv4(address)
-        #elif input_check.ipv6(address) != 0:
-        #   address = input_check.ipv6(address)
+        if pm_input_check.ipv4(address) != 0:
+            address = pm_input_check.ipv4(address)
+        #elif pm_input_check.ipv6(address) != 0:
+        #   address = pm_input_check.ipv6(address)
         else:
             return "That is not a valid IP address; canceling Set IP Configuration. \n"
         netmask = moves.input('Enter Subnet Mask (e.g. 255.255.255.0): ')
-        if input_check.ipv4(netmask) != 0:
-            netmask = input_check.ipv4(netmask)
+        if pm_input_check.ipv4(netmask) != 0:
+            netmask = pm_input_check.ipv4(netmask)
         else:
             return "That is not a valid Subnet Mask; canceling Set IP Configuration. \n"
         gateway = moves.input('Enter gateway (e.g. 192.168.0.1): ')
-        if input_check.ipv4(gateway) != 0:
-            gateway = input_check.ipv4(gateway)
+        if pm_input_check.ipv4(gateway) != 0:
+            gateway = pm_input_check.ipv4(gateway)
         else:
             return "That is not a valid Gateway Address; canceling Set IP Configuration. \n"
         confirm = moves.input("""Configuration change summary:
@@ -756,23 +842,28 @@ class PacketmasterEX(object):
         return "Canceling; no changes made.\n"
 
     def set_ip_config(self, address, netmask, gateway):
-        """Set management IP configuration for Packetmaster."""
+        """Set management IP configuration for Packetmaster.
+        
+           :param address: A string, management IP address
+           :param netmask: A string, managment IP subnet mask
+           :param gateway: A string, default gateway
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/ipconfig?'
         else:
             uri = 'http://' + self._address + '/rest/device/ipconfig?'
-        if input_check.ipv4(address) != 0:
-            address = input_check.ipv4(address)
-        #elif input_check.ipv6(address) != 0:
-        #   address = input_check.ipv6(address)
+        if pm_input_check.ipv4(address) != 0:
+            address = pm_input_check.ipv4(address)
+        #elif pm_input_check.ipv6(address) != 0:
+        #   address = pm_input_check.ipv6(address)
         else:
             return "That is not a valid IP address; canceling Set IP Configuration. \n"
-        if input_check.ipv4(netmask) != 0:
-            netmask = input_check.ipv4(netmask)
+        if pm_input_check.ipv4(netmask) != 0:
+            netmask = pm_input_check.ipv4(netmask)
         else:
             return "That is not a valid Subnet Mask; canceling Set IP Configuration. \n"
-        if input_check.ipv4(gateway) != 0:
-            gateway = input_check.ipv4(gateway)
+        if pm_input_check.ipv4(gateway) != 0:
+            gateway = pm_input_check.ipv4(gateway)
         else:
             return "That is not a valid Gateway Address; canceling Set IP Configuration. \n"
         data = {'ip': address, 'mask': netmask, 'gw': gateway}
@@ -797,7 +888,10 @@ class PacketmasterEX(object):
         return "Canceling; no changes made.\n"
 
     def set_name(self, name):
-        """Set Packetmaster name."""
+        """Set Packetmaster name.
+        
+           :param name: A string, device name
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/name?'
         else:
@@ -826,7 +920,11 @@ class PacketmasterEX(object):
         return "Canceling; no changes made.\n"
 
     def set_label(self, name, notes):
-        """Set Packetmaster name and notes."""
+        """Set Packetmaster name and notes.
+        
+           :param name: A string, device name
+           :param notes: A string, device notes
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/customident?'
         else:
@@ -965,7 +1063,17 @@ on QSFP ports of G4 devices. \n""")
 
     def set_port_config(self, interface, speed, duplex, description='',
                         forcetx=False, check=False, recalc=False, split=False):
-        """Set configuration of a port on the Packetmaster."""
+        """Set configuration of a port on the Packetmaster.
+        
+           :param interface: A string, interface to configure e.g. eth-0-1
+           :param speed: A string, bandwidth speed setting for interface
+           :param duplex: A string, link duplex setting for interface
+           :param description: A string, description for interface
+           :param forcetx: A bool, force tx transmit (unidirectional) of interface
+           :param check: A bool, 'True' to perform CRC checking; 'False' to skip
+           :param recalc: A bool, Recalculate frame CRC; enable if slicing packets
+           :param split: A bool, Configure port to use breakout cable; only availble on QSFP ports
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/config?'
         else:
@@ -1066,7 +1174,11 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def port_on_off(self, if_name, shutdown):
-        """Enable/disable a port on the Packetmaster."""
+        """Enable/disable a port on the Packetmaster.
+
+           :param if_name: A string, interface name e.g. eth-0-1
+           :param shutdown: A bool, 'True' to disable, 'False' to enable
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/config?'
         else:
@@ -1089,7 +1201,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def reset_port_counters(self):
-        """Reser all port counters to zero."""
+        """Reser all port counters to zero.
+        
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/counters?'
         else:
@@ -1104,7 +1218,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def reset_rule_counters(self):
-        """Reset all rule counters to zero."""
+        """Reset all rule counters to zero.
+        
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules/counters?'
         else:
@@ -1128,7 +1244,7 @@ on QSFP ports of G4 devices. \n""")
         priority = moves.input('Enter the priority level of the rule; '
                              '0 - 65535 higher number = higher priority [32768]: ')
         if priority != '':
-            if input_check.pm_pri(priority):
+            if pm_input_check.pm_pri(priority):
                 data['priority'] = int(priority)
             else:
                 return "That is not a valid input for priority; canceling Add Rule."
@@ -1150,12 +1266,12 @@ on QSFP ports of G4 devices. \n""")
         elif int(trafmatch) == 3:
             data['match[vlan]'] = 'match'
             matchid = moves.input('Enter the VLAN ID to filter on: ')
-            if input_check.vlan(matchid):
+            if pm_input_check.vlan(matchid):
                 data['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Add Rule."
             vpri = moves.input('Enter a VLAN priority? Enter 0-7 orleave blank for none: ')
-            if vpri != '' and input_check.vlan_pri(vpri):
+            if vpri != '' and pm_input_check.vlan_pri(vpri):
                 data['match[vlan_priority]'] = vpri
             elif vpri == '':
                 data['match[vlan_priority]'] = '0'
@@ -1207,8 +1323,8 @@ on QSFP ports of G4 devices. \n""")
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwsrc != '':
-                    if input_check.ipv4_mask(nwsrc) != 0:
-                        data['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                    if pm_input_check.ipv4_mask(nwsrc) != 0:
+                        data['match[nw_src]'] = pm_input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
                 nwdst = moves.input('Filter on destination IP address? '
@@ -1216,8 +1332,8 @@ on QSFP ports of G4 devices. \n""")
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwdst != '':
-                    if input_check.ipv4_mask(nwdst) != 0:
-                        data['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                    if pm_input_check.ipv4_mask(nwdst) != 0:
+                        data['match[nw_dst]'] = pm_input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Add Rule."
             if data['match[protocol]'] == 'ip':
@@ -1230,14 +1346,14 @@ on QSFP ports of G4 devices. \n""")
                 tp_src = moves.input('Filter on source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
-                    if input_check.port(tp_src):
+                    if pm_input_check.port(tp_src):
                         data['match[' + data['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Add Rule."
                 tp_dst = moves.input('Filter on destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
-                    if input_check.port(tp_dst):
+                    if pm_input_check.port(tp_dst):
                         data['match[' + data['match[protocol]'] + '_dst]'] = tp_dst
                     else:
                         return "That is not a valid port number; canceling Add Rule."
@@ -1245,14 +1361,14 @@ on QSFP ports of G4 devices. \n""")
                 icmpt = moves.input('Filter on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
-                    if input_check.icmp_type(icmpt):
+                    if pm_input_check.icmp_type(icmpt):
                         data['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Add Rule."
                 icmpc = moves.input('Filter on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
-                    if input_check.icmp_code(icmpc):
+                    if pm_input_check.icmp_code(icmpc):
                         data['match[icmp_code]'] = icmpc
                     else:
                         return "That is not a valid ICMP Code; canceling Add Rule."
@@ -1285,7 +1401,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def add_rule(self, data):
-        """Add a rule/filter to the Packetmaster."""
+        """Add a rule/filter to the Packetmaster.
+        
+           :param data: A dict, dictionary containing all valid rule parameters
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
@@ -1314,7 +1433,7 @@ on QSFP ports of G4 devices. \n""")
         priority = moves.input('Enter the priority of the rule (priority cannot be changed; '
                              'must match rule to be modified)[32768]: ')
         if priority != '':
-            if input_check.pm_pri(priority):
+            if pm_input_check.pm_pri(priority):
                 data['priority'] = int(priority)
             else:
                 return "That is not a valid input for priority; canceling Modify Rule."
@@ -1336,12 +1455,12 @@ on QSFP ports of G4 devices. \n""")
         elif int(trafmatch) == 3:
             data['match[vlan]'] = 'match'
             matchid = moves.input('Enter the VLAN ID the rule is filtering: ')
-            if input_check.vlan(matchid):
+            if pm_input_check.vlan(matchid):
                 data['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Modify Rule."
             vpri = moves.input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
-            if vpri != '' and input_check.vlan_pri(vpri):
+            if vpri != '' and pm_input_check.vlan_pri(vpri):
                 data['match[vlan_priority]'] = vpri
             elif vpri == '':
                 data['match[vlan_priority]'] = '0'
@@ -1391,8 +1510,8 @@ on QSFP ports of G4 devices. \n""")
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwsrc != '':
-                    if input_check.ipv4_mask(nwsrc) != 0:
-                        data['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                    if pm_input_check.ipv4_mask(nwsrc) != 0:
+                        data['match[nw_src]'] = pm_input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
                 nwdst = moves.input('Filtering on a destination IP address? '
@@ -1400,8 +1519,8 @@ on QSFP ports of G4 devices. \n""")
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwdst != '':
-                    if input_check.ipv4_mask(nwdst) != 0:
-                        data['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                    if pm_input_check.ipv4_mask(nwdst) != 0:
+                        data['match[nw_dst]'] = pm_input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Modify Rule."
             if data['match[protocol]'] == 'ip':
@@ -1414,14 +1533,14 @@ on QSFP ports of G4 devices. \n""")
                 tp_src = moves.input('Filtering on a source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
-                    if input_check.port(tp_src):
+                    if pm_input_check.port(tp_src):
                         data['match[' + data['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Modify Rule."
                 tp_dst = moves.input('Filtering on a destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
-                    if input_check.port(tp_dst):
+                    if pm_input_check.port(tp_dst):
                         data['match[' + data['match[protocol]'] + '_dst]'] = tp_dst
                     else:
                         return "That is not a valid port number; canceling Modify Rule."
@@ -1429,14 +1548,14 @@ on QSFP ports of G4 devices. \n""")
                 icmpt = moves.input('Filtering on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
-                    if input_check.icmp_type(icmpt):
+                    if pm_input_check.icmp_type(icmpt):
                         data['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Modify Rule."
                 icmpc = moves.input('Filtering on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
-                    if input_check.icmp_code(icmpc):
+                    if pm_input_check.icmp_code(icmpc):
                         data['match[icmp_code]'] = icmpc
                     else:
                         return "That is not a valid ICMP Code; canceling Modify Rule."
@@ -1469,7 +1588,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def mod_rule(self, data):
-        """Modify a rule/filter on the Packetmaster."""
+        """Modify a rule/filter on the Packetmaster.
+        
+           :param data: A dict, dictionary containing all valid rule parameters
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
@@ -1510,12 +1632,12 @@ on QSFP ports of G4 devices. \n""")
         elif int(trafmatch) == 3:
             data['match[vlan]'] = 'match'
             matchid = moves.input('Enter the VLAN ID the rule is filtering: ')
-            if input_check.vlan(matchid):
+            if pm_input_check.vlan(matchid):
                 data['match[vlan_id]'] = matchid
             else:
                 return "That is not a valid VLAN ID; canceling Delete Rule."
             vpri = moves.input('Enter the VLAN priority? Enter 0-7 or leave blank for none: ')
-            if vpri != '' and input_check.vlan_pri(vpri):
+            if vpri != '' and pm_input_check.vlan_pri(vpri):
                 data['match[vlan_priority]'] = vpri
             elif vpri == '':
                 data['match[vlan_priority]'] = '0'
@@ -1565,8 +1687,8 @@ on QSFP ports of G4 devices. \n""")
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwsrc != '':
-                    if input_check.ipv4_mask(nwsrc) != 0:
-                        data['match[nw_src]'] = input_check.ipv4_mask(nwsrc)
+                    if pm_input_check.ipv4_mask(nwsrc) != 0:
+                        data['match[nw_src]'] = pm_input_check.ipv4_mask(nwsrc)
                     else:
                         return "That is not a valid IP address; canceling Delete Rule."
                 nwdst = moves.input('Filtering on a destination IP address? '
@@ -1574,8 +1696,8 @@ on QSFP ports of G4 devices. \n""")
                                   '(e.g. "192.168.1.5" or "192.168.1.5/255.255.255.0"'
                                   'or "192.168.1.5/24"): ')
                 if nwdst != '':
-                    if input_check.ipv4_mask(nwdst) != 0:
-                        data['match[nw_dst]'] = input_check.ipv4_mask(nwdst)
+                    if pm_input_check.ipv4_mask(nwdst) != 0:
+                        data['match[nw_dst]'] = pm_input_check.ipv4_mask(nwdst)
                     else:
                         return "That is not a valid IP address; canceling Delete Rule."
             if data['match[protocol]'] == 'ip':
@@ -1588,14 +1710,14 @@ on QSFP ports of G4 devices. \n""")
                 tp_src = moves.input('Filtering on a source port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_src != '':
-                    if input_check.port(tp_src):
+                    if pm_input_check.port(tp_src):
                         data['match[' + data['match[protocol]'] + '_src]'] = tp_src
                     else:
                         return "That is not a valid port number; canceling Delete Rule."
                 tp_dst = moves.input('Filtering on a destination port? '
                                    'Leave blank for no or enter port number: ')
                 if tp_dst != '':
-                    if input_check.port(tp_dst):
+                    if pm_input_check.port(tp_dst):
                         data['match[' + data['match[protocol]'] + '_dst]'] = tp_dst
                     else:
                         return "That is not a valid port number; canceling Delete Rule."
@@ -1603,14 +1725,14 @@ on QSFP ports of G4 devices. \n""")
                 icmpt = moves.input('Filtering on ICMP type? '
                                   'Leave blank for no or enter ICMP type number: ')
                 if icmpt != '':
-                    if input_check.icmp_type(icmpt):
+                    if pm_input_check.icmp_type(icmpt):
                         data['match[icmp_type]'] = icmpt
                     else:
                         return "That is not a valid ICMP Type; canceling Delete Rule."
                 icmpc = moves.input('Filtering on ICMP code? '
                                   'Leave blank for no or enter ICMP code number: ')
                 if icmpc != '':
-                    if input_check.icmp_code(icmpc):
+                    if pm_input_check.icmp_code(icmpc):
                         data['match[icmp_code]'] = icmpc
                     else:
                         return "That is not a valid ICMP Code; canceling Delete Rule."
@@ -1640,7 +1762,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def del_rule(self, data):
-        """Delete a rule/filter from the Packetmaster."""
+        """Delete a rule/filter from the Packetmaster.
+        
+           :param data: A dict, dictionary containing all valid rule parameters
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
@@ -1658,7 +1783,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def del_rule_all(self):
-        """Delete all rules from the Packetmaster."""
+        """Delete all rules from the Packetmaster.
+        
+        :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules/all?'
         else:
@@ -1734,7 +1861,7 @@ on QSFP ports of G4 devices. \n""")
                 push_vlan = moves.input('Push VLAN ID to outout traffic? '
                                       'Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
-                    if input_check.vlan(push_vlan):
+                    if pm_input_check.vlan(push_vlan):
                         vlan = str(int(push_vlan) + 4096)
                         vlan = 'push_vlan:0x8100,set_field:' + vlan + '->vlan_vid,'
                         actions = vlan + actions
@@ -1744,7 +1871,7 @@ on QSFP ports of G4 devices. \n""")
                     mod_vlan = moves.input('Modify VLAN ID of output traffic? '
                                          'Enter VLAN ID or leave blank for no: ').strip()
                     if mod_vlan != '':
-                        if input_check.vlan(mod_vlan):
+                        if pm_input_check.vlan(mod_vlan):
                             vlan = str(int(mod_vlan) + 4096)
                             vlan = 'set_field:' + vlan + '->vlan_vid,'
                             actions = vlan + actions
@@ -1783,8 +1910,8 @@ on QSFP ports of G4 devices. \n""")
                 dst_ip = moves.input('Modify destination IP address? '
                                    'Enter new IP address or leave blank for no: ').strip()
                 if dst_ip != '':
-                    if input_check.ipv4_mask(dst_ip) != 0:
-                        actions = 'set_field:' + input_check.ipv4_mask(dst_ip) + \
+                    if pm_input_check.ipv4_mask(dst_ip) != 0:
+                        actions = 'set_field:' + pm_input_check.ipv4_mask(dst_ip) + \
                                   '->ip_dst,' + actions
                     else:
                         return ("That is not a valid input for IP address, "
@@ -1793,7 +1920,7 @@ on QSFP ports of G4 devices. \n""")
                     src_udp = moves.input('Modify source UDP port? '
                                         'Enter new port number or leave blank for no: ').strip()
                     if src_udp != '':
-                        if input_check.port(src_udp):
+                        if pm_input_check.port(src_udp):
                             actions = 'set_field:' + src_udp + '->udp_src,' + actions
                         else:
                             return ("That is not a valid input for port number; "
@@ -1801,7 +1928,7 @@ on QSFP ports of G4 devices. \n""")
                 dst_udp = moves.input('Modify destination UDP port? '
                                     'Enter new port number or leave blank for no: ').strip()
                 if dst_udp != '':
-                    if input_check.port(dst_udp):
+                    if pm_input_check.port(dst_udp):
                         actions = 'set_field:' + dst_udp + '->udp_dst,' + actions
                     else:
                         return ("That is not a valid input for port number; "
@@ -1810,7 +1937,7 @@ on QSFP ports of G4 devices. \n""")
                     src_tcp = moves.input('Modify source TCP port? '
                                         'Enter new port number or leave blank for no: ').strip()
                     if src_tcp != '':
-                        if input_check.port(src_tcp):
+                        if pm_input_check.port(src_tcp):
                             actions = 'set_field:' + src_tcp + '->tcp_src,' + actions
                         else:
                             return ("That is not a valid input for port number; "
@@ -1818,7 +1945,7 @@ on QSFP ports of G4 devices. \n""")
                 dst_tcp = moves.input('Modify destination TCP port? '
                                     'Enter new port number or leave blank for no: ').strip()
                 if dst_tcp != '':
-                    if input_check.port(dst_tcp):
+                    if pm_input_check.port(dst_tcp):
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
                     else:
                         return ("That is not a valid input for port number; "
@@ -1846,7 +1973,11 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def add_group(self, gid, json_app):
-        """Add a port group to the Packetmaster."""
+        """Add a port group to the Packetmaster.
+        
+           :param gid: A string, ID of group e.g. 1-4294967040
+           :param json_app: A dict, dictionary containing all valid group parameters
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
@@ -2039,7 +2170,11 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def mod_group(self, gid, json_app):
-        """Modify a port group on the Packetmaster."""
+        """Modify a port group on the Packetmaster.
+        
+           :param gid: A string, ID of group e.g. 1-4294967040
+           :param json_app: A dict, dictionary containing all valid group parameters
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
@@ -2085,7 +2220,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def delete_group(self, gid):
-        """Delete a port group from the Packetmaster."""
+        """Delete a port group from the Packetmaster.
+        
+           :param gid: A string, ID of group e.g. 1-4294967040
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
@@ -2114,7 +2252,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def delete_groups_all(self):
-        """Delete all port groups from the Packetmaster."""
+        """Delete all port groups from the Packetmaster.
+        
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups/all?'
         else:
@@ -2140,7 +2280,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_port_savepoint(self, savename):
-        """Activate a port save point."""
+        """Activate a port save point.
+        
+           :param savename: A string, name of port save point to make active
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/activeportsavepoint?'
         else:
@@ -2168,7 +2311,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_rule_savepoint(self, savename):
-        """Activate a rule save point."""
+        """Activate a rule save point.
+        
+           :param savename: A string, name of rule save point to make active
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/activerulesavepoint?'
         else:
@@ -2196,7 +2342,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_boot_savepoint(self, savename):
-        """Set a save point as default boot configuration."""
+        """Set a save point as default boot configuration.
+        
+           :param savename: A string, name of rule save point to load on boot
+           :returns: A string, JSON-formatted"""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/defaultrulesavepoint?'
         else:
@@ -2232,7 +2381,12 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; save points not exported.\n"
 
     def export_savepoint(self, rspname, pspname, filename):
-        """Download a save point from the Packetmaster."""
+        """Download a save point from the Packetmaster.
+        
+           :param rspname: A string, rule save point name to export
+           :param pspname: A string, port save point name to export
+           :param filename: A string, name to give to exported save point
+           :returns: A string, JSON-formatted"""
         if self.__https:
             base_uri = 'https://' + self._address + '/rest/savepoints/export?'
         else:
@@ -2283,7 +2437,13 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def mod_port_savepoint(self, oldname, newname, description, override=True):
-        """Modify a port save point."""
+        """Modify a port save point.
+        
+           :param oldname: A string, name of port save point to modify.
+           :param newname: A string, new name for modified port save point.
+           :param description: A string, description for port save point.
+           :param override: A bool, 'True' saves current port config; 'False' does not overwrite prior port config. 
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/modportsavepoint?'
         else:
@@ -2332,7 +2492,13 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def mod_rule_savepoint(self, oldname, newname, description, override=True):
-        """Modify a rule save point on the Packetmaster."""
+        """Modify a rule save point on the Packetmaster.
+        
+           :param oldname: A string, name of rule save point to modify.
+           :param newname: A string, new name for modified rule save point.
+           :param description: A string, description for rule save point.
+           :param override: A bool, 'True' saves current rule config; 'False' does not overwrite prior rule config. 
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/modrulesavepoint?'
         else:
@@ -2370,7 +2536,11 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def create_port_savepoint(self, name, description):
-        """Create port save point from current configuration."""
+        """Create port save point from current configuration.
+        
+           :param name: A string, new name for port save point.
+           :param description: A string, description for port save point.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/portsavepoint?'
         else:
@@ -2414,7 +2584,11 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def create_rule_savepoint(self, name, description):
-        """Create a rule save point from current configuration."""
+        """Create a rule save point from current configuration.
+        
+           :param name: A string, new name for rule save point.
+           :param description: A string, description for rule save point.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/rulesavepoint?'
         else:
@@ -2441,7 +2615,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def delete_port_savepoint(self, name):
-        """Delete a port save point from the Packetmaster."""
+        """Delete a port save point from the Packetmaster.
+        
+           :param name: A string, name of port save point to delete.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/portsavepoint?'
         else:
@@ -2469,7 +2646,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def delete_rule_savepoint(self, name):
-        """Delete a rule save point from the Packetmaster."""
+        """Delete a rule save point from the Packetmaster.
+        
+           :param name: A string, name of rule save point to delete.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/rulesavepoint?'
         else:
@@ -2997,7 +3177,12 @@ on QSFP ports of G4 devices. \n""")
         return run
 
     def start_app_ntp(self, server1, server2=None, user_description=''):
-        """Start an NTP app instance."""
+        """Start an NTP app instance.
+        
+           :param server1: A string, IP address or Domain Name of NTP server.
+           :param server2: A string, IP address or Domain Name of NTP server (optional).
+           :param user_description: A string, description for app instance (optional).
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3019,19 +3204,30 @@ on QSFP ports of G4 devices. \n""")
     def start_app_arpresponder(self, outport, src_mac, dst_mac, src_ip, dst_ip,
                                interval='5000', inport=None, match_srcmac=None,
                                user_description=''):
-        """Start an ArpResponder app instance."""
+        """Start an ArpResponder app instance.
+        
+           :param outport: A string, physical interface to send ARP responses on.
+           :param src_mac: A string, source MAC address for ARP response.
+           :param dst_mac: A string, destination MAC for ARP response.
+           :param src_ip: A string, source IP address for ARP response.
+           :param dst_ip: A string, destination IP address for ARP response.
+           :param interval: A string, check interval in milliseconds; default 5000
+           :param inport: A string, physical source port of incoming ARP request (optional).
+           :param match_srcmac: A string, source MAC address of incoming ARP request (optional).
+           :param user_description: A string, description for app instance.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
             uri = 'http://' + self._address + '/rest/apps?'
         try:
-            input_check = int(interval)
+            pm_input_check = int(interval)
         except ValueError as reason:
             return ("That is not an valid input for interval "
                     "(number in milliseconds); canceling start ArpResponder.", reason)
         try:
-            input_check = int(outport)
-            if input_check > self.ports:
+            pm_input_check = int(outport)
+            if pm_input_check > self.ports:
                 return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not an valid input for output port; "
@@ -3046,8 +3242,8 @@ on QSFP ports of G4 devices. \n""")
                 'ipDst': dst_ip}
         if inport:
             try:
-                input_check = int(inport)
-                if input_check > self.ports:
+                pm_input_check = int(inport)
+                if pm_input_check > self.ports:
                     return "Physical port does not exist on device."
             except ValueError as reason:
                 return ("That is not a valid input for input port; "
@@ -3070,7 +3266,18 @@ on QSFP ports of G4 devices. \n""")
                        community='public', user_description='',
                        trap_enable=True, trap1='1.1.1.1', trap1_port='162',
                        trap2='', trap2_port='162'):
-        """Start an SNMP app instance."""
+        """Start an SNMP app instance.
+
+           :param interval: A string, check interval in milliseconds; default is 5000.
+           :param snmp_port: A string, SNMP port; default 161.
+           :param community: A string, SNMP community; default 'public'.
+           :param user_description: description for app instance (optional).
+           :param trap_enable: A bool, 'True' to enable; 'False' to disable; default True.
+           :param trap1: A string, A string, primary trap receiver IP; default 1.1.1.1.
+           :param trap1_port: A string, A string, primary trap receiver port; default 162.
+           :param trap2: A string, secondary trap receiver IP (optional).
+           :param trap2_port: A string, secondary trap receiver port; default 162.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3143,7 +3350,24 @@ on QSFP ports of G4 devices. \n""")
                                   src_ip='0.0.0.1', dst_ip='0.0.0.2',
                                   src_port='5555', dst_port='5556',
                                   bypass_ip='1.1.1.1'):
-        """Start a HeartbeatBypass app instance."""
+        """Start a HeartbeatBypass app instance.
+        
+           :param bypass_port1: A string, first port connected to the bypass switch.
+           :param bypass_port2: A string, second port connected to the bypass switch.
+           :param hb_in: A string, interface on which to expect heartbeat packets.
+           :param hb_out: A string, interface on which to send heartbeat packets.
+           :param conn_type: A string, connection to bypass management port; either 'ip' or 'rs232'.
+           :param interval: A string, check interval in milliseconds.
+           :param user_description: A string, user description for the app instance.
+           :param proto: A string, either 'tcp' or 'udp'.
+           :param src_mac: A string, source MAC address for heartbeat.
+           :param dst_mac: A string, destination MAC address for heartbeat.
+           :param src_ip: A string, source IP address for heartbeat.
+           :param dst_ip: A string, destination IP address for heartbeat.
+           :param src_port: A string, source TCP or UDP port for hearbeat.
+           :param dst_port: A string, destination TCP or UDP for heartbeat.
+           :param bypass_ip: A string, management IP address of bypass switch.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3242,7 +3466,12 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def start_app_syslog(self, server_ip, port='514', user_description=''):
-        """Start a Syslog app instance."""
+        """Start a Syslog app instance.
+        
+           :param server_ip: A string, IP address of syslog server.
+           :param port: A string, A string, syslog port; defaults to 514.
+           :param user_description: A string, description for syslog app instance.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3272,7 +3501,13 @@ on QSFP ports of G4 devices. \n""")
 
     def start_app_bypasskeepalive(self, conn_type='ip', interval='2000',
                                   description='', bypass_ip='1.1.1.1'):
-        """Start a Bypass BypassKeepalive app instance."""
+        """Start a Bypass BypassKeepalive app instance.
+        
+           :param conn_type: A string, ip or rs232; default is ip.
+           :param interval: A string, check interval in milliseconds; default is 2000.
+           :param description: A string, description for app instance.
+           :param bypass_ip: A string, IP address of bypass switch; default is 1.1.1.1.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3315,7 +3550,22 @@ on QSFP ports of G4 devices. \n""")
                             src_mac='00:00:00:00:00:01',
                             dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1',
                             dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
-        """Start a Heartbeat app instance."""
+        """Start a Heartbeat app instance.
+        
+           :param hb_in: A string, port on which to expect heartbeat packets.
+           :param act_comm: A string, command to execute when heartbeats are detected.
+           :param hb_out: A string, port on which to send heartbeat packets.
+           :param deact_comm: A string, command to execute when heartbeats are not detected.
+           :param interval: A string, intercal in milliseconds; default is 2000.
+           :param user_description: A string, user description for app instance.
+           :param proto: A string, transport protocol (tcp or udp); default is udp.
+           :param src_mac: A string, source MAC address to assign to heartbeat; default is 00:00:00:00:00:01.
+           :param dst_mac: A string, destination MAC address to assign to heartbeat; default is 00:00:00:00:00:02.
+           :param src_ip: A string, source IP address to assign to heartbeat; default is 0.0.0.1.
+           :param dst_ip: A string, destination IP address to assign to heartbeat; default is 0.0.0.2.
+           :param src_port: A string, source port to assign to heartbeat; default is 5555.
+           :param dst_port: A string, destination port to assign to heartbeat; default is 5556.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3897,7 +4147,13 @@ on QSFP ports of G4 devices. \n""")
         return run
 
     def mod_app_ntp(self, pid, server1, server2=None, user_description=''):
-        """Modify an NTP app instance."""
+        """Modify an NTP app instance.
+
+           :param pid: A string, Process ID of app instance to modify.
+           :param server1: A string, IP address or Domain Name of NTP server.
+           :param server2: A string, IP address or Domain Name of NTP server (optional).
+           :param user_description: A string, description for app instance (optional).
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3924,7 +4180,19 @@ on QSFP ports of G4 devices. \n""")
     def mod_app_arpresponder(self, pid, outport, src_mac, dst_mac, src_ip,
                              dst_ip, interval='5000', inport=None,
                              match_srcmac=None, user_description=''):
-        """Modify an ArpResponder app instance."""
+        """Modify an ArpResponder app instance.
+
+           :param pid: A string, process ID of app instance to modify.
+           :param outport: A string, physical interface to send ARP responses on.
+           :param src_mac: A string, source MAC address for ARP response.
+           :param dst_mac: A string, destination MAC for ARP response.
+           :param src_ip: A string, source IP address for ARP response.
+           :param dst_ip: A string, destination IP address for ARP response.
+           :param interval: A string, check interval in milliseconds; default 5000
+           :param inport: A string, physical source port of incoming ARP request (optional).
+           :param match_srcmac: A string, source MAC address of incoming ARP request (optional).
+           :param user_description: A string, description for app instance.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3939,8 +4207,8 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not an valid input for interval "
                     "(number in milliseconds); canceling Modify ArpResponder.", reason)
         try:
-            input_check = int(outport)
-            if input_check > self.ports:
+            pm_input_check = int(outport)
+            if pm_input_check > self.ports:
                 return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not an valid input for output port; "
@@ -3956,8 +4224,8 @@ on QSFP ports of G4 devices. \n""")
                 'ipDst': dst_ip}
         if inport:
             try:
-                input_check = int(inport)
-                if input_check > self.ports:
+                pm_input_check = int(inport)
+                if pm_input_check > self.ports:
                     return "Physical port does not exist on device."
             except ValueError as reason:
                 return ("That is not a valid input for input port; "
@@ -3980,7 +4248,19 @@ on QSFP ports of G4 devices. \n""")
                      community='public', user_description='', trap_enable=True,
                      trap1='1.1.1.1', trap1_port='162', trap2='',
                      trap2_port='162'):
-        """Modify an SNMP app instance."""
+        """Modify an SNMP app instance.
+
+           :param pid: A string, process ID of app instance to modify.
+           :param interval: A string, check interval in milliseconds; default is 5000.
+           :param snmp_port: A string, SNMP port; default 161.
+           :param community: A string, SNMP community; default 'public'.
+           :param user_description: description for app instance (optional).
+           :param trap_enable: A bool, 'True' to enable; 'False' to disable; default True.
+           :param trap1: A string, A string, primary trap receiver IP; default 1.1.1.1.
+           :param trap1_port: A string, A string, primary trap receiver port; default 162.
+           :param trap2: A string, secondary trap receiver IP (optional).
+           :param trap2_port: A string, secondary trap receiver port; default 162.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:

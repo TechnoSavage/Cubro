@@ -8,7 +8,7 @@ a Cubro Packetmaster via the REST API. """
 from __future__ import print_function #Requires Python 2.6 or later
 from getpass import getpass
 from six import moves
-import input_check
+import pm_input_check
 from packetmaster_ex_rest import PacketmasterEX
 # Add code to handle case and verify input in all areas where needed
 
@@ -17,8 +17,8 @@ def set_ip():
     fail_count = 0
     while fail_count < 3:
         address = moves.input('What is the IP address of the Packetmaster you want to access?: ')
-        if input_check.ipv4(address) != 0:
-            address = input_check.ipv4(address)
+        if pm_input_check.ipv4(address) != 0:
+            address = pm_input_check.ipv4(address)
             return address
         else:
             print("That is not a valid IPv4 address.")
