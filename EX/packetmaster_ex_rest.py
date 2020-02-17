@@ -3356,17 +3356,17 @@ on QSFP ports of G4 devices. \n""")
            :param bypass_port2: A string, second port connected to the bypass switch.
            :param hb_in: A string, interface on which to expect heartbeat packets.
            :param hb_out: A string, interface on which to send heartbeat packets.
-           :param conn_type: A string, connection to bypass management port; either 'ip' or 'rs232'.
-           :param interval: A string, check interval in milliseconds.
-           :param user_description: A string, user description for the app instance.
-           :param proto: A string, either 'tcp' or 'udp'.
-           :param src_mac: A string, source MAC address for heartbeat.
-           :param dst_mac: A string, destination MAC address for heartbeat.
-           :param src_ip: A string, source IP address for heartbeat.
-           :param dst_ip: A string, destination IP address for heartbeat.
-           :param src_port: A string, source TCP or UDP port for hearbeat.
-           :param dst_port: A string, destination TCP or UDP for heartbeat.
-           :param bypass_ip: A string, management IP address of bypass switch.
+           :param conn_type: A string, connection to bypass management port, either 'ip' or 'rs232'; default ip.
+           :param interval: A string, check interval in milliseconds; dedault 2000
+           :param user_description: A string, user description for the app instance (optional).
+           :param proto: A string, either 'tcp' or 'udp'; default udp.
+           :param src_mac: A string, source MAC address for heartbeat; default 00:00:00:00:00:01.
+           :param dst_mac: A string, destination MAC address for heartbeat; default 00:00:00:00:00:02.
+           :param src_ip: A string, source IP address for heartbeat; default 0.0.0.1
+           :param dst_ip: A string, destination IP address for heartbeat; default 0.0.0.2
+           :param src_port: A string, source TCP or UDP port for hearbeat; default 5555
+           :param dst_port: A string, destination TCP or UDP for heartbeat; default 5556
+           :param bypass_ip: A string, management IP address of bypass switch; default 1.1.1.1.
            :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
@@ -3470,7 +3470,7 @@ on QSFP ports of G4 devices. \n""")
         
            :param server_ip: A string, IP address of syslog server.
            :param port: A string, A string, syslog port; defaults to 514.
-           :param user_description: A string, description for syslog app instance.
+           :param user_description: A string, description for syslog app instance (optional).
            :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
@@ -3505,7 +3505,7 @@ on QSFP ports of G4 devices. \n""")
         
            :param conn_type: A string, ip or rs232; default is ip.
            :param interval: A string, check interval in milliseconds; default is 2000.
-           :param description: A string, description for app instance.
+           :param description: A string, description for app instance (optional).
            :param bypass_ip: A string, IP address of bypass switch; default is 1.1.1.1.
            :returns: A string, JSON-formatted."""
         if self.__https:
@@ -4339,7 +4339,25 @@ on QSFP ports of G4 devices. \n""")
                                 dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1',
                                 dst_ip='0.0.0.2', src_port='5555',
                                 dst_port='5556', bypass_ip='1.1.1.1'):
-        """Modify a HeartbeatBypass app instance."""
+        """Modify a HeartbeatBypass app instance.
+
+           :param pid: A string, process ID of app instance to modify.
+           :param bypass_port1: A string, first port connected to the bypass switch.
+           :param bypass_port2: A string, second port connected to the bypass switch.
+           :param hb_in: A string, interface on which to expect heartbeat packets.
+           :param hb_out: A string, interface on which to send heartbeat packets.
+           :param conn_type: A string, connection to bypass management port, either 'ip' or 'rs232'; default ip.
+           :param interval: A string, check interval in milliseconds; dedault 2000
+           :param user_description: A string, user description for the app instance (optional).
+           :param proto: A string, either 'tcp' or 'udp'; default udp.
+           :param src_mac: A string, source MAC address for heartbeat; default 00:00:00:00:00:01.
+           :param dst_mac: A string, destination MAC address for heartbeat; default 00:00:00:00:00:02.
+           :param src_ip: A string, source IP address for heartbeat; default 0.0.0.1
+           :param dst_ip: A string, destination IP address for heartbeat; default 0.0.0.2
+           :param src_port: A string, source TCP or UDP port for hearbeat; default 5555
+           :param dst_port: A string, destination TCP or UDP for heartbeat; default 5556
+           :param bypass_ip: A string, management IP address of bypass switch; default 1.1.1.1.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4444,7 +4462,13 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def mod_app_syslog(self, pid, server_ip, port='514', user_description=''):
-        """Modify a Syslog app instance."""
+        """Modify a Syslog app instance.
+        
+           :param pid: A string, process ID of the app instance to modify.
+           :param server_ip: A string, IP address of syslog server.
+           :param port: A string, A string, syslog port; defaults to 514.
+           :param user_description: A string, description for syslog app instance (optional).
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4479,7 +4503,14 @@ on QSFP ports of G4 devices. \n""")
 
     def mod_app_bypasskeepalive(self, pid, conn_type='ip', interval='2000',
                                 description='', bypass_ip='1.1.1.1'):
-        """Modify a BypassKeepalive app instance."""
+        """Modify a BypassKeepalive app instance.
+        
+           :param pid: A string, process ID of the app instance to modify.
+           :param conn_type: A string, ip or rs232; default is ip.
+           :param interval: A string, check interval in milliseconds; default is 2000.
+           :param description: A string, description for app instance (optional).
+           :param bypass_ip: A string, IP address of bypass switch; default is 1.1.1.1.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
