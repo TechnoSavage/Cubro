@@ -1,5 +1,0 @@
-This is a sample text with a label that allows
-us to demonstrate how regular expressions work.
-Additionally, here is a word, aberration, that
-will also be found by the regex match and here
-is another: astrolabe
