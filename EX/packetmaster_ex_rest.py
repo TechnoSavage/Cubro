@@ -3557,7 +3557,7 @@ on QSFP ports of G4 devices. \n""")
            :param hb_out: A string, port on which to send heartbeat packets.
            :param deact_comm: A string, command to execute when heartbeats are not detected.
            :param interval: A string, intercal in milliseconds; default is 2000.
-           :param user_description: A string, user description for app instance.
+           :param user_description: A string, user description for app instance (optional).
            :param proto: A string, transport protocol (tcp or udp); default is udp.
            :param src_mac: A string, source MAC address to assign to heartbeat; default is 00:00:00:00:00:01.
            :param dst_mac: A string, destination MAC address to assign to heartbeat; default is 00:00:00:00:00:02.
@@ -4558,7 +4558,23 @@ on QSFP ports of G4 devices. \n""")
                           src_mac='00:00:00:00:00:01',
                           dst_mac='00:00:00:00:00:02', src_ip='0.0.0.1',
                           dst_ip='0.0.0.2', src_port='5555', dst_port='5556'):
-        """Modify a Heartbeat app instance."""
+        """Modify a Heartbeat app instance.
+        
+           :param pid: A string, process ID of app instance to modify.
+           :param hb_in: A string, port on which to expect heartbeat packets.
+           :param act_comm: A string, command to execute when heartbeats are detected.
+           :param hb_out: A string, port on which to send heartbeat packets.
+           :param deact_comm: A string, command to execute when heartbeats are not detected.
+           :param interval: A string, intercal in milliseconds; default is 2000.
+           :param user_description: A string, user description for app instance (optional).
+           :param proto: A string, transport protocol (tcp or udp); default is udp.
+           :param src_mac: A string, source MAC address to assign to heartbeat; default is 00:00:00:00:00:01.
+           :param dst_mac: A string, destination MAC address to assign to heartbeat; default is 00:00:00:00:00:02.
+           :param src_ip: A string, source IP address to assign to heartbeat; default is 0.0.0.1.
+           :param dst_ip: A string, destination IP address to assign to heartbeat; default is 0.0.0.2.
+           :param src_port: A string, source port to assign to heartbeat; default is 5555.
+           :param dst_port: A string, destination port to assign to heartbeat; default is 5556.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4650,7 +4666,11 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def call_app_action(self, pid, name):
-        """Call a custom app action."""
+        """Call a custom app action.
+        
+           :param pid: A string, process ID of the app instance.
+           :param name: A string, name of custom app action.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps/action?'
         else:
@@ -4682,7 +4702,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def kill_app(self, pid):
-        """Stop an active app instance."""
+        """Stop an active app instance.
+        
+           :param pid: A string, process ID of app instance to terminate.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
