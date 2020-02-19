@@ -15,6 +15,7 @@ import pm_input_check
 #add_rule_guided requires many input checks
 #Add code to validate input for IPv6 as well as IPv4
 #Integrate new REST rules for 2.2.5 device/setlicense
+#restrict all bool input to only bool
 
 
 class PacketmasterEX(object):
@@ -4789,7 +4790,17 @@ on QSFP ports of G4 devices. \n""")
 
     def set_hash_algorithms(self, macsa, macda, ether,
                             ipsa, ipda, proto, src, dst):
-        """Set group hash algorithms on the Packetmaster."""
+        """Set group hash algorithms on the Packetmaster.
+           
+           :param macsa: A bool, True to enable, False to disable.
+           :param macda: A bool, True to enable, False to disable.
+           :param ether: A bool, True to enable, False to disable.
+           :param ipsa: A bool, True to enable, False to disable.
+           :param ipda: A bool, True to enable, False to disable.
+           :param proto: A bool, True to enable, False to disable.
+           :param src: A bool, True to enable, False to disable.
+           :param dst: A bool, True to enable, False to disable.
+           :returns: A string, JSON-formatted."""
         #EX2 has only 'ipsa', 'ipda', 'ip_protocol', 'scp_port', 'dst_port'
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/grouphash?'
@@ -4867,7 +4878,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_rule_permanence(self, permanence):
-        """Set Rule Mode Permanance on the Packetmaster."""
+        """Set Rule Mode Permanance on the Packetmaster.
+        
+           :param permanence: A bool, True to enable, False to disable.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/permanentrulesmode?'
         else:
@@ -4917,7 +4931,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_storage_mode(self, mode):
-        """Set Rule Storage Mode of the Packetmaster."""
+        """Set Rule Storage Mode of the Packetmaster.
+        
+           :param mode: A string, 'simple' for more rules but no ipv6 support, 'ipv6' for ipv6 support and fewer rules.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/rulestoragemode?'
         else:
