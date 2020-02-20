@@ -4990,7 +4990,14 @@ on QSFP ports of G4 devices. \n""")
 
     def add_user(self, username, access_level,
                  passwd, description='', rad=False):
-        """Add a user account to the Packetmaster."""
+        """Add a user account to the Packetmaster.
+        
+           :param username: A string, username for new user.
+           :param access_level: An int, 1 = read only, 7 = write, 31 = super user.
+           :param passwd: A string, user password.
+           :param description: A string, description for user (optional).
+           :param rad: A bool, True for RADIUS authentication, False for local auth; default is False.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users?'
         else:
