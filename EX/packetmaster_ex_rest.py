@@ -5072,7 +5072,15 @@ on QSFP ports of G4 devices. \n""")
 
     def mod_user(self, cur_name, new_name,
                  access_level, passwd, description='', rad=False):
-        """Modify a user account on the Packetmaster."""
+        """Modify a user account on the Packetmaster.
+        
+           :param cur_name: A string, username for user to edit.
+           :param new_name: A string, new username for user.
+           :param access_level: An int, 1 = read only, 7 = write, 31 = super user.
+           :param passwd: A string, user password.
+           :param description: A string, description for user (optional).
+           :param rad: A bool, True for RADIUS authentication, False for local auth; default is False.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users?'
         else:
