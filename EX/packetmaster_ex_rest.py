@@ -5137,7 +5137,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def delete_user(self, username):
-        """Delete a user account from the Packetmaster."""
+        """Delete a user account from the Packetmaster.
+        
+           param username: A string, username of user to delete.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users?'
         else:
@@ -5173,7 +5176,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_uac(self, uac):
-        """Enable/disable user authentication on the Packetmaster."""
+        """Enable/disable user authentication on the Packetmaster.
+        
+           :param uac: A bool, True for enable, False for disable.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users/uac?'
         else:
