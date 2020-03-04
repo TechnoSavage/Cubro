@@ -37,11 +37,11 @@ class PacketmasterEX(object):
 
     def conn_test(self):
         """Test if device is reachable and assign properties.
-        Assigns additional properties including connecting via HTTP or HTTPS
-        Total port count for device
-        Model of Packetmaster
-        Hardware generation of Packetmaster
-        """
+        Assigns additional properties including connecting via HTTP or HTTPS,
+        Total port count for device, Model of Packetmaster, Hardware generation of Packetmaster.
+
+        :returns: A string, "Connection test failed" or "Connection established."
+        :raises: ConnectionError: if unable to successfully make GET request to device."""
         try:
             port_test = self.get_port_count()
             if not isinstance(port_test, (int, long)):
@@ -69,7 +69,8 @@ class PacketmasterEX(object):
     def get_port_count(self):
         """Return the number of ports on the device.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/config?'
         else:
@@ -95,7 +96,8 @@ class PacketmasterEX(object):
     def firmware_version(self):
         """Return firmware version of Packetmaster and set as property.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/imageversion?'
         else:
@@ -113,7 +115,8 @@ class PacketmasterEX(object):
     def api_level(self):
         """Return API level of Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/apilevel?'
         else:
@@ -130,7 +133,8 @@ class PacketmasterEX(object):
     def ip_config(self):
         """Return IP config of device and set netmask and gateway properties.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/ipconfig?'
         else:
@@ -149,7 +153,8 @@ class PacketmasterEX(object):
     def device_model(self):
         """Return model of Packetmaster and set model property.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/model?'
         else:
@@ -168,7 +173,8 @@ class PacketmasterEX(object):
     def device_name(self):
         """Return name of Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/name?'
         else:
@@ -186,7 +192,8 @@ class PacketmasterEX(object):
     def device_label(self):
         """Return name and notes of Packetmaster and set them as properties.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/customident?'
         else:
@@ -205,7 +212,8 @@ class PacketmasterEX(object):
     def hardware_generation(self):
         """Return hardware generation of Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/generation?'
         else:
@@ -223,7 +231,8 @@ class PacketmasterEX(object):
     def serial_number(self):
         """Return serial number of Packetmaster and set as property.
            
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/serialno?'
         else:
@@ -241,7 +250,8 @@ class PacketmasterEX(object):
     def port_config(self):
         """Return port configuration of Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/config?'
         else:
@@ -258,7 +268,8 @@ class PacketmasterEX(object):
     def port_info(self):
         """Return port information of Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/info?'
         else:
@@ -275,7 +286,8 @@ class PacketmasterEX(object):
     def port_statistics(self):
         """Return port counters of Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/stats?'
         else:
@@ -292,7 +304,8 @@ class PacketmasterEX(object):
     def sfp_info(self):
         """Return SFP information of any installed transceivers.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/sfpstatus?'
         else:
@@ -310,7 +323,8 @@ class PacketmasterEX(object):
     def rules_active(self):
         """Return any active rules/filters on the Packetmaster.
            
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules/all?'
         else:
@@ -327,7 +341,8 @@ class PacketmasterEX(object):
     def groups_active(self):
         """Return any active port groups on the Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups/all?'
         else:
@@ -344,7 +359,8 @@ class PacketmasterEX(object):
     def device_apps(self):
         """Return all Apps on Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -361,7 +377,8 @@ class PacketmasterEX(object):
     def apps_active(self):
         """Return any running Apps on Packetmaster.
            
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps/running?'
         else:
@@ -378,7 +395,8 @@ class PacketmasterEX(object):
     def hash_algorithms(self):
         """Return load balancing hash algorithm configuration.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/grouphash?'
         else:
@@ -395,7 +413,8 @@ class PacketmasterEX(object):
     def rule_permanence(self):
         """Return state of Rule Permanance setting.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/permanentrulesmode?'
         else:
@@ -412,7 +431,8 @@ class PacketmasterEX(object):
     def storage_mode(self):
         """Return setting of Rule Storage Mode.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/rulestoragemode?'
         else:
@@ -429,7 +449,8 @@ class PacketmasterEX(object):
     def env_info(self):
         """Return environmental information of Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/environment?'
         else:
@@ -446,7 +467,8 @@ class PacketmasterEX(object):
     def id_led(self):
         """Return status of ID LED setting.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/idled?'
         else:
@@ -463,7 +485,8 @@ class PacketmasterEX(object):
     def load_info(self):
         """Return load information.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/loadaverage?'
         else:
@@ -480,7 +503,8 @@ class PacketmasterEX(object):
     def tcam(self):
         """Return the max and currently used TCAM flows.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/flownumbers?'
         else:
@@ -497,7 +521,8 @@ class PacketmasterEX(object):
     def mem_free(self):
         """Return memory usage.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/memoryusage?'
         else:
@@ -514,7 +539,8 @@ class PacketmasterEX(object):
     def server_revision(self):
         """Return CCH machinery server revision.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/serverrevision?'
         else:
@@ -531,7 +557,8 @@ class PacketmasterEX(object):
     def save_points(self):
         """Return all available save points.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints?'
         else:
@@ -548,7 +575,8 @@ class PacketmasterEX(object):
     def web_log(self):
         """Return web server log.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/weblog?'
         else:
@@ -565,7 +593,8 @@ class PacketmasterEX(object):
     def get_users(self):
         """Return all user accounts on Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users?'
         else:
@@ -582,7 +611,8 @@ class PacketmasterEX(object):
     def user_uac(self):
         """Return status of User Authentication setting.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users/uac?'
         else:
@@ -599,7 +629,8 @@ class PacketmasterEX(object):
     def get_radius(self):
         """Return RADIUS settings.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users/radius?'
         else:
@@ -616,7 +647,8 @@ class PacketmasterEX(object):
     def get_dns(self):
         """Return DNS server settings.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/nameresolution?'
         else:
@@ -633,7 +665,8 @@ class PacketmasterEX(object):
     def get_telnet(self):
         """Return status of Telnet service setting.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/telnet?'
         else:
@@ -650,7 +683,8 @@ class PacketmasterEX(object):
     def get_controller(self):
         """Return Vitrum Controller configuration.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/controller?'
         else:
@@ -700,7 +734,8 @@ class PacketmasterEX(object):
            :param conn: A string, connection type; either 'tcp' or 'ssl'.
            :param ipadd: A string, controller IP address.
            :param port: A string, TCP port number for controller.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/controller?'
         else:
@@ -759,7 +794,8 @@ class PacketmasterEX(object):
            :param conn: A string, connection type; either 'tcp' or 'ssl'.
            :param ipadd: A string, controller IP address.
            :param port: A string, TCP port number for controller.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/controller?'
         else:
@@ -785,7 +821,8 @@ class PacketmasterEX(object):
     def get_dpid(self):
         """Return Device OpenFlow Datapath ID.
         
-           :returns: A string, JSON-formatted"""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/dpid?'
         else:
@@ -845,10 +882,11 @@ class PacketmasterEX(object):
     def set_ip_config(self, address, netmask, gateway):
         """Set management IP configuration for Packetmaster.
         
-           :param address: A string, management IP address
-           :param netmask: A string, managment IP subnet mask
-           :param gateway: A string, default gateway
-           :returns: A string, JSON-formatted"""
+           :param address: A string, management IP address.
+           :param netmask: A string, managment IP subnet mask.
+           :param gateway: A string, default gateway.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/ipconfig?'
         else:
@@ -892,7 +930,8 @@ class PacketmasterEX(object):
         """Set Packetmaster name.
         
            :param name: A string, device name
-           :returns: A string, JSON-formatted"""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/name?'
         else:
@@ -923,9 +962,10 @@ class PacketmasterEX(object):
     def set_label(self, name, notes):
         """Set Packetmaster name and notes.
         
-           :param name: A string, device name
-           :param notes: A string, device notes
-           :returns: A string, JSON-formatted"""
+           :param name: A string, device name.
+           :param notes: A string, device notes.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/customident?'
         else:
@@ -1066,15 +1106,16 @@ on QSFP ports of G4 devices. \n""")
                         forcetx=False, check=False, recalc=False, split=False):
         """Set configuration of a port on the Packetmaster.
         
-           :param interface: A string, interface to configure e.g. eth-0-1
-           :param speed: A string, bandwidth speed setting for interface
-           :param duplex: A string, link duplex setting for interface
-           :param description: A string, description for interface
-           :param forcetx: A bool, force tx transmit (unidirectional) of interface
-           :param check: A bool, 'True' to perform CRC checking; 'False' to skip
-           :param recalc: A bool, Recalculate frame CRC; enable if slicing packets
-           :param split: A bool, Configure port to use breakout cable; only availble on QSFP ports
-           :returns: A string, JSON-formatted"""
+           :param interface: A string, interface to configure e.g. eth-0-1.
+           :param speed: A string, bandwidth speed setting for interface.
+           :param duplex: A string, link duplex setting for interface.
+           :param description: A string, description for interface.
+           :param forcetx: A bool, force tx transmit (unidirectional) of interface.
+           :param check: A bool, 'True' to perform CRC checking; 'False' to skip.
+           :param recalc: A bool, Recalculate frame CRC; enable if slicing packets.
+           :param split: A bool, Configure port to use breakout cable; only availble on QSFP ports.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/config?'
         else:
@@ -1177,9 +1218,10 @@ on QSFP ports of G4 devices. \n""")
     def port_on_off(self, if_name, shutdown):
         """Enable/disable a port on the Packetmaster.
 
-           :param if_name: A string, interface name e.g. eth-0-1
-           :param shutdown: A bool, 'True' to disable, 'False' to enable
-           :returns: A string, JSON-formatted"""
+           :param if_name: A string, interface name e.g. eth-0-1.
+           :param shutdown: A bool, 'True' to disable, 'False' to enable.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/config?'
         else:
@@ -1204,7 +1246,8 @@ on QSFP ports of G4 devices. \n""")
     def reset_port_counters(self):
         """Reser all port counters to zero.
         
-           :returns: A string, JSON-formatted"""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/ports/counters?'
         else:
@@ -1221,7 +1264,8 @@ on QSFP ports of G4 devices. \n""")
     def reset_rule_counters(self):
         """Reset all rule counters to zero.
         
-           :returns: A string, JSON-formatted"""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules/counters?'
         else:
@@ -1236,7 +1280,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def add_rule_guided(self):
-        """Interactive menu to add a rule/filter."""
+        """Interactive menu to add a rule/filter.
+        
+           :raises: ValueError: If proto variable not an int in the range of 2-9."""
         data = {}
         rulename = moves.input('Enter a name for the rule [none]: ')
         data['name'] = rulename
@@ -1405,7 +1451,8 @@ on QSFP ports of G4 devices. \n""")
         """Add a rule/filter to the Packetmaster.
         
            :param data: A dict, dictionary containing all valid rule parameters
-           :returns: A string, JSON-formatted"""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
@@ -1423,7 +1470,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def mod_rule_guided(self):
-        """Interactive menu to modify a rule/filter on the Packetmaster."""
+        """Interactive menu to modify a rule/filter on the Packetmaster.
+        
+           :raises: ValueError: If proto variable not an int in the range of 2-9."""
         data = {}
         name = moves.input('Enter a new name for the rule: ')
         data['name'] = name
@@ -1591,8 +1640,9 @@ on QSFP ports of G4 devices. \n""")
     def mod_rule(self, data):
         """Modify a rule/filter on the Packetmaster.
         
-           :param data: A dict, dictionary containing all valid rule parameters
-           :returns: A string, JSON-formatted"""
+           :param data: A dict, dictionary containing all valid rule parameters.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
@@ -1610,7 +1660,10 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def del_rule_guided(self):
-        """Interactive menu to delete a rule/filter."""
+        """Interactive menu to delete a rule/filter.
+        
+           :raises: ValueError: If priority variable cannot be converted to int.
+           :raises: ValueError: If proto variable cannot be converted to int in range 2 to 9."""
         priority = moves.input("What is the priority of the rule to delete: ")
         try:
             priority = int(priority)
@@ -1765,8 +1818,9 @@ on QSFP ports of G4 devices. \n""")
     def del_rule(self, data):
         """Delete a rule/filter from the Packetmaster.
         
-           :param data: A dict, dictionary containing all valid rule parameters
-           :returns: A string, JSON-formatted"""
+           :param data: A dict, dictionary containing all valid rule parameters.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
@@ -1786,7 +1840,8 @@ on QSFP ports of G4 devices. \n""")
     def del_rule_all(self):
         """Delete all rules from the Packetmaster.
         
-        :returns: A string, JSON-formatted"""
+        :returns: A string, JSON-formatted.
+        :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules/all?'
         else:
@@ -1801,7 +1856,13 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def add_group_guided(self):
-        """Interactive menu for adding a port group."""
+        """Interactive menu for adding a port group.
+        
+           :raises: ValueError: If name variable cannot be converted to int.
+           :raises: ValueError: If group_type variable cannot be converted to int.
+           :raises: ValueError: If buckets variable cannot be converted to int.
+           :raises: ValueError: If output variable cannot be converted to int.
+           :raises: ValueError: If watch variable cannot be converted to int."""
         name = moves.input("Enter the group ID: ")
         try:
             int(name)
@@ -1976,9 +2037,11 @@ on QSFP ports of G4 devices. \n""")
     def add_group(self, gid, json_app):
         """Add a port group to the Packetmaster.
         
-           :param gid: A string, ID of group e.g. 1-4294967040
-           :param json_app: A dict, dictionary containing all valid group parameters
-           :returns: A string, JSON-formatted"""
+           :param gid: A string, ID of group e.g. 1-4294967040.
+           :param json_app: A dict, dictionary containing all valid group parameters.
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: If gid variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
@@ -2009,7 +2072,19 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def mod_group_guided(self):
-        """Interactive menu to modify a port group."""
+        """Interactive menu to modify a port group.
+
+           :raises: ValueError: If name variable cannot be converted to int.
+           :raises: ValueError: If buckets variable cannot be converted to int.
+           :raises: ValueError: If output variable cannot be converted to int.
+           :raises: ValueError: If watch variable cannot be converted to int.
+           :raises: ValueError: If push_vlan variable cannot be converted to int.
+           :raises: ValueError: If mod_vlan variable cannot be converted to int.
+           :raises: TypeError: If re.findall produces no results on dstip variable.
+           :raises: ValueError: If src_udp variable cannot be converted to int.
+           :raises: ValueError: If dst_udp variable cannot be converted to int.
+           :raises: ValueError: If src_tcp variable cannot be converted to int.
+           :raises: ValueError: If dst_tcp variable cannot be converted to int."""
         name = moves.input("Enter the group ID of the group you would like to modify: ")
         try:
             int(name)
@@ -2173,9 +2248,11 @@ on QSFP ports of G4 devices. \n""")
     def mod_group(self, gid, json_app):
         """Modify a port group on the Packetmaster.
         
-           :param gid: A string, ID of group e.g. 1-4294967040
-           :param json_app: A dict, dictionary containing all valid group parameters
-           :returns: A string, JSON-formatted"""
+           :param gid: A string, ID of group e.g. 1-4294967040.
+           :param json_app: A dict, dictionary containing all valid group parameters.
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: If gid variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
@@ -2206,17 +2283,20 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def delete_group_guided(self):
-        """Interactive menu to delete a port group."""
-        name = moves.input("Enter the group ID of the group to be deleted: ")
+        """Interactive menu to delete a port group.
+
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: If gid variable cannot be converted to int."""
+        gid = moves.input("Enter the group ID of the group to be deleted: ")
         try:
-            int(name)
+            int(gid)
         except ValueError as reason:
             return ("That is not a valid group ID, canceling Delete Group.", reason)
         confirm = moves.input("""Configuration Change Summary:
                             Delete Group ID: %s
-                            Confirm changes [y/n]: """ % name)
+                            Confirm changes [y/n]: """ % gid)
         if confirm.lower() in ('y', 'yes'):
-            run = self.delete_group(name)
+            run = self.delete_group(gid)
             return run
         return "Canceling; no changes made.\n"
 
@@ -2224,7 +2304,9 @@ on QSFP ports of G4 devices. \n""")
         """Delete a port group from the Packetmaster.
         
            :param gid: A string, ID of group e.g. 1-4294967040
-           :returns: A string, JSON-formatted"""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: If gid variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
@@ -5234,7 +5316,14 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_radius(self, server, secret, refresh, level, port=1812):
-        """Set RADIUS configuration."""
+        """Set RADIUS configuration.
+        
+           :param server: A string, IP address or Domain Name of RADIUS server.
+           :param secret: A string, RADIUS secret.
+           :param refresh: An int, refresh rate in milliseconds.
+           :param level: An int, default login level for RADIUS. 0 for None, 1 for read, 7 for write, 31 for super user.
+           :param port: An int, RADIUS port number; default is 1812.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users/radius?'
         else:
@@ -5292,7 +5381,11 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_https(self, enabled=False, ssl=None):
-        """Enable/disable HTTPS web interface."""
+        """Enable/disable HTTPS web interface.
+        
+           :param enabled: A bool, True to enable, False to disable. Default is False.
+           :param ssl: A string, SSL/TLS password. Default None.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/https?'
         else:
@@ -5326,7 +5419,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_telnet(self, enabled=False):
-        """Enable/disable Telnet service on the Packetmaster."""
+        """Enable/disable Telnet service on the Packetmaster.
+        
+           :param enabled: A bool, True for enable, False for disable. Default is False.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/telnet?'
         else:
@@ -5348,7 +5444,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def del_web_log(self):
-        """Delete Webserver logs."""
+        """Delete Webserver logs.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/weblog?'
         else:
@@ -5382,7 +5480,12 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_dns(self, dns1='', dns2='', dns3=''):
-        """Set DNS configuration."""
+        """Set DNS configuration.
+        
+           :param dns1: A string, IP address or Domaine Name of DNS server (optional).
+           :param dns2: A string, IP address or Domaine Name of DNS server (optional).
+           :param dns3: A string, IP address or Domaine Name of DNS server (optional).
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/nameresolution?'
         else:
@@ -5420,7 +5523,10 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_id_led(self, led):
-        """Enable/disable ID LED on the face of the Packetmaster."""
+        """Enable/disable ID LED on the face of the Packetmaster.
+        
+           :param led: A bool, True to enable, False to disable.
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/idled?'
         else:
@@ -5442,7 +5548,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def restart_webserver(self):
-        """Restart the Packetmaster Web Server.  Does not reboot device."""
+        """Restart the Packetmaster Web Server. Does not reboot device.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/restartwebserver?'
         else:
@@ -5457,7 +5565,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def reboot(self):
-        """Reboot the Packetmaster."""
+        """Reboot the Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/reboot?'
         else:
