@@ -2337,7 +2337,8 @@ on QSFP ports of G4 devices. \n""")
     def delete_groups_all(self):
         """Delete all port groups from the Packetmaster.
         
-           :returns: A string, JSON-formatted"""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups/all?'
         else:
@@ -2352,7 +2353,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_port_savepoint_guided(self):
-        """Interactive menu to activate a port save point."""
+        """Interactive menu to activate a port save point.
+        
+           :returns: A string, JSON-formatted."""
         savename = moves.input('Name of port save point to make active: ')
         confirm = moves.input("""Configuration Change Summary:
                             You are about to make port save point %s active.
@@ -2365,8 +2368,9 @@ on QSFP ports of G4 devices. \n""")
     def set_port_savepoint(self, savename):
         """Activate a port save point.
         
-           :param savename: A string, name of port save point to make active
-           :returns: A string, JSON-formatted"""
+           :param savename: A string, name of port save point to make active.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/activeportsavepoint?'
         else:
@@ -2383,7 +2387,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_rule_savepoint_guided(self):
-        """Interactive menu to activate a rule save point."""
+        """Interactive menu to activate a rule save point.
+        
+           :returns: A string, JSON-formatted."""
         savename = moves.input('Name of rule save point to make active: ')
         confirm = moves.input("""Configuration Change Summary:
                             You are about to make rule save point "%s" active.
@@ -2396,8 +2402,9 @@ on QSFP ports of G4 devices. \n""")
     def set_rule_savepoint(self, savename):
         """Activate a rule save point.
         
-           :param savename: A string, name of rule save point to make active
-           :returns: A string, JSON-formatted"""
+           :param savename: A string, name of rule save point to make active.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/activerulesavepoint?'
         else:
@@ -2414,7 +2421,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_boot_savepoint_guided(self):
-        """Interactive menu to set a save point as default boot configuration."""
+        """Interactive menu to set a save point as default boot configuration.
+        
+           :returns: A string, JSON-formatted."""
         savename = moves.input('Save point to set to default boot configuration: ')
         confirm = moves.input("""Configuration Change Summary:
                             You are about to set save point "%s" the default boot configuration.
@@ -2427,8 +2436,9 @@ on QSFP ports of G4 devices. \n""")
     def set_boot_savepoint(self, savename):
         """Set a save point as default boot configuration.
         
-           :param savename: A string, name of rule save point to load on boot
-           :returns: A string, JSON-formatted"""
+           :param savename: A string, name of rule save point to load on boot.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/defaultrulesavepoint?'
         else:
@@ -2445,7 +2455,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def export_savepoint_guided(self):
-        """Interactive menu to download a save point from the Packetmaster."""
+        """Interactive menu to download a save point from the Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         rspname = moves.input('Name of rule save point(s) to export (leave blank for none)'
                               'to enter multiple save points separate names by "," with no spaces: ')
         rspname = rspname.split(',')
@@ -2466,10 +2478,15 @@ on QSFP ports of G4 devices. \n""")
     def export_savepoint(self, rspname, pspname, filename):
         """Download a save point from the Packetmaster.
         
-           :param rspname: A string, rule save point name to export
-           :param pspname: A string, port save point name to export
-           :param filename: A string, name to give to exported save point
-           :returns: A string, JSON-formatted"""
+           :param rspname: A string, rule save point name to export.
+           :param pspname: A string, port save point name to export.
+           :param filename: A string, name to give to exported save point.
+           :returns: A string, JSON-formatted.
+           :raises: NameError: if filename varaible is unrecognized.
+           :raises: TypeError: if filename variable is not a string.
+           :raises: IOError: if unable to write file due to permissions, path, or other reason.
+           :raises: OSError: if unable to write file due to permissions, path, or other reason.
+           :raises: ConnectionError: if unable to successfully make GET request to device."""
         if self.__https:
             base_uri = 'https://' + self._address + '/rest/savepoints/export?'
         else:
@@ -2496,7 +2513,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def mod_port_savepoint_guided(self):
-        """Interactive menu to modify a port save point."""
+        """Interactive menu to modify a port save point.
+        
+           :returns: A string, JSON-formatted."""
         oldname = moves.input("Name of port save point to modify: ")
         newname = moves.input("New name for port save point: ")
         desc = moves.input("Description of save point: ")
