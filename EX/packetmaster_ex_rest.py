@@ -3408,11 +3408,6 @@ on QSFP ports of G4 devices. \n""")
            :param trap2_port: A string, secondary trap receiver port; default 162.
            :returns: A string, JSON-formatted.
            :raises: ValueError: if interval variable cannot be converted to int.
-           :raises: ValueError: if snmp_port variable cannot be converted to int.
-           :raises: TypeError: if regex check on trap1 variable returns an empty list.
-           :raises: ValueError: if trap1_port variable cannot be converted to int.
-           :raises: TypeError: if regex check on trap2 variable returns an empty list.
-           :raises: ValueError: if trap2_port variable cannot be converted to int.
            :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
@@ -3422,31 +3417,22 @@ on QSFP ports of G4 devices. \n""")
             int(interval)
         except ValueError as reason:
             return ("That is not valid input for Check Interval; canceling SNMP.", reason)
-        try:
-            int(snmp_port)
-        except ValueError as reason:
-            return ("That is not valid input for SNMP Port; canceling SNMP.", reason)
-        if trap_enable or type(trap_enable) is str and trap_enable.lower() in ('true', 't', 'yes', 'y'):
-            trap_enable = True
-            try:
-                ip1 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap1)
-                trap1 = ip1[0]
-            except TypeError as reason:
-                return ("That is not a valid IP address for Trap 1; canceling SNMP.", reason)
-            try:
-                int(trap1_port)
-            except ValueError as reason:
-                return ("That is not valid input for Trap Port 1; canceling SNMP.", reason)
+        if not pm_input_check.port(snmp_port):
+            return "That is not a valid SNMP port number; canceling SNMP. \n"
+        if trap_enable:
+            if pm_input_check.ipv4(trap1) != 0:
+                trap1 = pm_input_check.ipv4(trap1)
+            else:
+                return "That is not a valid IP address for Trap 1; canceling SNMP. \n"
+            if not pm_input_check.port(trap1_port):
+                return "That is not a valid TCP port number for Trap 1; canceling SNMP. \n"
             if trap2 != '':
-                try:
-                    ip2 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap2)
-                    trap2 = ip2[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address for Trap 2; canceling SNMP.", reason)
-            try:
-                int(trap2_port)
-            except ValueError as reason:
-                return ("That is not valid input for Trap Port 2; canceling SNMP.", reason)
+                if pm_input_check.ipv4(trap2) != 0:
+                    trap2 = pm_input_check.ipv4(trap2)
+                else:
+                    return "That is not a valid IP address for Trap 2; canceling SNMP. \n"
+            if not pm_input_check.port(trap2_port):
+                return "That is not a valid TCP port number for Trap 2; canceling SNMP. \n"
             data = {'name': 'SNMP',
                     'description': 'Runs an SNMP Server.  The server uses [url=',
                     'interval': interval,
@@ -3458,8 +3444,7 @@ on QSFP ports of G4 devices. \n""")
                     'trapReceiver': trap1,
                     'trapReceiver2': trap2,
                     'userDescription': user_description}
-        elif trap_enable or trap_enable.lower() in ('false', 'f', 'no', 'n'):
-            trap_enable = False
+        elif not trap_enable:
             data = {'name': 'SNMP',
                     'description': 'Runs an SNMP Server.  The server uses [url=',
                     'interval': interval,
