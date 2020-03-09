@@ -2545,7 +2545,8 @@ on QSFP ports of G4 devices. \n""")
            :param newname: A string, new name for modified port save point.
            :param description: A string, description for port save point.
            :param override: A bool, 'True' saves current port config; 'False' does not overwrite prior port config. 
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/modportsavepoint?'
         else:
@@ -2571,7 +2572,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def mod_rule_savepoint_guided(self):
-        """Interactive menu to modify a rule save point."""
+        """Interactive menu to modify a rule save point.
+        
+           :returns: A string, JSON-formatted."""
         oldname = moves.input("Name of rule save point to modify: ")
         newname = moves.input("New name for rule save point: ")
         desc = moves.input("Description for save point: ")
@@ -2600,7 +2603,8 @@ on QSFP ports of G4 devices. \n""")
            :param newname: A string, new name for modified rule save point.
            :param description: A string, description for rule save point.
            :param override: A bool, 'True' saves current rule config; 'False' does not overwrite prior rule config. 
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/modrulesavepoint?'
         else:
@@ -2625,7 +2629,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def create_port_savepoint_guided(self):
-        """Interactive menu to create port save point from current config."""
+        """Interactive menu to create port save point from current config.
+        
+           :returns: A string, JSON-formatted."""
         name = moves.input("Name for  newly created port savepoint: ")
         desc = moves.input("Description for the port save point: ")
         confirm = moves.input("""Create Port Save Point:
@@ -2642,7 +2648,8 @@ on QSFP ports of G4 devices. \n""")
         
            :param name: A string, new name for port save point.
            :param description: A string, description for port save point.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/portsavepoint?'
         else:
@@ -2658,7 +2665,10 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def create_quick_savepoint(self):
-        """Create a Quicksave save point from current configuration."""
+        """Create a Quicksave save point from current configuration.
+           
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/quicksaverules?'
         else:
@@ -2673,7 +2683,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def create_rule_savepoint_guided(self):
-        """Interactive menu to create rule save point from current config."""
+        """Interactive menu to create rule save point from current config.
+        
+           :returns: A string, JSON-formatted."""
         name = moves.input("Name for newly created rule save point: ")
         desc = moves.input("Description for the rule save point: ")
         confirm = moves.input("""Create Rule Save Point:
@@ -2690,7 +2702,8 @@ on QSFP ports of G4 devices. \n""")
         
            :param name: A string, new name for rule save point.
            :param description: A string, description for rule save point.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/rulesavepoint?'
         else:
@@ -2706,7 +2719,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def delete_port_savepoint_guided(self):
-        """Interactive menu to delete a port save point."""
+        """Interactive menu to delete a port save point.
+        
+           :returns: A string, JSON-formatted."""
         name = moves.input("Port save point to delete: ")
         confirm = moves.input("""Delete Port Save Point Summary:
                             Save Point Name: %s
@@ -2720,7 +2735,8 @@ on QSFP ports of G4 devices. \n""")
         """Delete a port save point from the Packetmaster.
         
            :param name: A string, name of port save point to delete.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/portsavepoint?'
         else:
@@ -2737,7 +2753,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def delete_rule_savepoint_guided(self):
-        """Interactive menu to delete a rule save point."""
+        """Interactive menu to delete a rule save point.
+        
+           returns: A string, JSON-formatted."""
         name = moves.input("Rule save point to delete:  ")
         confirm = moves.input("""Delete Rule Save Point Summary:
                             Save Point Name: %s
@@ -2751,7 +2769,8 @@ on QSFP ports of G4 devices. \n""")
         """Delete a rule save point from the Packetmaster.
         
            :param name: A string, name of rule save point to delete.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/savepoints/rulesavepoint?'
         else:
@@ -2768,7 +2787,10 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def start_app_guided(self):
-        """Interactive menu to start a new app instance."""
+        """Interactive menu to start a new app instance.
+        
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if app variable cannot be converted to int."""
         app = moves.input("""Select the App instance to start:
                             1 - NTP
                             2 - Arp Responder
@@ -3284,7 +3306,8 @@ on QSFP ports of G4 devices. \n""")
            :param server1: A string, IP address or Domain Name of NTP server.
            :param server2: A string, IP address or Domain Name of NTP server (optional).
            :param user_description: A string, description for app instance (optional).
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3317,7 +3340,11 @@ on QSFP ports of G4 devices. \n""")
            :param inport: A string, physical source port of incoming ARP request (optional).
            :param match_srcmac: A string, source MAC address of incoming ARP request (optional).
            :param user_description: A string, description for app instance.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if interval variable cannot be converted to int.
+           :raises: ValueError: if outport variable cannot be converted to int.
+           :raises: ValueError: if inport variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3379,7 +3406,14 @@ on QSFP ports of G4 devices. \n""")
            :param trap1_port: A string, A string, primary trap receiver port; default 162.
            :param trap2: A string, secondary trap receiver IP (optional).
            :param trap2_port: A string, secondary trap receiver port; default 162.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if interval variable cannot be converted to int.
+           :raises: ValueError: if snmp_port variable cannot be converted to int.
+           :raises: TypeError: if regex check on trap1 variable returns an empty list.
+           :raises: ValueError: if trap1_port variable cannot be converted to int.
+           :raises: TypeError: if regex check on trap2 variable returns an empty list.
+           :raises: ValueError: if trap2_port variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3469,7 +3503,18 @@ on QSFP ports of G4 devices. \n""")
            :param src_port: A string, source TCP or UDP port for hearbeat; default 5555
            :param dst_port: A string, destination TCP or UDP for heartbeat; default 5556
            :param bypass_ip: A string, management IP address of bypass switch; default 1.1.1.1.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if bypass_port1 variable cannot be converted to int.
+           :raises: ValueError: if bypass_port2 variable cannot be converted to int.
+           :raises: ValueError: if hb_in variable cannot be converted to int.
+           :raises: ValueError: if hb_out variable cannot be converted to int.
+           :raises: ValueError: if interval variable cannot be converted to int.
+           :raises: TypeError: if regex check on src_ip variable returns an empty list.
+           :raises: TypeError: if regex check on dst_ip variable returns an empty list.
+           :raises: TypeError: if regex check on bypass_ip variable returns an empty list.
+           :raises: ValueError: if src_port variable cannot be converted to int.
+           :raises: ValueError: if dst_port variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3573,7 +3618,10 @@ on QSFP ports of G4 devices. \n""")
            :param server_ip: A string, IP address of syslog server.
            :param port: A string, A string, syslog port; defaults to 514.
            :param user_description: A string, description for syslog app instance (optional).
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: TypeError: if regex check on server_ip variable returns an empty list.
+           :raises: ValueError: if port variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
