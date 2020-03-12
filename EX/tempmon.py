@@ -38,4 +38,4 @@ if __name__ == '__main__':
         writetime = str(datetime.now())
         with open(path, 'a') as f:
             f.write(writetime + ': ' + data + '\n')
-        time.sleep(1800)
+        time.sleep(1800) #Time in seconds to wait between queries.
