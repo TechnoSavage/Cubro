@@ -131,6 +131,21 @@ def pm_pri(test):
         return False
     return False
 
+def group_id(test):
+    '''Test if input is a valid group ID number for the Packetmaster.
+    
+       :param test: A string or int, string or value to test for valid Group ID.
+       :returns: A bool, True if valid, False if invalid.
+       :raises: ValueError: if test variable cannot be converted to int.'''
+    try:
+        test = int(test)
+        if test in range(0, 4294967041):
+            return True
+    except ValueError as reason:
+        log_event(reason)
+        return False
+    return False
+
 def icmp_type(test):
     '''Test if input is a valid ICMP Type value.
     
