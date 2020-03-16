@@ -1329,13 +1329,17 @@ on QSFP ports of G4 devices. \n""")
         macsrc = moves.input('Filter by source MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
-        #MAC Address input check
-            data['match[dl_src]'] = macsrc
+            if pm_input_check.mac(macsrc) != 0:
+                data['match[dl_src]'] = pm_input_check.mac(macsrc)
+            else:
+                return "That is not a valid MAC address; canceling Add Rule."
         macdst = moves.input('Filter by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
-        #MAC Address input check
-            data['match[dl_dst]'] = macdst
+            if pm_input_check.mac(macdst) != 0:
+                data['match[dl_dst]'] = pm_input_check.mac(macdst)
+            else:
+                return "That is not a valid MAC address; canceling Add Rule."
         proto_options = {2: 'ip',
                          3: 'tcp',
                          4: 'udp',
@@ -1453,6 +1457,7 @@ on QSFP ports of G4 devices. \n""")
            :param data: A dict, dictionary containing all valid rule parameters
            :returns: A string, JSON-formatted.
            :raises: ConnectionError: if unable to successfully make POST request to device."""
+        #Need to validate input in dict
         if self.__https:
             uri = 'https://' + self._address + '/rest/rules?'
         else:
@@ -1521,11 +1526,17 @@ on QSFP ports of G4 devices. \n""")
         macsrc = moves.input('Filtering by source MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macsrc != '':
-            data['match[dl_src]'] = macsrc
+            if pm_input_check.mac(macsrc) != 0:
+                data['match[dl_src]'] = pm_input_check.mac(macsrc)
+            else:
+                return "That is not a valid MAC address; canceling Modify Rule."
         macdst = moves.input('Filtering by destination MAC address? '
                            'Leave blank for no or enter MAC address: ')
         if macdst != '':
-            data['match[dl_dst]'] = macdst
+            if pm_input_check.mac(macdst) != 0:
+                data['match[dl_dst]'] = pm_input_check.mac(macdst)
+            else:
+                return "That is not a valid MAC address; canceling Modify Rule."
         proto_options = {2: 'ip',
                          3: 'tcp',
                          4: 'udp',
@@ -1858,16 +1869,13 @@ on QSFP ports of G4 devices. \n""")
     def add_group_guided(self):
         """Interactive menu for adding a port group.
         
-           :raises: ValueError: If name variable cannot be converted to int.
            :raises: ValueError: If group_type variable cannot be converted to int.
            :raises: ValueError: If buckets variable cannot be converted to int.
            :raises: ValueError: If output variable cannot be converted to int.
            :raises: ValueError: If watch variable cannot be converted to int."""
-        name = moves.input("Enter the group ID: ")
-        try:
-            int(name)
-        except ValueError as reason:
-            return ("That is not a valid group ID, canceling Add Group.", reason)
+        gid = moves.input("Enter the group ID: ")
+        if not pm_input_check.group_id(gid):
+            return "That is not a valid group ID, canceling Add Group."
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
@@ -1875,7 +1883,7 @@ on QSFP ports of G4 devices. \n""")
         for group in json_groups['groups']:
             existing.append(json_groups['groups'][count]['group_id'])
             count += 1
-        if name in existing:
+        if gid in existing:
             return ("A group with this group ID already exists; "
                     "use Modify Group or select a different group ID. Canceling Add Group")
         description = moves.input("Enter the group description: ")
@@ -1908,6 +1916,7 @@ on QSFP ports of G4 devices. \n""")
                 print("\nConfigure settings for bucket %s" % bucket)
                 #Add check against number of ports on device
                 output = moves.input("Output on which port: ")
+                #Validate if port exists on device
                 try:
                     int(output)
                     output = 'output:' + output
@@ -1964,11 +1973,19 @@ on QSFP ports of G4 devices. \n""")
                 src_mac = moves.input('Modify source MAC address? '
                                     'Enter new MAC address or leave blank for no: ').strip()
                 if src_mac != '':
-                    actions = 'set_field:' + src_mac + '->eth_src,' + actions
+                    if pm_input_check.mac(src_mac) != 0:
+                        src_mac = pm_input_check.mac(src_mac)
+                        actions = 'set_field:' + src_mac + '->eth_src,' + actions
+                    else:
+                        return "That is not a valid MAC address, canceling Add Group."
                 dst_mac = moves.input('Modify destination MAC address? '
                                     'Enter new MAC address or leave blank for no: ').strip()
                 if dst_mac != '':
-                    actions = 'set_field:' + dst_mac + '->eth_dst,' + actions
+                    if pm_input_check.mac(dst_mac) != 0:
+                        src_mac = pm_input_check.mac(dst_mac)
+                        actions = 'set_field:' + dst_mac + '->eth_dst,' + actions
+                    else:
+                        return "That is not a valid MAC address, canceling Add Group."
                 dst_ip = moves.input('Modify destination IP address? '
                                    'Enter new IP address or leave blank for no: ').strip()
                 if dst_ip != '':
@@ -2021,7 +2038,7 @@ on QSFP ports of G4 devices. \n""")
         else:
             return "That is not a valid bucket number; canceling Add Group."
         data = {'buckets': bucket_list,
-                  'group_id': name,
+                  'group_id': gid,
                   'type': type_group,
                   'description': description
                  }
@@ -2030,26 +2047,23 @@ on QSFP ports of G4 devices. \n""")
                             Add Group Parameters: %s
                             Confirm changes [y/n]: """ % check_data)
         if confirm.lower() in ('y', 'yes'):
-            run = self.add_group(name, data)
+            run = self.add_group(gid, data)
             return run
         return "Canceling; no changes made.\n"
 
     def add_group(self, gid, json_app):
         """Add a port group to the Packetmaster.
         
-           :param gid: A string, ID of group e.g. 1-4294967040.
+           :param gid: A string, ID of group e.g. 0-4294967040.
            :param json_app: A dict, dictionary containing all valid group parameters.
            :returns: A string, JSON-formatted.
-           :raises: ValueError: If gid variable cannot be converted to int.
            :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
             uri = 'http://' + self._address + '/rest/groups?'
-        try:
-            int(gid)
-        except ValueError as reason:
-            return ("That is not a valid group ID, canceling Add Group.", reason)
+        if not pm_input_check.group_id(gid):
+            return "That is not a valid group ID, canceling Add Group."
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
@@ -2074,32 +2088,22 @@ on QSFP ports of G4 devices. \n""")
     def mod_group_guided(self):
         """Interactive menu to modify a port group.
 
-           :raises: ValueError: If name variable cannot be converted to int.
            :raises: ValueError: If buckets variable cannot be converted to int.
            :raises: ValueError: If output variable cannot be converted to int.
-           :raises: ValueError: If watch variable cannot be converted to int.
-           :raises: ValueError: If push_vlan variable cannot be converted to int.
-           :raises: ValueError: If mod_vlan variable cannot be converted to int.
-           :raises: TypeError: If re.findall produces no results on dstip variable.
-           :raises: ValueError: If src_udp variable cannot be converted to int.
-           :raises: ValueError: If dst_udp variable cannot be converted to int.
-           :raises: ValueError: If src_tcp variable cannot be converted to int.
-           :raises: ValueError: If dst_tcp variable cannot be converted to int."""
-        name = moves.input("Enter the group ID of the group you would like to modify: ")
-        try:
-            int(name)
-        except ValueError as reason:
-            return ("That is not a valid group ID, canceling Modify Group.", reason)
+           :raises: ValueError: If watch variable cannot be converted to int."""
+        gid = moves.input("Enter the group ID of the group you would like to modify: ")
+        if not pm_input_check.group_id(gid):
+            return "That is not a valid group ID, canceling Modify Group."
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
         count = 0
         for group in json_groups['groups']:
             existing.append(json_groups['groups'][count]['group_id'])
-            if json_groups['groups'][count]['group_id'] == name:
+            if json_groups['groups'][count]['group_id'] == gid:
                 group_type = json_groups['groups'][count]['type']
             count += 1
-        if name not in existing:
+        if gid not in existing:
             return ("A group with this group ID does not exist; "
                     "use Add Group. Canceling Modify Group")
         description = moves.input("Enter the new group description or "
@@ -2131,23 +2135,23 @@ on QSFP ports of G4 devices. \n""")
                 push_vlan = moves.input('Push VLAN ID to outout traffic? '
                                       'Enter VLAN ID or leave blank for no: ').strip()
                 if push_vlan != '':
-                    try:
+                    if pm_input_check.vlan(push_vlan):
                         vlan = str(int(push_vlan) + 4096)
                         vlan = 'push_vlan:0x8100,set_field:' + vlan + '->vlan_vid,'
                         actions = vlan + actions
-                    except ValueError as reason:
-                        return ("That is not a valid VLAN ID, canceling Modify Group.", reason)
+                    else:
+                        return "That is not a valid VLAN ID, canceling Modify Group."
                 else:
                     mod_vlan = moves.input('Modify VLAN ID of output traffic? '
                                          'Enter VLAN ID or leave blank for no: ').strip()
                     if mod_vlan != '':
-                        try:
+                        if pm_input_check.vlan(mod_vlan):
                             vlan = str(int(mod_vlan) + 4096)
                             vlan = 'set_field:' + vlan + '->vlan_vid,'
                             actions = vlan + actions
-                        except ValueError as reason:
+                        else:
                             return ("That is not a valid input for VLAN ID, "
-                                    "canceling Modify Group.", reason)
+                                    "canceling Modify Group.")
                     else:
                         strip_vlan = moves.input('Strip VLAN ID from output traffic? '
                                                'Y or N [N]: ').lower()
@@ -2172,58 +2176,62 @@ on QSFP ports of G4 devices. \n""")
                 src_mac = moves.input('Modify source MAC address? '
                                     'Enter new MAC address or leave blank for no: ').strip()
                 if src_mac != '':
-                    actions = 'set_field:' + src_mac + '->eth_src,' + actions
+                    if pm_input_check.mac(src_mac) != 0:
+                        src_mac = pm_input_check.mac(src_mac)
+                        actions = 'set_field:' + src_mac + '->eth_src,' + actions
+                    else:
+                        return "That is not a valid MAC address, canceling Modify Group."
                 dst_mac = moves.input('Modify destination MAC address? '
                                     'Enter new MAC address or leave blank for no: ').strip()
                 if dst_mac != '':
-                    actions = 'set_field:' + dst_mac + '->eth_dst,' + actions
+                    if pm_input_check.mac(dst_mac) != 0:
+                        src_mac = pm_input_check.mac(dst_mac)
+                        actions = 'set_field:' + dst_mac + '->eth_dst,' + actions
+                    else:
+                        return "That is not a valid MAC address, canceling Modify Group."
                 dst_ip = moves.input('Modify destination IP address? '
                                    'Enter new IP address or leave blank for no: ').strip()
                 if dst_ip != '':
-                    try:
-                        dstip = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
-                        actions = 'set_field:' + dstip[0] + '->ip_dst,' + actions
-                    except TypeError as reason:
+                    if pm_input_check.ipv4_mask(dst_ip) != 0:
+                        actions = 'set_field:' + pm_input_check.ipv4_mask(dst_ip) + \
+                                  '->ip_dst,' + actions
+                    else:
                         return ("That is not a valid input for IP address, "
-                                "canceling Modify Group.", reason)
+                                "canceling Modify Group.")
                 if self.hardware == '4':
                     src_udp = moves.input('Modify source UDP port? '
                                         'Enter new port number or leave blank for no: ').strip()
                     if src_udp != '':
-                        try:
-                            int(src_udp)
+                        if pm_input_check.port(src_udp):
                             actions = 'set_field:' + src_udp + '->udp_src,' + actions
-                        except ValueError as reason:
+                        else:
                             return ("That is not a valid input for port number; "
-                                    "canceling Modify Group.", reason)
+                                    "canceling Modify Group.")
                 dst_udp = moves.input('Modify destination UDP port? '
                                     'Enter new port number or leave blank for no: ').strip()
                 if dst_udp != '':
-                    try:
-                        int(dst_udp)
+                    if pm_input_check.port(dst_udp):
                         actions = 'set_field:' + dst_udp + '->udp_dst,' + actions
-                    except ValueError as reason:
+                    else:
                         return ("That is not a valid input for port number; "
-                                "canceling Modify Group.", reason)
+                                "canceling Modify Group.")
                 if self.hardware == '4':
                     src_tcp = moves.input('Modify source TCP port? '
                                         'Enter new port number or leave blank for no: ').strip()
                     if src_tcp != '':
-                        try:
-                            int(src_tcp)
+                        if pm_input_check.port(src_tcp):
                             actions = 'set_field:' + src_tcp + '->tcp_src,' + actions
-                        except ValueError as reason:
+                        else:
                             return ("That is not a valid input for port number; "
-                                    "canceling Modify Group.", reason)
+                                    "canceling Modify Group.")
                 dst_tcp = moves.input('Modify destination TCP port? '
                                     'Enter new port number or leave blank for no: ').strip()
                 if dst_tcp != '':
-                    try:
-                        int(dst_tcp)
+                    if pm_input_check.port(dst_tcp):
                         actions = 'set_field:' + dst_tcp + '->tcp_dst,' + actions
-                    except ValueError as reason:
+                    else:
                         return ("That is not a valid input for port number; "
-                                "canceling Modify Group.", reason)
+                                "canceling Modify Group.")
                 if self.hardware != '4' or group_type == 'ff':
                     bucket_data = {'actions': actions,
                                      'watch_port': watch}
@@ -2233,7 +2241,7 @@ on QSFP ports of G4 devices. \n""")
         else:
             return "That is not a valid bucket number; canceling Modify Group."
         data = {'buckets': bucket_list,
-                  'group_id': name,
+                  'group_id': gid,
                   'type': group_type,
                   'description': description}
         check_data = json.dumps(data, indent=4)
@@ -2241,26 +2249,23 @@ on QSFP ports of G4 devices. \n""")
                             Modified Group Parameters: %s
                             Confirm changes [y/n]: """ % check_data)
         if confirm.lower() in ('y', 'yes'):
-            run = self.mod_group(name, data)
+            run = self.mod_group(gid, data)
             return run
         return "Canceling; no changes made.\n"
 
     def mod_group(self, gid, json_app):
         """Modify a port group on the Packetmaster.
         
-           :param gid: A string, ID of group e.g. 1-4294967040.
+           :param gid: A string, ID of group e.g. 0-4294967040.
            :param json_app: A dict, dictionary containing all valid group parameters.
            :returns: A string, JSON-formatted.
-           :raises: ValueError: If gid variable cannot be converted to int.
            :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
             uri = 'http://' + self._address + '/rest/groups?'
-        try:
-            int(gid)
-        except ValueError as reason:
-            return ("That is not a valid group ID, canceling Modify Group.", reason)
+        if not pm_input_check.group_id(gid):
+            return "That is not a valid group ID, canceling Modify Group."
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
@@ -3485,8 +3490,8 @@ on QSFP ports of G4 devices. \n""")
            :param dst_mac: A string, destination MAC address for heartbeat; default 00:00:00:00:00:02.
            :param src_ip: A string, source IP address for heartbeat; default 0.0.0.1
            :param dst_ip: A string, destination IP address for heartbeat; default 0.0.0.2
-           :param src_port: A string, source TCP or UDP port for hearbeat; default 5555
-           :param dst_port: A string, destination TCP or UDP for heartbeat; default 5556
+           :param src_port: A string, source UDP port for hearbeat; default 5555
+           :param dst_port: A string, destination UDP for heartbeat; default 5556
            :param bypass_ip: A string, management IP address of bypass switch; default 1.1.1.1.
            :returns: A string, JSON-formatted.
            :raises: ValueError: if bypass_port1 variable cannot be converted to int.
@@ -3494,16 +3499,12 @@ on QSFP ports of G4 devices. \n""")
            :raises: ValueError: if hb_in variable cannot be converted to int.
            :raises: ValueError: if hb_out variable cannot be converted to int.
            :raises: ValueError: if interval variable cannot be converted to int.
-           :raises: TypeError: if regex check on src_ip variable returns an empty list.
-           :raises: TypeError: if regex check on dst_ip variable returns an empty list.
-           :raises: TypeError: if regex check on bypass_ip variable returns an empty list.
-           :raises: ValueError: if src_port variable cannot be converted to int.
-           :raises: ValueError: if dst_port variable cannot be converted to int.
            :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
             uri = 'http://' + self._address + '/rest/apps?'
+        #Check against actual ports on device
         try:
             int(bypass_port1)
         except ValueError as reason:
@@ -3535,17 +3536,14 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not a valid input for Protocol; "
                     "must be UDP or ICMP.  Canceling HeartbeatBypass.")
         #MAC address regex check
-        try:
-            src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
-            src_ip = src_ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid input for Source IP; canceling HeartbeatBypass.", reason)
-        try:
-            dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
-            dst_ip = dst_ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid input for Destination IP; "
-                    "canceling HeartbeatBypass.", reason)
+        if pm_input_check.ipv4(src_ip) != 0:
+                src_ip = pm_input_check.ipv4(src_ip)
+        else:
+            return "That is not a valid IP address for Source IP; canceling HeartbeatBypass. \n"
+        if pm_input_check.ipv4(dst_ip) != 0:
+                dst_ip = pm_input_check.ipv4(dst_ip)
+        else:
+             return "That is not a valid IP address for Destination IP; canceling HeartbeatBypass. \n"
         data = {'bypassPort1': bypass_port1,
                 'bypassPort2': bypass_port2,
                 'connectionType': conn_type,
@@ -3566,28 +3564,22 @@ on QSFP ports of G4 devices. \n""")
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
             if conn_type == 'IP':
-                try:
-                    ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
-                    data['bypassIP'] = ip_check[0]
-                except TypeError as reason:
-                    return ("That is not a valid input for Bypass Switch IP; "
-                            "canceling HeartbeatBypass.", reason)
+                if pm_input_check.ipv4(bypass_ip) != 0:
+                    data['bypassIP'] = pm_input_check.ipv4(bypass_ip)
+                else:
+                    return "That is not a valid IP address for Bypass Switch IP; canceling HeartbeatBypass. \n"
         else:
             return ("That is not a valid input for Connection Type; "
                     "must be IP or RS232.  Canceling HeartbeatBypass.")
         if proto == 'UDP':
-            try:
-                int(src_port)
-            except ValueError as reason:
-                return ("That is not a valid input for Source Port; "
-                        "canceling HeartbeatBypass.", reason)
-            data['portSrc'] = src_port
-            try:
-                int(dst_port)
-            except ValueError as reason:
-                return ("That is not a valid input for Destination Port; "
-                        "canceling HeartbeatBypass.", reason)
-            data['portDst'] = dst_port
+            if pm_input_check.port(src_port):
+                data['portSrc'] = src_port
+            else:
+                return "That is not a valid UDP port number for Heartbeat Source Port; canceling HeartbeatBypass. \n"
+            if pm_input_check.port(dst_port):
+                data['portDst'] = dst_port
+            else:
+                return "That is not a valid UDP port number for Heartbeat Destination Port; canceling HeartbeatBypass. \n"
         try:
             response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
