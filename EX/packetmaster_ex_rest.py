@@ -2310,16 +2310,13 @@ on QSFP ports of G4 devices. \n""")
         
            :param gid: A string, ID of group e.g. 1-4294967040
            :returns: A string, JSON-formatted.
-           :raises: ValueError: If gid variable cannot be converted to int.
            :raises: ConnectionError: if unable to successfully make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/groups?'
         else:
             uri = 'http://' + self._address + '/rest/groups?'
-        try:
-            int(gid)
-        except ValueError as reason:
-            return ("That is not a valid group ID, canceling Delete Group.", reason)
+        if not pm_input_check.group_id(gid):
+            return "That is not a valid group ID, canceling Delete Group."
         existing = []
         all_groups = self.groups_active()
         json_groups = json.loads(all_groups)
@@ -2796,6 +2793,7 @@ on QSFP ports of G4 devices. \n""")
         
            :returns: A string, JSON-formatted.
            :raises: ValueError: if app variable cannot be converted to int."""
+           #add input validation here? Break selections out to individual methods?
         app = moves.input("""Select the App instance to start:
                             1 - NTP
                             2 - Arp Responder
@@ -3355,17 +3353,33 @@ on QSFP ports of G4 devices. \n""")
         else:
             uri = 'http://' + self._address + '/rest/apps?'
         try:
-            pm_input_check = int(interval)
+            interval_test = int(interval)
         except ValueError as reason:
             return ("That is not an valid input for interval "
-                    "(number in milliseconds); canceling start ArpResponder.", reason)
+                    "(number in milliseconds); canceling Start ArpResponder.", reason)
         try:
-            pm_input_check = int(outport)
-            if pm_input_check > self.ports:
+            outport_test = int(outport)
+            if outport_test > self.ports:
                 return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not an valid input for output port; "
                     "canceling start ArpResponder.", reason)
+        if pm_input_check.mac(src_mac) != 0:
+            src_mac = pm_input_check.mac(src_mac)
+        else:
+            return "That is not a valid MAC address for source MAC; canceling Start ArpResponder."
+        if pm_input_check.mac(dst_mac) != 0:
+            dst_mac = pm_input_check.mac(dst_mac)
+        else:
+            return "That is not a valid MAC address for destination MAC; canceling Start ArpResponder."
+        if pm_input_check.ipv4(src_ip) != 0:
+            src_ip = pm_input_check.ipv4(src_ip)
+        else:
+            return "That is not a valid IP address for source IP; canceling Start ArpResponder."
+        if pm_input_check.ipv4(dst_ip) != 0:
+            dst_ip = pm_input_check.ipv4(dst_ip)
+        else:
+            return "That is not a valid IP address for destination IP; canceling Start ArpResponder."
         data = {'name': 'ArpResponder',
                 'description': 'Responds to an arbotrary packet with an ARP response',
                 'interval': interval,
@@ -3376,15 +3390,18 @@ on QSFP ports of G4 devices. \n""")
                 'ipDst': dst_ip}
         if inport:
             try:
-                pm_input_check = int(inport)
-                if pm_input_check > self.ports:
+                inport_test = int(inport)
+                if inport_test > self.ports:
                     return "Physical port does not exist on device."
             except ValueError as reason:
                 return ("That is not a valid input for input port; "
                         "canceling ArpResponder.", reason)
             data['inPort'] = inport
         if match_srcmac:
-            data['matchMacSrc'] = match_srcmac
+            if pm_input_check.mac(match_srcmac) != 0:
+                data['matchMacSrc'] = pm_input_check.mac(match_srcmac)
+            else:
+                return "That is not a valid MAC address for Match Source MAC; canceling Start ArpResponder."
         if user_description:
             data['userDescription'] = user_description
         try:
