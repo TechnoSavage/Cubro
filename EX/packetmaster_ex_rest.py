@@ -3552,7 +3552,14 @@ on QSFP ports of G4 devices. \n""")
         else:
             return ("That is not a valid input for Protocol; "
                     "must be UDP or ICMP.  Canceling HeartbeatBypass.")
-        #MAC address regex check
+        if pm_input_check.mac(src_mac) != 0:
+            src_mac = pm_input_check.mac(src_mac)
+        else:
+            return "That is not a valid MAC address for Source MAC; canceling HeartbeatBypass."
+        if pm_input_check.mac(dst_mac) != 0:
+            dst_mac = pm_input_check.mac(dst_mac)
+        else:
+            return "That is not a valid MAC address for Destination MAC; canceling HeartbeatBypass."
         if pm_input_check.ipv4(src_ip) != 0:
                 src_ip = pm_input_check.ipv4(src_ip)
         else:
