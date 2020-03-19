@@ -3620,26 +3620,21 @@ on QSFP ports of G4 devices. \n""")
            :param port: A string, A string, syslog port; defaults to 514.
            :param user_description: A string, description for syslog app instance (optional).
            :returns: A string, JSON-formatted.
-           :raises: TypeError: if regex check on server_ip variable returns an empty list.
-           :raises: ValueError: if port variable cannot be converted to int.
            :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
             uri = 'http://' + self._address + '/rest/apps?'
-        try:
-            ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', server_ip)
-            server = ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid server IP address; canceling Syslog.", reason)
-        try:
-            int(port)
-        except ValueError as reason:
-            return ("That is not a valid input for port number; canceling Syslog.", reason)
+        if pm_input_check.ipv4(server_ip) != 0:
+            server_ip = pm_input_check.ipv4(server_ip)
+        else:
+            return "That is not a valid server IP address; canceling Start Syslog."
+        if not pm_input_check.port(port):
+            return "That is not a valid TCP/UDP port number; canceling Start Syslog."
         data = {'description': 'Logs syslog data to a remote server',
                 'name': 'Syslog',
                 'port': port,
-                'server': server,
+                'server': server_ip,
                 'userDescription': user_description}
         try:
             response = requests.post(uri, data=data, auth=(self.username, self.password))
