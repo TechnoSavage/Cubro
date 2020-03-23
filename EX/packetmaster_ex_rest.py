@@ -3634,7 +3634,7 @@ on QSFP ports of G4 devices. \n""")
         data = {'description': 'Logs syslog data to a remote server',
                 'name': 'Syslog',
                 'port': port,
-                'server': server_ip,
+                'server': server,
                 'userDescription': user_description}
         try:
             response = requests.post(uri, data=data, auth=(self.username, self.password))
@@ -3653,7 +3653,9 @@ on QSFP ports of G4 devices. \n""")
            :param interval: A string, check interval in milliseconds; default is 2000.
            :param description: A string, description for app instance (optional).
            :param bypass_ip: A string, IP address of bypass switch; default is 1.1.1.1.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if interval variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -3669,16 +3671,14 @@ on QSFP ports of G4 devices. \n""")
                 'name': 'BypassKeepalive'}
         if conn_type.upper() in ('IP', 'RS232'):
             data['connectionType'] = conn_type.upper()
-            if conn_type == 'RS232' and self.hardware_generation == '4':
+            if conn_type.upper() == 'RS232' and self.hardware_generation == '4':
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
-            if conn_type == 'IP':
-                try:
-                    ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
-                    data['bypassIP'] = ip_check[0]
-                except TypeError as reason:
-                    return ("That is not a valid input for Bypass Switch IP; "
-                            "canceling Bypass Keepalive.", reason)
+            if conn_type.upper() == 'IP':
+                if pm_input_check.ipv4(bypass_ip) != 0:
+                    data['bypassIP'] = pm_input_check.ipv4(bypass_ip)
+                else:
+                    return "That is not a valid input for Bypass Switch IP; canceling Bypass Keepalive."
         else:
             return ("That is not a valid input for Connection Type; "
                     "must be IP or RS232.  Canceling Bypass Keepalive.")
