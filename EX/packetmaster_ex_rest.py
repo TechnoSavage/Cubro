@@ -4587,10 +4587,10 @@ on QSFP ports of G4 devices. \n""")
                 'userDescription': user_description}
         if conn_type.upper() in ('IP', 'RS232'):
             data['connectionType'] = conn_type.upper()
-            if conn_type == 'RS232' and self.hardware_generation == '4':
+            if conn_type.upper() == 'RS232' and self.hardware_generation == '4':
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
-            if conn_type == 'IP':
+            if conn_type.upper() == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
                     data['bypassIP'] = ip_check[0]
@@ -4692,10 +4692,10 @@ on QSFP ports of G4 devices. \n""")
                 'name': 'BypassKeepalive'}
         if conn_type.upper() in ('IP', 'RS232'):
             data['connectionType'] = conn_type.upper()
-            if conn_type == 'RS232' and self.hardware_generation == '4':
+            if conn_type.upper() == 'RS232' and self.hardware_generation == '4':
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
-            if conn_type == 'IP':
+            if conn_type.upper() == 'IP':
                 try:
                     ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
                     data['bypassIP'] = ip_check[0]
