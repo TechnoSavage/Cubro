@@ -3521,26 +3521,33 @@ on QSFP ports of G4 devices. \n""")
             uri = 'https://' + self._address + '/rest/apps?'
         else:
             uri = 'http://' + self._address + '/rest/apps?'
-        #Check against actual ports on device
         try:
-            int(bypass_port1)
+            pm_port_test = int(bypass_port1)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
-            return ("That is not a valid port number for Bypass Port 1; "
+            return ("That is not an valid input for Bypass Port 1; "
                     "canceling HeartbeatBypass.", reason)
         try:
-            int(bypass_port2)
+            pm_port_test = int(bypass_port2)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
-            return ("That is not a valid port number for Bypass Port 2; "
+            return ("That is not an valid input for Bypass Port 2; "
                     "canceling HeartbeatBypass.", reason)
         try:
-            int(hb_in)
+            pm_port_test = int(hb_in)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
-            return ("That is not a valid port number for Heartbeat In Port; "
+            return ("That is not an valid input for Heartbeat In; "
                     "canceling HeartbeatBypass.", reason)
         try:
-            int(hb_out)
+            pm_port_test = int(hb_out)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
-            return ("That is not a valid port number for Heartbeat Out Port; "
+            return ("That is not an valid input for Heartbeat Out; "
                     "canceling HeartbeatBypass.", reason)
         try:
             int(interval)
@@ -3584,10 +3591,10 @@ on QSFP ports of G4 devices. \n""")
                 'userDescription': user_description}
         if conn_type.upper() in ('IP', 'RS232'):
             data['connectionType'] = conn_type.upper()
-            if conn_type == 'RS232' and self.hardware_generation == '4':
+            if conn_type.upper() == 'RS232' and self.hardware_generation == '4':
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
-            if conn_type == 'IP':
+            if conn_type.upper() == 'IP':
                 if pm_input_check.ipv4(bypass_ip) != 0:
                     data['bypassIP'] = pm_input_check.ipv4(bypass_ip)
                 else:
@@ -3634,7 +3641,7 @@ on QSFP ports of G4 devices. \n""")
         data = {'description': 'Logs syslog data to a remote server',
                 'name': 'Syslog',
                 'port': port,
-                'server': server,
+                'server': server_ip,
                 'userDescription': user_description}
         try:
             response = requests.post(uri, data=data, auth=(self.username, self.password))
@@ -3711,18 +3718,25 @@ on QSFP ports of G4 devices. \n""")
            :param dst_ip: A string, destination IP address to assign to heartbeat; default is 0.0.0.2.
            :param src_port: A string, source port to assign to heartbeat; default is 5555.
            :param dst_port: A string, destination port to assign to heartbeat; default is 5556.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if hb_in variable cannot be converted to int.
+           :raises: ValueError: if hb_out variable cannot be converted to int.
+           :raises: ValueError: if interval variable cannot be converted to int."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
             uri = 'http://' + self._address + '/rest/apps?'
         try:
-            int(hb_in)
+            pm_port_test = int(hb_in)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not a valid port number for Heartbeat In Port; "
                     "canceling Heartbeat.", reason)
         try:
-            int(hb_out)
+            pm_port_test = int(hb_out)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not a valid port number for Heartbeat Out Port; "
                     "canceling Heartbeat.", reason)
@@ -3736,25 +3750,26 @@ on QSFP ports of G4 devices. \n""")
         else:
             return ("That is not a valid input for Protocol; "
                     "must be UDP or ICMP.  Canceling Heartbeat.")
-        #MAC address regex check
-        try:
-            src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
-            src_ip = src_ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid input for Source IP; canceling Heartbeat.", reason)
-        try:
-            dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
-            dst_ip = dst_ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid input for Destination IP; canceling Heartbeat.", reason)
-        try:
-            int(src_port)
-        except ValueError as reason:
-            return ("That is not a valid input for Source Port; canceling Heartbeat.", reason)
-        try:
-            int(dst_port)
-        except ValueError as reason:
-            return ("That is not a valid input for Destination Port; canceling Heartbeat.", reason)
+        if pm_input_check.mac(src_mac) != 0:
+            src_mac = pm_input_check.mac(src_mac)
+        else:
+            return "That is not a valid input for Source MAC; canceling Heartbeat."
+        if pm_input_check.mac(dst_mac) != 0:
+            dst_mac = pm_input_check.mac(dst_mac)
+        else:
+            return "That is not a valid input for Destination MAC; canceling Heartbeat."
+        if pm_input_check.ipv4(src_ip) != 0:
+            src_ip = pm_input_check.ipv4(src_ip)
+        else:
+            return "That is not a valid input for Source IP; canceling Heartbeat."
+        if pm_input_check.ipv4(dst_ip) != 0:
+            dst_ip = pm_input_check.ipv4(dst_ip)
+        else:
+            return "That is not a valid input for Destination IP; canceling Heartbeat."
+        if not pm_input_check.port(src_port):
+            return "That is not a valid input for Source Port; canceling Heartbeat."
+        if not pm_input_check.port(dst_port):
+            return "That is not a valid input for Destination Port; canceling Heartbeat."
         data = {'activateCommand': act_comm,
                 'deactivateCommand': deact_comm,
                 'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
@@ -4370,8 +4385,8 @@ on QSFP ports of G4 devices. \n""")
                 'ipDst': dst_ip}
         if inport:
             try:
-                pm_input_check = int(inport)
-                if pm_input_check > self.ports:
+                pm_port_check = int(inport)
+                if pm_port_check > self.ports:
                     return "Physical port does not exist on device."
             except ValueError as reason:
                 return ("That is not a valid input for input port; "
