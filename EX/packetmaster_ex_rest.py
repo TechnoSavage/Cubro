@@ -3353,7 +3353,7 @@ on QSFP ports of G4 devices. \n""")
         else:
             uri = 'http://' + self._address + '/rest/apps?'
         try:
-            interval_test = int(interval)
+            int(interval)
         except ValueError as reason:
             return ("That is not an valid input for interval "
                     "(number in milliseconds); canceling Start ArpResponder.", reason)
@@ -3795,7 +3795,10 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def mod_app_guided(self):
-        """Interactive menu to modify an app instance."""
+        """Interactive menu to modify an app instance.
+           
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable can't be converted to int."""
         pid = moves.input("What is the PID of the app instance: ")
         try:
             app = int(pid)
@@ -4314,7 +4317,9 @@ on QSFP ports of G4 devices. \n""")
            :param server1: A string, IP address or Domain Name of NTP server.
            :param server2: A string, IP address or Domain Name of NTP server (optional).
            :param user_description: A string, description for app instance (optional).
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4353,7 +4358,12 @@ on QSFP ports of G4 devices. \n""")
            :param inport: A string, physical source port of incoming ARP request (optional).
            :param match_srcmac: A string, source MAC address of incoming ARP request (optional).
            :param user_description: A string, description for app instance.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable cannot be converted to int.
+           :raises: ValueError: if interval variable cannot be converted to int.
+           :raises: ValueError: if outport variable cannot be converted to int.
+           :raises: ValueError: if inport variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4368,14 +4378,30 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not an valid input for interval "
                     "(number in milliseconds); canceling Modify ArpResponder.", reason)
         try:
-            pm_input_check = int(outport)
-            if pm_input_check > self.ports:
+            pm_port_check = int(outport)
+            if pm_port_check > self.ports:
                 return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not an valid input for output port; "
                     "canceling Modify ArpResponder.", reason)
+        if pm_input_check.mac(src_mac) != 0:
+            src_mac = pm_input_check.mac(src_mac)
+        else:
+            return "That is not a valid MAC address for source MAC; canceling Modify ArpResponder."
+        if pm_input_check.mac(dst_mac) != 0:
+            dst_mac = pm_input_check.mac(dst_mac)
+        else:
+            return "That is not a valid MAC address for destination MAC; canceling Modify ArpResponder."
+        if pm_input_check.ipv4(src_ip) != 0:
+            src_ip = pm_input_check.ipv4(src_ip)
+        else:
+            return "That is not a valid IP address for source IP; canceling Modify ArpResponder."
+        if pm_input_check.ipv4(dst_ip) != 0:
+            dst_ip = pm_input_check.ipv4(dst_ip)
+        else:
+            return "That is not a valid IP address for destination IP; canceling Modify ArpResponder."
         data = {'name': 'ArpResponder',
-                'description': 'Responds to an arbotrary packet with an ARP response',
+                'description': 'Responds to an arbitrary packet with an ARP response',
                 'pid': pid,
                 'interval': interval,
                 'outPort': outport,
@@ -4390,10 +4416,11 @@ on QSFP ports of G4 devices. \n""")
                     return "Physical port does not exist on device."
             except ValueError as reason:
                 return ("That is not a valid input for input port; "
-                        "canceling ArpResponder.", reason)
+                        "canceling Modify ArpResponder.", reason)
             data['inPort'] = inport
         if match_srcmac:
-            data['matchMacSrc'] = match_srcmac
+            if pm_input_check.mac(match_srcmac) != 0:
+                data['matchMacSrc'] = pm_input_check.mac(match_srcmac)
         if user_description:
             data['userDescription'] = user_description
         try:
