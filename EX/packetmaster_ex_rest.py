@@ -2790,10 +2790,9 @@ on QSFP ports of G4 devices. \n""")
 
     def start_app_guided(self):
         """Interactive menu to start a new app instance.
-        
+
            :returns: A string, JSON-formatted.
            :raises: ValueError: if app variable cannot be converted to int."""
-           #add input validation here? Break selections out to individual methods?
         app = moves.input("""Select the App instance to start:
                             1 - NTP
                             2 - Arp Responder
@@ -2809,499 +2808,472 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not a valid input for App selection; canceling Start App.", reason)
         description = moves.input("Custom description for the new App instance: ")
         if app == 1:
-            server1 = moves.input("Enter NTP target IP or Host Name: ")
-            server2 = moves.input("Enter NTP backup IP or Host Name: ")
-            confirm = moves.input("""Start NTP App Summary:
-                                Server 1: %s
-                                Server 2: %s
-                                Description: %s
-                                Confirm changes [y/n]: """ % (server1, server2, description))
-            if confirm.lower() in ('y', 'yes'):
-                run = self.start_app_ntp(server1, server2, description)
-            else:
-                return "Canceling; no changes made.\n"
+            run = self.start_ntp_guided(description)
+            return run
         elif app == 2:
-            interval = moves.input("Enter the check interval in milliseconds [5000]: ")
-            if interval == '':
-                interval = '5000'
-            in_port = moves.input("Physical source port of incoming ARP request (optional): ")
-            out_port = moves.input("Physical port for sending ARP response: ")
-            match_mac = moves.input("Enter source MAC address of incoming ARP request (optional): ")
-            src_mac = moves.input("Source MAC address of outgoing ARP response: ")
-            dst_mac = moves.input("Destination MAC address of outgoing ARP response: ")
-            src_ip = moves.input("Source IP address of outgoing ARP response: ")
-            dst_ip = moves.input("Destination IP of outgoing ARP response: ")
-            confirm = moves.input("""Start ARP Responder App Summary:
-                                Check Interval: %s
-                                Port of incoming ARP packets: %s
-                                Port to send ARP packets: %s
-                                Source MAC of incoming ARPs: %s
-                                Source MAC of outgoing ARPs: %s
-                                Destinaton MAC of outgoing ARPs: %s
-                                Source IP of outgoing ARPs: %s
-                                Destination IP of outgoing ARPs: %s
-                                Description: %s
-                                Confirm changes [y/n]: """ % (interval,
-                                                              in_port,
-                                                              out_port,
-                                                              match_mac,
-                                                              src_mac,
-                                                              dst_mac,
-                                                              src_ip,
-                                                              dst_ip,
-                                                              description))
-            if confirm.lower() in ('y', 'yes'):
-                run = self.start_app_arpresponder(out_port, src_mac, dst_mac,
-                                                  src_ip, dst_ip, interval,
-                                                  in_port, match_mac,
-                                                  description)
-            else:
-                return "Canceling; no changes made.\n"
+            run = self.start_arpresp_guided(description)
+            return run
         elif app == 3:
-            interval = moves.input("Enter the check interval in milliseconds [5000]: ")
-            if interval == '':
-                interval = '5000'
-            snmp_port = moves.input("Enter the SNMP port [161]: ")
-            if snmp_port == '':
-                snmp_port = '161'
-            community = moves.input("Enter the SNMP community [public]: ")
-            if community == '':
-                community = 'public'
-            trap_enable = moves.input("Enter SNMP traps?  Enter 'true' to enable "
-                                    "or 'false' to keep disabled [true]: ")
-            if trap_enable.lower() in ('false', 'f', 'n', 'no'):
-                trap_enable = False
-            else:
-                trap_enable = True
-            if trap_enable:
-                trap1 = moves.input('Enter IP address of SNMP trap: ')
-                trap1_port = moves.input('Enter port number for SNMP trap [162]: ')
-                if trap1_port == '':
-                    trap1_port = '162'
-                trap2 = moves.input('Enter IP address for additional SNMP trap '
-                                  'or leave blank for none: ')
-                trap2_port = moves.input('Enter port number for additional SNMP trap [162]: ')
-                if trap2_port == '':
-                    trap2_port = '162'
-                confirm = moves.input("""Start SNMP App Summary:
-                                    Check Interval: %s
-                                    SNMP Port: %s
-                                    SNMP Community: %s
-                                    Trap Enabled: %s
-                                    Trap 1 IP: %s
-                                    Trap 1 Port: %s
-                                    Trap 2 IP: %s
-                                    Trap 2 Port: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (interval,
-                                                                  snmp_port,
-                                                                  community,
-                                                                  trap_enable,
-                                                                  trap1,
-                                                                  trap1_port,
-                                                                  trap2,
-                                                                  trap2_port,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_snmp(interval, snmp_port, community,
-                                              description, trap_enable, trap1,
-                                              trap1_port, trap2, trap2_port)
-                else:
-                    return "Canceling; no changes made.\n"
-            else:
-                confirm = moves.input("""Start SNMP App Summary:
-                                    Check Interval: %s
-                                    SNMP Port: %s
-                                    SNMP Community: %s
-                                    Trap Enabled: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (interval,
-                                                                  snmp_port,
-                                                                  community,
-                                                                  trap_enable,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_snmp(interval, snmp_port, community,
-                                              description, trap_enable)
-                else:
-                    return "Canceling; no changes made.\n"
+            run = self.start_snmp_guided(description)
+            return run
         elif app == 4:
-            conn_type = moves.input('''Control Bypass Switch using:
-                                    1 - IP Address
-                                    2 - RS232 Console Cable
-                                    Enter selection [1]: ''')
-            if conn_type in ('', '1'):
-                conn_type = 'IP'
-                bypass_ip = moves.input("IP address of Bypass Switch: ")
-            elif int(conn_type) == 2:
-                conn_type = 'RS232'
-            else:
-                return "That is not a valid input for Connection Type; canceling HeartbeatBypass."
-            bypass_port1 = moves.input("Port number of first port connected to the Bypass Switch: ")
-            bypass_port2 = moves.input("Port number of the second port "
-                                     "connected to the Bypass Switch: ")
-            hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
-            hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
-            interval = moves.input("Check interval time in milliseconds that the "
-                                 "App should check for heartbeat packets [2000]: ")
-            if interval == '':
-                interval = '2000'
-            proto = moves.input('''Protocol to use for heartbeat packets:
-                                 1 - UDP
-                                 2 - ICMP
-                                 Enter selection [1]: ''')
-            if proto in ('', '1'):
-                proto = 'UDP'
-                src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
-                if src_port == '':
-                    src_port = '5555'
-                dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
-                if dst_port == '':
-                    dst_port = '5556'
-            elif int(proto) == 2:
-                proto = 'ICMP'
-            else:
-                return "That is not a valid input for Protocol; canceling HeartbeatBypass."
-            src_mac = moves.input("Enter source MAC address for heartbeat "
-                                "packets [00:00:00:00:00:01]: ")
-            if src_mac == '':
-                src_mac = '00:00:00:00:00:01'
-            dst_mac = moves.input("Enter destination MAC address for heartbeat "
-                                "packets [00:00:00:00:00:02]: ")
-            if dst_mac == '':
-                dst_mac = '00:00:00:00:00:02'
-            src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
-            if src_ip == '':
-                src_ip = '0.0.0.1'
-            dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
-            if dst_ip == '':
-                dst_ip = '0.0.0.2'
-            if conn_type == 'IP' and proto == 'UDP':
-                confirm = moves.input("""Start Heartbeat Bypass App Summary:
-                                    First Port connected to Bypass Switch: %s
-                                    Second Port connected to Bypass Switch: %s
-                                    Port to receive Heartbeat packets: %s
-                                    Port to send Heartbeat packets: %s
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Heartbeat Source Port: %s
-                                    Heartbeat Destination Port: %s
-                                    Bypass Switch IP: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1,
-                                                                  bypass_port2,
-                                                                  hb_in, hb_out,
-                                                                  conn_type,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  src_port,
-                                                                  dst_port,
-                                                                  bypass_ip,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeatbypass(bypass_port1,
-                                                         bypass_port2,
-                                                         hb_in, hb_out,
-                                                         conn_type, interval,
-                                                         description, proto,
-                                                         src_mac, dst_mac,
-                                                         src_ip, dst_ip,
-                                                         src_port, dst_port,
-                                                         bypass_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            elif conn_type == 'IP' and proto == 'ICMP':
-                confirm = moves.input("""Start Heartbeat Bypass App Summary:
-                                    First Port connected to Bypass Switch: %s
-                                    Second Port connected to Bypass Switch: %s
-                                    Port to receive Heartbeat packets: %s
-                                    Port to send Heartbeat packets: %s
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Bypass Switch IP: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1,
-                                                                  bypass_port2,
-                                                                  hb_in,
-                                                                  hb_out,
-                                                                  conn_type,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  bypass_ip,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeatbypass(bypass_port1,
-                                                         bypass_port2, hb_in,
-                                                         hb_out, conn_type,
-                                                         interval, description,
-                                                         proto, src_mac,
-                                                         dst_mac, src_ip,
-                                                         dst_ip, bypass_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            elif conn_type == 'RS232' and proto == 'UDP':
-                confirm = moves.input("""Start Heartbeat Bypass App Summary:
-                                    First Port connected to Bypass Switch: %s
-                                    Second Port connected to Bypass Switch: %s
-                                    Port to receive Heartbeat packets: %s
-                                    Port to send Heartbeat packets: %s
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Heartbeat Source Port: %s
-                                    Heartbeat Destination Port: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1,
-                                                                  bypass_port2,
-                                                                  hb_in,
-                                                                  hb_out,
-                                                                  conn_type,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  src_port,
-                                                                  dst_port,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeatbypass(bypass_port1,
-                                                         bypass_port2, hb_in,
-                                                         hb_out, conn_type,
-                                                         interval, description,
-                                                         proto, src_mac,
-                                                         dst_mac, src_ip,
-                                                         dst_ip, src_port,
-                                                         dst_port)
-                else:
-                    return "Canceling; no changes made.\n"
-            elif conn_type == 'RS232' and proto == 'ICMP':
-                confirm = moves.input("""Start Heartbeat Bypass App Summary:
-                                    First Port connected to Bypass Switch: %s
-                                    Second Port connected to Bypass Switch: %s
-                                    Port to receive Heartbeat packets: %s
-                                    Port to send Heartbeat packets: %s
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1,
-                                                                  bypass_port2,
-                                                                  hb_in,
-                                                                  hb_out,
-                                                                  conn_type,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeatbypass(bypass_port1,
-                                                         bypass_port2, hb_in,
-                                                         hb_out, conn_type,
-                                                         interval, description,
-                                                         proto, src_mac,
-                                                         dst_mac, src_ip,
-                                                         dst_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            else:
-                return "Something went wrong."
+            run = self.start_hbbypass_guided(description)  
+            return run
         elif app == 5:
-            server_ip = moves.input("IP address of the syslog server: ")
-            port = moves.input("Server port [514]: ")
-            if port == '':
-                port = '514'
-            confirm = moves.input("""Start Syslog App Summary:
-                                Syslog Server IP: %s
-                                Syslog Server Port: %s
-                                Description: %s
-                                Confirm changes [y/n]: """ % (server_ip, port, description))
-            if confirm.lower() in ('y', 'yes'):
-                run = self.start_app_syslog(server_ip, port, description)
-            else:
-                return "Canceling; no changes made.\n"
+            run = self.start_syslog_guided(description)  
+            return run
         elif app == 6:
-            conn_type = moves.input('''Bypass Switch connection type:
-                                    1 - IP Address
-                                    2 - RS232 Console Cable
-                                    Enter selection [1]: ''')
-            if conn_type in ('', '1'):
-                conn_type = 'IP'
-                bypass_ip = moves.input("IP address of Bypass Switch: ")
-            elif int(conn_type) == 2:
-                conn_type = 'RS232'
-            else:
-                return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
-            interval = moves.input("Check interval time in milliseconds that the "
-                                 "App should check for heartbeat packets [2000]: ")
-            if interval == '':
-                interval = '2000'
-            if conn_type == 'IP':
-                confirm = moves.input('''Start Bypass Keepalive Summary:
-                                    Connection Type: %s
-                                    Bypass Switch IP: %s
-                                    Check Interval: %s
-                                    Description: %s
-                                    Confirm changes [y/n]''' % (conn_type,
-                                                                bypass_ip,
-                                                                interval,
-                                                                description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_bypasskeepalive(conn_type, interval,
-                                                         description, bypass_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            else:
-                confirm = moves.input('''Start Bypass Keepalive Summary:
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Description: %s
-                                    Confirm changes [y/n]''' % (conn_type, interval, description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_bypasskeepalive(conn_type, interval, description)
-                else:
-                    return "Canceling; no changes made.\n"
+            run = self.start_bypasska_guided(description)
+            return run
         elif app == 7:
-            hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
-            act_comm = moves.input("Command to run when heartbeat packets are detected: ")
-            hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
-            deact_comm = moves.input("Command to run when heartbeat packets are not detected: ")
-            interval = moves.input("Check interval time in milliseconds that the "
-                                 "App should check for heartbeat packets [2000]: ")
-            if interval == '':
-                interval = '2000'
-            proto = moves.input('''Protocol to use for heartbeat packets:
-                                 1 - UDP
-                                 2 - ICMP
-                                 Enter selection [1]: ''')
-            if proto in ('', '1'):
-                proto = 'UDP'
-                src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
-                if src_port == '':
-                    src_port = '5555'
-                dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
-                if dst_port == '':
-                    dst_port = '5556'
-            elif int(proto) == 2:
-                proto = 'ICMP'
-            else:
-                return "That is not a valid input for Protocol; canceling Heartbeat."
-            src_mac = moves.input("Enter source MAC address for heartbeat "
-                                "packets [00:00:00:00:00:01]: ")
-            if src_mac == '':
-                src_mac = '00:00:00:00:00:01'
-            dst_mac = moves.input("Enter destination MAC address for heartbeat "
-                                "packets [00:00:00:00:00:02]: ")
-            if dst_mac == '':
-                dst_mac = '00:00:00:00:00:02'
-            src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
-            if src_ip == '':
-                src_ip = '0.0.0.1'
-            dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
-            if dst_ip == '':
-                dst_ip = '0.0.0.2'
-            if proto == 'UDP':
-                confirm = moves.input("""Start Heartbeat App Summary:
-                                    Port to receive Heartbeat packets: %s
-                                    Activation Command: %s
-                                    Port to send Heartbeat packets: %s
-                                    Deactivation Command: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Heartbeat Source Port: %s
-                                    Heartbeat Destination Port: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (hb_in,
-                                                                  act_comm,
-                                                                  hb_out,
-                                                                  deact_comm,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  src_port,
-                                                                  dst_port,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeat(hb_in, act_comm, hb_out,
-                                                   deact_comm, interval,
-                                                   description, proto, src_mac,
-                                                   dst_mac, src_ip, dst_ip,
-                                                   src_port, dst_port)
-                else:
-                    return "Canceling; no changes made.\n"
-            elif proto == 'ICMP':
-                confirm = moves.input("""Start Heartbeat App Summary:
-                                    Port to receive Heartbeat packets: %s
-                                    Activation Command: %s
-                                    Port to send heartbeat packets: %s
-                                    Deactivation Command: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (hb_in,
-                                                                  act_comm,
-                                                                  hb_out,
-                                                                  deact_comm,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.start_app_heartbeat(hb_in, act_comm, hb_out,
-                                                   deact_comm, interval,
-                                                   description, proto, src_mac,
-                                                   dst_mac, src_ip, dst_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            else:
-                return "Something went wrong."
+            run = self.start_heartbeat_guided(description)
+            return run
         else:
             return "That is not a valid input for App selection; canceling Start App."
-        return run
+
+    def start_ntp_guided(self, description):
+        '''Interactive menu to start NTP app.
+        
+           :param description: A string, custom description for app instance.
+           :returns: A string, JSON-formatted.'''
+        server1 = moves.input("Enter NTP target IP or Host Name: ")
+        server2 = moves.input("Enter NTP backup IP or Host Name: ")
+        confirm = moves.input("""Start NTP App Summary:
+                              Server 1: %s
+                              Server 2: %s
+                              Description: %s
+                              Confirm changes [y/n]: """ % (server1, server2, description))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.start_app_ntp(server1, server2, description)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
+    
+    def start_arpresp_guided(self, description):
+        '''Interactive menu to start ARP Respomder app.
+           
+           :param description: A string, custom description for app instance.
+           :returns: A string, JSON-formatted.'''
+        interval = moves.input("Enter the check interval in milliseconds [5000]: ")
+        if interval == '':
+            interval = '5000'
+        in_port = moves.input("Physical source port of incoming ARP request (optional): ")
+        out_port = moves.input("Physical port for sending ARP response: ")
+        match_mac = moves.input("Enter source MAC address of incoming ARP request (optional): ")
+        src_mac = moves.input("Source MAC address of outgoing ARP response: ")
+        dst_mac = moves.input("Destination MAC address of outgoing ARP response: ")
+        src_ip = moves.input("Source IP address of outgoing ARP response: ")
+        dst_ip = moves.input("Destination IP of outgoing ARP response: ")
+        confirm = moves.input("""Start ARP Responder App Summary:
+                              Check Interval: %s
+                              Port of incoming ARP packets: %s
+                              Port to send ARP packets: %s
+                              Source MAC of incoming ARPs: %s
+                              Source MAC of outgoing ARPs: %s
+                              Destinaton MAC of outgoing ARPs: %s
+                              Source IP of outgoing ARPs: %s
+                              Destination IP of outgoing ARPs: %s
+                              Description: %s
+                              Confirm changes [y/n]: """ % (interval,
+                                                            in_port,
+                                                            out_port,
+                                                            match_mac,
+                                                            src_mac,
+                                                            dst_mac,
+                                                            src_ip,
+                                                            dst_ip,
+                                                            description))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.start_app_arpresponder(out_port, src_mac, dst_mac, src_ip, dst_ip, interval,
+                                              in_port, match_mac, description)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
+
+    def start_snmp_guided(self, description):
+        '''Interactive menu to start SNMP app.
+           
+           :param description: A string, custom description for app instance.
+           :returns: A string, JSON-formatted. '''
+        interval = moves.input("Enter the check interval in milliseconds [5000]: ")
+        if interval == '':
+            interval = '5000'
+        snmp_port = moves.input("Enter the SNMP port [161]: ")
+        if snmp_port == '':
+            snmp_port = '161'
+        community = moves.input("Enter the SNMP community [public]: ")
+        if community == '':
+            community = 'public'
+        trap_enable = moves.input("Enter SNMP traps?  Enter 'true' to enable "
+                                  "or 'false' to keep disabled [true]: ")
+        if trap_enable.lower() in ('false', 'f', 'n', 'no'):
+            trap_enable = False
+        else:
+            trap_enable = True
+        if trap_enable:
+            trap1 = moves.input('Enter IP address of SNMP trap: ')
+            trap1_port = moves.input('Enter port number for SNMP trap [162]: ')
+            if trap1_port == '':
+                trap1_port = '162'
+            trap2 = moves.input('Enter IP address for additional SNMP trap '
+                                'or leave blank for none: ')
+            trap2_port = moves.input('Enter port number for additional SNMP trap [162]: ')
+            if trap2_port == '':
+                trap2_port = '162'
+            confirm = moves.input("""Start SNMP App Summary:
+                                  Check Interval: %s
+                                  SNMP Port: %s
+                                  SNMP Community: %s
+                                  Trap Enabled: %s
+                                  Trap 1 IP: %s
+                                  Trap 1 Port: %s
+                                  Trap 2 IP: %s
+                                  Trap 2 Port: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (interval, snmp_port,
+                                                                community, trap_enable,
+                                                                trap1, trap1_port,
+                                                                trap2, trap2_port,
+                                                                description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_snmp(interval, snmp_port, community, description, 
+                                          trap_enable, trap1, trap1_port, trap2, trap2_port)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        else:
+            confirm = moves.input("""Start SNMP App Summary:
+                                  Check Interval: %s
+                                  SNMP Port: %s
+                                  SNMP Community: %s
+                                  Trap Enabled: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (interval, snmp_port, community,
+                                                                trap_enable, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_snmp(interval, snmp_port, community, description, trap_enable)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+    
+    def start_hbbypass_guided(self, description):
+        '''Interactive menu to start Heartbeat Bypass app.
+           
+           :param description: A string, custom description for app instance.
+           :returns: A string, JSON-formatted.'''
+        conn_type = moves.input('''Control Bypass Switch using:
+                                   1 - IP Address
+                                   2 - RS232 Console Cable
+                                   Enter selection [1]: ''')
+        if conn_type in ('', '1'):
+            conn_type = 'IP'
+            bypass_ip = moves.input("IP address of Bypass Switch: ")
+        elif int(conn_type) == 2:
+            conn_type = 'RS232'
+        else:
+            return "That is not a valid input for Connection Type; canceling HeartbeatBypass."
+        bypass_port1 = moves.input("Port number of first port connected to the Bypass Switch: ")
+        bypass_port2 = moves.input("Port number of the second port "
+                                   "connected to the Bypass Switch: ")
+        hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
+        hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
+        interval = moves.input("Check interval time in milliseconds that the "
+                               "App should check for heartbeat packets [2000]: ")
+        if interval == '':
+            interval = '2000'
+        proto = moves.input('''Protocol to use for heartbeat packets:
+                               1 - UDP
+                               2 - ICMP
+                               Enter selection [1]: ''')
+        if proto in ('', '1'):
+            proto = 'UDP'
+            src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
+            if src_port == '':
+                src_port = '5555'
+            dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
+            if dst_port == '':
+                dst_port = '5556'
+        elif int(proto) == 2:
+            proto = 'ICMP'
+        else:
+            return "That is not a valid input for Protocol; canceling HeartbeatBypass."
+        src_mac = moves.input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+        if src_mac == '':
+            src_mac = '00:00:00:00:00:01'
+        dst_mac = moves.input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+        if dst_mac == '':
+            dst_mac = '00:00:00:00:00:02'
+        src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+        if src_ip == '':
+            src_ip = '0.0.0.1'
+        dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+        if dst_ip == '':
+            dst_ip = '0.0.0.2'
+        if conn_type == 'IP' and proto == 'UDP':
+            confirm = moves.input("""Start Heartbeat Bypass App Summary:
+                                  First Port connected to Bypass Switch: %s
+                                  Second Port connected to Bypass Switch: %s
+                                  Port to receive Heartbeat packets: %s
+                                  Port to send Heartbeat packets: %s
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Heartbeat Source Port: %s
+                                  Heartbeat Destination Port: %s
+                                  Bypass Switch IP: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (bypass_port1, bypass_port2,
+                                                                hb_in, hb_out, conn_type,
+                                                                interval, proto, src_mac,
+                                                                dst_mac, src_ip, dst_ip, src_port,
+                                                                dst_port, bypass_ip, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out,
+                                                     conn_type, interval, description, proto,
+                                                     src_mac, dst_mac, src_ip, dst_ip, src_port, 
+                                                     dst_port, bypass_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        elif conn_type == 'IP' and proto == 'ICMP':
+            confirm = moves.input("""Start Heartbeat Bypass App Summary:
+                                  First Port connected to Bypass Switch: %s
+                                  Second Port connected to Bypass Switch: %s
+                                  Port to receive Heartbeat packets: %s
+                                  Port to send Heartbeat packets: %s
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Bypass Switch IP: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in,
+                                                                hb_out, conn_type, interval, proto,
+                                                                src_mac, dst_mac, src_ip, dst_ip,
+                                                                bypass_ip, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out,
+                                                     conn_type, interval, description, proto, 
+                                                     src_mac, dst_mac, src_ip, dst_ip, bypass_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        elif conn_type == 'RS232' and proto == 'UDP':
+            confirm = moves.input("""Start Heartbeat Bypass App Summary:
+                                  First Port connected to Bypass Switch: %s
+                                  Second Port connected to Bypass Switch: %s
+                                  Port to receive Heartbeat packets: %s
+                                  Port to send Heartbeat packets: %s
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Heartbeat Source Port: %s
+                                  Heartbeat Destination Port: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in,
+                                                                hb_out, conn_type, interval, proto,
+                                                                src_mac, dst_mac, src_ip, dst_ip,
+                                                                src_port, dst_port, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out,
+                                                     conn_type, interval, description, proto, src_mac,
+                                                     dst_mac, src_ip, dst_ip, src_port, dst_port)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        elif conn_type == 'RS232' and proto == 'ICMP':
+            confirm = moves.input("""Start Heartbeat Bypass App Summary:
+                                  First Port connected to Bypass Switch: %s
+                                  Second Port connected to Bypass Switch: %s
+                                  Port to receive Heartbeat packets: %s
+                                  Port to send Heartbeat packets: %s
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in,
+                                                                hb_out, conn_type, interval, proto,
+                                                                src_mac, dst_mac, src_ip, dst_ip,
+                                                                description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_heartbeatbypass(bypass_port1, bypass_port2, hb_in, hb_out,
+                                                     conn_type, interval, description, proto, src_mac,
+                                                     dst_mac, src_ip, dst_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        else:
+            return "Something went wrong."
+    
+    def start_syslog_guided(self, description):
+        '''Interactive menu to start Syslog app.
+           
+           :param description: A string, custom description for app instance.
+           :returns: A string, JSON-formatted.'''
+        server_ip = moves.input("IP address of the syslog server: ")
+        port = moves.input("Server port [514]: ")
+        if port == '':
+            port = '514'
+        confirm = moves.input("""Start Syslog App Summary:
+                              Syslog Server IP: %s
+                              Syslog Server Port: %s
+                              Description: %s
+                              Confirm changes [y/n]: """ % (server_ip, port, description))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.start_app_syslog(server_ip, port, description)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
+
+    def start_bypasska_guided(self, description):
+        '''Interactive menu to start Bypass Keepalive app.
+           
+           :param description: A string, custom description for app instance.
+           :returns: A string, JSON-formatted.'''
+        conn_type = moves.input('''Bypass Switch connection type:
+                                    1 - IP Address
+                                    2 - RS232 Console Cable
+                                    Enter selection [1]: ''')
+        if conn_type in ('', '1'):
+            conn_type = 'IP'
+            bypass_ip = moves.input("IP address of Bypass Switch: ")
+        elif int(conn_type) == 2:
+            conn_type = 'RS232'
+        else:
+            return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
+        interval = moves.input("Check interval time in milliseconds that the "
+                               "App should check for heartbeat packets [2000]: ")
+        if interval == '':
+            interval = '2000'
+        if conn_type == 'IP':
+            confirm = moves.input('''Start Bypass Keepalive Summary:
+                                  Connection Type: %s
+                                  Bypass Switch IP: %s
+                                  Check Interval: %s
+                                  Description: %s
+                                  Confirm changes [y/n]''' % (conn_type, bypass_ip, interval,
+                                                              description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_bypasskeepalive(conn_type, interval, description, bypass_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        else:
+            confirm = moves.input('''Start Bypass Keepalive Summary:
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Description: %s
+                                  Confirm changes [y/n]''' % (conn_type, interval, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_bypasskeepalive(conn_type, interval, description)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+    
+    def start_heartbeat_guided(self, description):
+        '''Interactive menu to start Heartbeat app.
+           
+           :param description: A string, custom description for app instance.
+           :returns: A string, JSON-formatted.'''
+        hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
+        act_comm = moves.input("Command to run when heartbeat packets are detected: ")
+        hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
+        deact_comm = moves.input("Command to run when heartbeat packets are not detected: ")
+        interval = moves.input("Check interval time in milliseconds that the "
+                               "App should check for heartbeat packets [2000]: ")
+        if interval == '':
+            interval = '2000'
+        proto = moves.input('''Protocol to use for heartbeat packets:
+                            1 - UDP
+                            2 - ICMP
+                            Enter selection [1]: ''')
+        if proto in ('', '1'):
+            proto = 'UDP'
+            src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
+            if src_port == '':
+                src_port = '5555'
+            dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
+            if dst_port == '':
+                dst_port = '5556'
+        elif int(proto) == 2:
+            proto = 'ICMP'
+        else:
+            return "That is not a valid input for Protocol; canceling Heartbeat."
+        src_mac = moves.input("Enter source MAC address for heartbeat packets [00:00:00:00:00:01]: ")
+        if src_mac == '':
+            src_mac = '00:00:00:00:00:01'
+        dst_mac = moves.input("Enter destination MAC address for heartbeat packets [00:00:00:00:00:02]: ")
+        if dst_mac == '':
+            dst_mac = '00:00:00:00:00:02'
+        src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+        if src_ip == '':
+            src_ip = '0.0.0.1'
+        dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+        if dst_ip == '':
+            dst_ip = '0.0.0.2'
+        if proto == 'UDP':
+            confirm = moves.input("""Start Heartbeat App Summary:
+                                  Port to receive Heartbeat packets: %s
+                                  Activation Command: %s
+                                  Port to send Heartbeat packets: %s
+                                  Deactivation Command: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Heartbeat Source Port: %s
+                                  Heartbeat Destination Port: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm,
+                                                                interval, proto, src_mac, dst_mac, src_ip,
+                                                                dst_ip, src_port, dst_port, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, 
+                                               proto, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        elif proto == 'ICMP':
+            confirm = moves.input("""Start Heartbeat App Summary:
+                                  Port to receive Heartbeat packets: %s
+                                  Activation Command: %s
+                                  Port to send heartbeat packets: %s
+                                  Deactivation Command: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm, interval,
+                                                                proto, src_mac, dst_mac, src_ip, dst_ip, 
+                                                                description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.start_app_heartbeat(hb_in, act_comm, hb_out, deact_comm, interval, description, proto, 
+                                               src_mac, dst_mac, src_ip, dst_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        else:
+            return "Something went wrong."
 
     def start_app_ntp(self, server1, server2=None, user_description=''):
         """Start an NTP app instance.
@@ -4448,7 +4420,10 @@ on QSFP ports of G4 devices. \n""")
            :param trap1_port: A string, A string, primary trap receiver port; default 162.
            :param trap2: A string, secondary trap receiver IP (optional).
            :param trap2_port: A string, secondary trap receiver port; default 162.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable cannot be converted to int.
+           :raises: ValueError: if interval variable cannot be converted to int.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4461,32 +4436,22 @@ on QSFP ports of G4 devices. \n""")
             int(interval)
         except ValueError as reason:
             return ("That is not valid input for Check Interval; canceling Modify SNMP.", reason)
-        try:
-            int(snmp_port)
-        except ValueError as reason:
-            return ("That is not valid input for SNMP Port; canceling Modify SNMP.", reason)
-        if trap_enable or isinstance(trap_enable, str) and trap_enable.lower() in ('true', 't', 'yes', 'y'):
-            trap_enable = True
-            try:
-                ip1 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap1)
-                trap1 = ip1[0]
-            except TypeError as reason:
-                return ("That is not a valid IP address for Trap 1; canceling Modify SNMP.", reason)
-            try:
-                int(trap1_port)
-            except ValueError as reason:
-                return ("That is not valid input for Trap Port 1; canceling Modify SNMP.", reason)
+        if not pm_input_check.port(snmp_port):
+            return "That is not valid input for SNMP Port; canceling Modify SNMP."
+        if trap_enable:
+            if pm_input_check.ipv4(trap1) != 0:
+                trap1 = pm_input_check.ipv4(trap1)
+            else:
+                return "That is not a valid IP address for Trap 1; canceling Modify SNMP."
+            if not pm_input_check.port(trap1_port):
+                return "That is not valid input for Trap Port 1; canceling Modify SNMP."
             if trap2 != '':
-                try:
-                    ip2 = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', trap2)
-                    trap2 = ip2[0]
-                except TypeError as reason:
-                    return ("That is not a valid IP address for Trap 2; "
-                            "canceling Modify SNMP.", reason)
-            try:
-                int(trap2_port)
-            except ValueError as reason:
-                return ("That is not valid input for Trap Port 2; canceling Modify SNMP.", reason)
+                if pm_input_check.ipv4(trap2) != 0:
+                    trap2 = pm_input_check.ipv4(trap2)
+                else:
+                    return "That is not a valid IP address for Trap 2; canceling Modify SNMP."
+                if not pm_input_check.port(trap2_port):
+                    return "That is not valid input for Trap Port 2; canceling Modify SNMP."
             data = {'name': 'SNMP',
                     'description': 'Runs an SNMP Server.  The server uses [url=',
                     'pid': pid,
@@ -4499,8 +4464,7 @@ on QSFP ports of G4 devices. \n""")
                     'trapReceiver': trap1,
                     'trapReceiver2': trap2,
                     'userDescription': user_description}
-        elif trap_enable is False or trap_enable.lower() in ('false', 'f', 'no', 'n'):
-            trap_enable = False
+        elif trap_enable is False:
             data = {'name': 'SNMP',
                     'description': 'Runs an SNMP Server.  The server uses [url=',
                     'pid': pid,
