@@ -608,7 +608,7 @@ class PacketmasterEX(object):
             content = 'No Response'
             raise error
 
-    def user_uac(self):
+    def get_uac(self):
         """Return status of User Authentication setting.
         
            :returns: A string, JSON-formatted.
@@ -3788,499 +3788,478 @@ on QSFP ports of G4 devices. \n""")
             return "That PID doesn't exist; use Start App to start an app instance."
         description = moves.input("New description for the modified App instance: ")
         if instance == 'NTP':
-            server1 = moves.input("Enter NTP target IP or Host Name: ")
-            server2 = moves.input("Enter NTP backup IP or Host Name: ")
-            confirm = moves.input("""Modify NTP App Summary:
-                                Server 1: %s
-                                Server 2: %s
-                                Description: %s
-                                Confirm changes [y/n]: """ % (server1, server2, description))
-            if confirm.lower() in ('y', 'yes'):
-                run = self.mod_app_ntp(pid, server1, server2, description)
-            else:
-                return "Canceling; no changes made.\n"
+            run = self.mod_ntp_guided(pid, description)
+            return run
         elif instance == 'ArpResponder':
-            interval = moves.input("Enter the check interval in milliseconds [5000]: ")
-            if interval == '':
-                interval = '5000'
-            in_port = moves.input("Physical source port of incoming ARP request (optional): ")
-            out_port = moves.input("Physical port for sending ARP response: ")
-            match_mac = moves.input("Enter source MAC address of incoming ARP request (optional): ")
-            src_mac = moves.input("Source MAC address of outgoing ARP response: ")
-            dst_mac = moves.input("Destination MAC address of outgoing ARP response: ")
-            src_ip = moves.input("Source IP address of outgoing ARP response: ")
-            dst_ip = moves.input("Destination IP of outgoing ARP response: ")
-            confirm = moves.input("""Modify ARP Responder App Summary:
-                                Check Interval: %s
-                                Port of incoming ARP packets: %s
-                                Port to send ARP packets: %s
-                                Source MAC of incoming ARPs: %s
-                                Source MAC of outgoing ARPs: %s
-                                Destinaton MAC of outgoing ARPs: %s
-                                Source IP of outgoing ARPs: %s
-                                Destination IP of outgoing ARPs: %s
-                                Description: %s
-                                Confirm changes [y/n]: """ % (interval,
-                                                              in_port,
-                                                              out_port,
-                                                              match_mac,
-                                                              src_mac,
-                                                              dst_mac,
-                                                              src_ip,
-                                                              dst_ip,
-                                                              description))
-            if confirm.lower() in ('y', 'yes'):
-                run = self.mod_app_arpresponder(pid, out_port, src_mac,
-                                                dst_mac, src_ip, dst_ip,
-                                                interval, in_port, match_mac,
-                                                description)
-            else:
-                return "Canceling; no changes made.\n"
+            run = self.mod_arpresp_guided(pid, description)
+            return run
         elif instance == 'SNMP':
-            interval = moves.input("Enter the check interval in milliseconds [5000]: ")
-            if interval == '':
-                interval = '5000'
-            snmp_port = moves.input("Enter the SNMP port [161]: ")
-            if snmp_port == '':
-                snmp_port = '161'
-            community = moves.input("Enter the SNMP community [public]: ")
-            if community == '':
-                community = 'public'
-            trap_enable = moves.input("Enter SNMP traps?  Enter 'true' to "
-                                    "enable or 'false' to keep disabled [true]: ")
-            if trap_enable.lower() in ('false', 'f', 'n', 'no'):
-                trap_enable = False
-            else:
-                trap_enable = True
-            if trap_enable:
-                trap1 = moves.input('Enter IP address of SNMP trap: ')
-                trap1_port = moves.input('Enter port number for SNMP trap [162]: ')
-                if trap1_port == '':
-                    trap1_port = '162'
-                trap2 = moves.input('Enter IP address for additional SNMP trap '
-                                  'or leave blank for none: ')
-                trap2_port = moves.input('Enter port number for additional SNMP trap [162]: ')
-                if trap2_port == '':
-                    trap2_port = '162'
-                confirm = moves.input("""Modify SNMP App Summary:
-                                    Check Interval: %s
-                                    SNMP Port: %s
-                                    SNMP Community: %s
-                                    Trap Enabled: %s
-                                    Trap 1 IP: %s
-                                    Trap 1 Port: %s
-                                    Trap 2 IP: %s
-                                    Trap 2 Port: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (interval,
-                                                                  snmp_port,
-                                                                  community,
-                                                                  trap_enable,
-                                                                  trap1,
-                                                                  trap1_port,
-                                                                  trap2,
-                                                                  trap2_port,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_snmp(pid, interval, snmp_port,
-                                            community, description,
-                                            trap_enable, trap1, trap1_port,
-                                            trap2, trap2_port)
-                else:
-                    return "Canceling; no changes made.\n"
-            else:
-                confirm = moves.input("""Modify SNMP App Summary:
-                                    Check Interval: %s
-                                    SNMP Port: %s
-                                    SNMP Community: %s
-                                    Trap Enabled: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (interval,
-                                                                  snmp_port,
-                                                                  community,
-                                                                  trap_enable,
-                                                                  description))
-                if confirm in ('y', 'yes'):
-                    run = self.mod_app_snmp(pid, interval, snmp_port,
-                                            community, description, trap_enable)
-                else:
-                    return "Canceling; no changes made.\n"
+            run = self.mod_snmp_guided(pid, description)
+            return run
         elif instance == 'HeartbeatBypass':
-            conn_type = moves.input('''Control Bypass Switch using:
-                                    1 - IP Address
-                                    2 - RS232 Console Cable
-                                    Enter selection [1]: ''')
-            if conn_type in ('', '1'):
-                conn_type = 'IP'
-                bypass_ip = moves.input("IP address of Bypass Switch: ")
-            elif int(conn_type) == 2:
-                conn_type = 'RS232'
-            else:
-                return ("That is not a valid input for Connection Type; "
-                        "canceling Modify HeartbeatBypass.")
-            bypass_port1 = moves.input("Port number of first port connected to the Bypass Switch: ")
-            bypass_port2 = moves.input("Port number of the second port "
-                                     "connected to the Bypass Switch: ")
-            hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
-            hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
-            interval = moves.input("Check interval time in milliseconds that the "
-                                 "App should check for heartbeat packets [2000]: ")
-            if interval == '':
-                interval = '2000'
-            proto = moves.input('''Protocol to use for heartbeat packets:
-                                 1 - UDP
-                                 2 - ICMP
-                                 Enter selection [1]: ''')
-            if proto in ('', '1'):
-                proto = 'UDP'
-                src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
-                if src_port == '':
-                    src_port = '5555'
-                dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
-                if dst_port == '':
-                    dst_port = '5556'
-            elif int(proto) == 2:
-                proto = 'ICMP'
-            else:
-                return "That is not a valid input for Protocol; canceling modify HeartbeatBypass."
-            src_mac = moves.input("Enter source MAC address for "
-                                "heartbeat packets [00:00:00:00:00:01]: ")
-            if src_mac == '':
-                src_mac = '00:00:00:00:00:01'
-            dst_mac = moves.input("Enter destination MAC address for "
-                                "heartbeat packets [00:00:00:00:00:02]: ")
-            if dst_mac == '':
-                dst_mac = '00:00:00:00:00:02'
-            src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
-            if src_ip == '':
-                src_ip = '0.0.0.1'
-            dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
-            if dst_ip == '':
-                dst_ip = '0.0.0.2'
-            if conn_type == 'IP' and proto == 'UDP':
-                confirm = moves.input("""Modify Heartbeat Bypass App Summary:
-                                    First Port connected to Bypass Switch: %s
-                                    Second Port connected to Bypass Switch: %s
-                                    Port to receive Heartbeat packets: %s
-                                    Port to send Heartbeat packets: %s
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Heartbeat Source Port: %s
-                                    Heartbeat Destination Port: %s
-                                    Bypass Switch IP: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1,
-                                                                  bypass_port2,
-                                                                  hb_in,
-                                                                  hb_out,
-                                                                  conn_type,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  src_port,
-                                                                  dst_port,
-                                                                  bypass_ip,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeatbypass(pid, bypass_port1,
-                                                       bypass_port2, hb_in,
-                                                       hb_out, conn_type,
-                                                       interval, description,
-                                                       proto, src_mac, dst_mac,
-                                                       src_ip, dst_ip,
-                                                       src_port, dst_port,
-                                                       bypass_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            elif conn_type == 'IP' and proto == 'ICMP':
-                confirm = moves.input("""Modify Heartbeat Bypass App Summary:
-                                    First Port connected to Bypass Switch: %s
-                                    Second Port connected to Bypass Switch: %s
-                                    Port to receive Heartbeat packets: %s
-                                    Port to send Heartbeat packets: %s
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Bypass Switch IP: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1,
-                                                                  bypass_port2,
-                                                                  hb_in,
-                                                                  hb_out,
-                                                                  conn_type,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  bypass_ip,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeatbypass(pid, bypass_port1,
-                                                       bypass_port2, hb_in,
-                                                       hb_out, conn_type,
-                                                       interval, description,
-                                                       proto, src_mac, dst_mac,
-                                                       src_ip, dst_ip, bypass_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            elif conn_type == 'RS232' and proto == 'UDP':
-                confirm = moves.input("""Modify Heartbeat Bypass App Summary:
-                                    First Port connected to Bypass Switch: %s
-                                    Second Port connected to Bypass Switch: %s
-                                    Port to receive Heartbeat packets: %s
-                                    Port to send Heartbeat packets: %s
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Heartbeat Source Port: %s
-                                    Heartbeat Destination Port: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1,
-                                                                  bypass_port2,
-                                                                  hb_in,
-                                                                  hb_out,
-                                                                  conn_type,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  src_port,
-                                                                  dst_port,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeatbypass(pid, bypass_port1,
-                                                       bypass_port2, hb_in,
-                                                       hb_out, conn_type,
-                                                       interval, description,
-                                                       proto, src_mac, dst_mac,
-                                                       src_ip, dst_ip, src_port,
-                                                       dst_port)
-                else:
-                    return "Canceling; no changes made.\n"
-            elif conn_type == 'RS232' and proto == 'ICMP':
-                confirm = moves.input("""Modify Heartbeat Bypass App Summary:
-                                    First Port connected to Bypass Switch: %s
-                                    Second Port connected to Bypass Switch: %s
-                                    Port to receive Heartbeat packets: %s
-                                    Port to send Heartbeat packets: %s
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (bypass_port1,
-                                                                  bypass_port2,
-                                                                  hb_in,
-                                                                  hb_out,
-                                                                  conn_type,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeatbypass(pid, bypass_port1,
-                                                       bypass_port2, hb_in,
-                                                       hb_out, conn_type,
-                                                       interval, description,
-                                                       proto, src_mac, dst_mac,
-                                                       src_ip, dst_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            else:
-                return "Something went wrong."
+            run = self.mod_hbbypass_guided(pid, description)
+            return run
         elif instance == 'Syslog':
-            server_ip = moves.input("IP address of the syslog server: ")
-            port = moves.input("Server port [514]: ")
-            if port == '':
-                port = '514'
-            confirm = moves.input("""Modify Syslog App Summary:
-                                Syslog Server IP: %s
-                                Syslog Server Port: %s
-                                Description: %s
-                                Confirm changes [y/n]: """ % (server_ip, port, description))
-            if confirm.lower() in ('y', 'yes'):
-                run = self.mod_app_syslog(pid, server_ip, port, description)
-            else:
-                return "Canceling; no changes made.\n"
+            run = self.mod_syslog_guided(pid, description)
+            return run
         elif instance == 'BypassKeepalive':
-            conn_type = moves.input('''Bypass Switch connection type:
-                                    1 - IP Address
-                                    2 - RS232 Console Cable
-                                    Enter selection [1]: ''')
-            if conn_type in ('', '1'):
-                conn_type = 'IP'
-                bypass_ip = moves.input("IP address of Bypass Switch: ")
-            elif int(conn_type) == 2:
-                conn_type = 'RS232'
-            else:
-                return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
-            interval = moves.input("Check interval time in milliseconds that the "
-                                 "App should check for heartbeat packets [2000]: ")
-            if interval == '':
-                interval = '2000'
-            if conn_type == 'IP':
-                confirm = moves.input('''Modify Bypass Keepalive Summary:
-                                    Connection Type: %s
-                                    Bypass Switch IP: %s
-                                    Check Interval: %s
-                                    Description: %s
-                                    Confirm changes [y/n]''' % (conn_type,
-                                                                bypass_ip,
-                                                                interval,
-                                                                description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_bypasskeepalive(pid, conn_type,
-                                                       interval, description,
-                                                       bypass_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            else:
-                confirm = moves.input('''Modify Bypass Keepalive Summary:
-                                    Connection Type: %s
-                                    Check Interval: %s
-                                    Description: %s
-                                    Confirm changes [y/n]''' % (conn_type, interval, description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_bypasskeepalive(pid, conn_type, interval, description)
-                else:
-                    return "Canceling; no changes made.\n"
+            run = self.mod_bypasska_guided(pid, description)
+            return run
         elif instance == 'Heartbeat':
-            hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
-            act_comm = moves.input("Command to run when heartbeat packets are detected: ")
-            hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
-            deact_comm = moves.input("Command to run when heartbeat packets are not detected: ")
-            interval = moves.input("Check interval time in milliseconds that the "
-                                 "App should check for heartbeat packets [2000]: ")
-            if interval == '':
-                interval = '2000'
-            proto = moves.input('''Protocol to use for heartbeat packets:
-                                 1 - UDP
-                                 2 - ICMP
-                                 Enter selection [1]: ''')
-            if proto in ('', '1'):
-                proto = 'UDP'
-                src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
-                if src_port == '':
-                    src_port = '5555'
-                dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
-                if dst_port == '':
-                    dst_port = '5556'
-            elif int(proto) == 2:
-                proto = 'ICMP'
-            else:
-                return "That is not a valid input for Protocol; canceling Modify Heartbeat."
-            src_mac = moves.input("Enter source MAC address for "
-                                "heartbeat packets [00:00:00:00:00:01]: ")
-            if src_mac == '':
-                src_mac = '00:00:00:00:00:01'
-            dst_mac = moves.input("Enter destination MAC address for "
-                                "heartbeat packets [00:00:00:00:00:02]: ")
-            if dst_mac == '':
-                dst_mac = '00:00:00:00:00:02'
-            src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
-            if src_ip == '':
-                src_ip = '0.0.0.1'
-            dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
-            if dst_ip == '':
-                dst_ip = '0.0.0.2'
-            if proto == 'UDP':
-                confirm = moves.input("""Modify Heartbeat App Summary:
-                                    Port to receive Heartbeat packets: %s
-                                    Activation Command: %s
-                                    Port to send Heartbeat packets: %s
-                                    Deactivation Command: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Heartbeat Source Port: %s
-                                    Heartbeat Destination Port: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (hb_in,
-                                                                  act_comm,
-                                                                  hb_out,
-                                                                  deact_comm,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  src_port,
-                                                                  dst_port,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out,
-                                                 deact_comm, interval,
-                                                 description, proto, src_mac,
-                                                 dst_mac, src_ip, dst_ip,
-                                                 src_port, dst_port)
-                else:
-                    return "Canceling; no changes made.\n"
-            elif proto == 'ICMP':
-                confirm = moves.input("""Modify Heartbeat App Summary:
-                                    Port to receive Heartbeat packets: %s
-                                    Activation Command: %s
-                                    Port to send heartbeat packets: %s
-                                    Deactivation Command: %s
-                                    Check Interval: %s
-                                    Heartbeat Protocol: %s
-                                    Heartbeat Source MAC: %s
-                                    Heartbeat Destination MAC: %s
-                                    Heartbeat Source IP: %s
-                                    Heartbeat Destination IP: %s
-                                    Description: %s
-                                    Confirm changes [y/n]: """ % (hb_in,
-                                                                  act_comm,
-                                                                  hb_out,
-                                                                  deact_comm,
-                                                                  interval,
-                                                                  proto,
-                                                                  src_mac,
-                                                                  dst_mac,
-                                                                  src_ip,
-                                                                  dst_ip,
-                                                                  description))
-                if confirm.lower() in ('y', 'yes'):
-                    run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out,
-                                                 deact_comm, interval,
-                                                 description, proto, src_mac,
-                                                 dst_mac, src_ip, dst_ip)
-                else:
-                    return "Canceling; no changes made.\n"
-            else:
-                return "Something went wrong."
+            run = self.mod_heartbeat_guided(pid, description)
+            return run
         else:
             return "That is not a valid input for PID; canceling Modify App."
-        return run
+
+    def mod_ntp_guided(self, pid, description):
+        '''Interactive menu to modify NTP app.
+        
+           :param pid: A string or int, PID of running app instance.
+           :param description: A string, new description for app instance.
+           :returns: A string, JSON-formatted.'''
+        server1 = moves.input("Enter NTP target IP or Host Name: ")
+        server2 = moves.input("Enter NTP backup IP or Host Name: ")
+        confirm = moves.input("""Modify NTP App Summary:
+                              Server 1: %s
+                              Server 2: %s
+                              Description: %s
+                              Confirm changes [y/n]: """ % (server1, server2, description))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.mod_app_ntp(pid, server1, server2, description)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
+
+    def mod_arpresp_guided(self, pid, description):
+        '''Interactive menu to modify ARP Responder app.
+        
+           :param pid: A string or int, PID of running app instance.
+           :param description: A string, new description for app instance.
+           :returns: A string, JSON-formatted.'''
+        interval = moves.input("Enter the check interval in milliseconds [5000]: ")
+        if interval == '':
+            interval = '5000'
+        in_port = moves.input("Physical source port of incoming ARP request (optional): ")
+        out_port = moves.input("Physical port for sending ARP response: ")
+        match_mac = moves.input("Enter source MAC address of incoming ARP request (optional): ")
+        src_mac = moves.input("Source MAC address of outgoing ARP response: ")
+        dst_mac = moves.input("Destination MAC address of outgoing ARP response: ")
+        src_ip = moves.input("Source IP address of outgoing ARP response: ")
+        dst_ip = moves.input("Destination IP of outgoing ARP response: ")
+        confirm = moves.input("""Modify ARP Responder App Summary:
+                              Check Interval: %s
+                              Port of incoming ARP packets: %s
+                              Port to send ARP packets: %s
+                              Source MAC of incoming ARPs: %s
+                              Source MAC of outgoing ARPs: %s
+                              Destinaton MAC of outgoing ARPs: %s
+                              Source IP of outgoing ARPs: %s
+                              Destination IP of outgoing ARPs: %s
+                              Description: %s
+                              Confirm changes [y/n]: """ % (interval, in_port, out_port, match_mac,
+                                                            src_mac, dst_mac, src_ip, dst_ip, description))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.mod_app_arpresponder(pid, out_port, src_mac, dst_mac, src_ip, dst_ip, interval,
+                                            in_port, match_mac, description)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
+
+    def mod_snmp_guided(self, pid, description):
+        '''Interactive menu to modify SNMP app.
+        
+           :param pid: A string or int, PID of running app instance.
+           :param description: A string, new description for app instance.
+           :returns: A string, JSON-formatted.'''
+        interval = moves.input("Enter the check interval in milliseconds [5000]: ")
+        if interval == '':
+            interval = '5000'
+        snmp_port = moves.input("Enter the SNMP port [161]: ")
+        if snmp_port == '':
+            snmp_port = '161'
+        community = moves.input("Enter the SNMP community [public]: ")
+        if community == '':
+            community = 'public'
+        trap_enable = moves.input("Enter SNMP traps?  Enter 'true' to "
+                                  "enable or 'false' to keep disabled [true]: ")
+        if trap_enable.lower() in ('false', 'f', 'n', 'no'):
+            trap_enable = False
+        else:
+            trap_enable = True
+        if trap_enable:
+            trap1 = moves.input('Enter IP address of SNMP trap: ')
+            trap1_port = moves.input('Enter port number for SNMP trap [162]: ')
+            if trap1_port == '':
+                trap1_port = '162'
+            trap2 = moves.input('Enter IP address for additional SNMP trap '
+                                'or leave blank for none: ')
+            trap2_port = moves.input('Enter port number for additional SNMP trap [162]: ')
+            if trap2_port == '':
+                trap2_port = '162'
+            confirm = moves.input("""Modify SNMP App Summary:
+                                  Check Interval: %s
+                                  SNMP Port: %s
+                                  SNMP Community: %s
+                                  Trap Enabled: %s
+                                  Trap 1 IP: %s
+                                  Trap 1 Port: %s
+                                  Trap 2 IP: %s
+                                  Trap 2 Port: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (interval, snmp_port, community, 
+                                                                trap_enable, trap1, trap1_port, 
+                                                                trap2, trap2_port, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_snmp(pid, interval, snmp_port, community, description,
+                                        trap_enable, trap1, trap1_port, trap2, trap2_port)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        else:
+            confirm = moves.input("""Modify SNMP App Summary:
+                                  Check Interval: %s
+                                  SNMP Port: %s
+                                  SNMP Community: %s
+                                  Trap Enabled: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (interval, snmp_port, community, 
+                                                                trap_enable, description))
+            if confirm in ('y', 'yes'):
+                run = self.mod_app_snmp(pid, interval, snmp_port, community, description, trap_enable)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+    
+    def mod_hbbypass_guided(self, pid, description):
+        '''Interactive menu to modify SNMP app.
+        
+           :param pid: A string or int, PID of running app instance.
+           :param description: A string, new description for app instance.
+           :returns: A string, JSON-formatted.'''
+        conn_type = moves.input('''Control Bypass Switch using:
+                                1 - IP Address
+                                2 - RS232 Console Cable
+                                Enter selection [1]: ''')
+        if conn_type in ('', '1'):
+            conn_type = 'IP'
+            bypass_ip = moves.input("IP address of Bypass Switch: ")
+        elif int(conn_type) == 2:
+            conn_type = 'RS232'
+        else:
+            return ("That is not a valid input for Connection Type; "
+                    "canceling Modify HeartbeatBypass.")
+        bypass_port1 = moves.input("Port number of first port connected to the Bypass Switch: ")
+        bypass_port2 = moves.input("Port number of the second port "
+                                   "connected to the Bypass Switch: ")
+        hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
+        hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
+        interval = moves.input("Check interval time in milliseconds that the "
+                               "App should check for heartbeat packets [2000]: ")
+        if interval == '':
+            interval = '2000'
+        proto = moves.input('''Protocol to use for heartbeat packets:
+                            1 - UDP
+                            2 - ICMP
+                            Enter selection [1]: ''')
+        if proto in ('', '1'):
+            proto = 'UDP'
+            src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
+            if src_port == '':
+                src_port = '5555'
+            dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
+            if dst_port == '':
+                dst_port = '5556'
+        elif int(proto) == 2:
+            proto = 'ICMP'
+        else:
+            return "That is not a valid input for Protocol; canceling modify HeartbeatBypass."
+        src_mac = moves.input("Enter source MAC address for "
+                              "heartbeat packets [00:00:00:00:00:01]: ")
+        if src_mac == '':
+            src_mac = '00:00:00:00:00:01'
+        dst_mac = moves.input("Enter destination MAC address for "
+                              "heartbeat packets [00:00:00:00:00:02]: ")
+        if dst_mac == '':
+            dst_mac = '00:00:00:00:00:02'
+        src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+        if src_ip == '':
+            src_ip = '0.0.0.1'
+        dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+        if dst_ip == '':
+            dst_ip = '0.0.0.2'
+        if conn_type == 'IP' and proto == 'UDP':
+            confirm = moves.input("""Modify Heartbeat Bypass App Summary:
+                                  First Port connected to Bypass Switch: %s
+                                  Second Port connected to Bypass Switch: %s
+                                  Port to receive Heartbeat packets: %s
+                                  Port to send Heartbeat packets: %s
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Heartbeat Source Port: %s
+                                  Heartbeat Destination Port: %s
+                                  Bypass Switch IP: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (bypass_port1, bypass_port2,
+                                                                hb_in, hb_out, conn_type,
+                                                                interval, proto, src_mac,
+                                                                dst_mac, src_ip, dst_ip,
+                                                                src_port, dst_port, bypass_ip,
+                                                                description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in,
+                                                   hb_out, conn_type, interval, description,
+                                                   proto, src_mac, dst_mac, src_ip, dst_ip,
+                                                   src_port, dst_port, bypass_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        elif conn_type == 'IP' and proto == 'ICMP':
+            confirm = moves.input("""Modify Heartbeat Bypass App Summary:
+                                  First Port connected to Bypass Switch: %s
+                                  Second Port connected to Bypass Switch: %s
+                                  Port to receive Heartbeat packets: %s
+                                  Port to send Heartbeat packets: %s
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Bypass Switch IP: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (bypass_port1, bypass_port2,
+                                                                hb_in, hb_out, conn_type, interval,
+                                                                proto, src_mac, dst_mac, src_ip, dst_ip,
+                                                                bypass_ip, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out,
+                                                   conn_type, interval, description, proto, src_mac,
+                                                   dst_mac, src_ip, dst_ip, bypass_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        elif conn_type == 'RS232' and proto == 'UDP':
+            confirm = moves.input("""Modify Heartbeat Bypass App Summary:
+                                  First Port connected to Bypass Switch: %s
+                                  Second Port connected to Bypass Switch: %s
+                                  Port to receive Heartbeat packets: %s
+                                  Port to send Heartbeat packets: %s
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Heartbeat Source Port: %s
+                                  Heartbeat Destination Port: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in,
+                                                                hb_out, conn_type, interval, proto,
+                                                                src_mac, dst_mac, src_ip, dst_ip, src_port,
+                                                                dst_port, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out,
+                                                   conn_type, interval, description, proto, src_mac, 
+                                                   dst_mac, src_ip, dst_ip, src_port, dst_port)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        elif conn_type == 'RS232' and proto == 'ICMP':
+            confirm = moves.input("""Modify Heartbeat Bypass App Summary:
+                                  First Port connected to Bypass Switch: %s
+                                  Second Port connected to Bypass Switch: %s
+                                  Port to receive Heartbeat packets: %s
+                                  Port to send Heartbeat packets: %s
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (bypass_port1, bypass_port2, hb_in,
+                                                                hb_out, conn_type, interval, proto,
+                                                                src_mac, dst_mac, src_ip, dst_ip,
+                                                                description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_heartbeatbypass(pid, bypass_port1, bypass_port2, hb_in, hb_out,
+                                                   conn_type, interval, description, proto, src_mac, 
+                                                   dst_mac, src_ip, dst_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        else:
+            return "Something went wrong."
+
+    def mod_syslog_guided(self, pid, description):
+        '''Interactive menu to modify Syslog app.
+        
+           :param pid: A string or int, PID of running app instance.
+           :param description: A string, new description for app instance.
+           :returns: A string, JSON-formatted.'''
+        server_ip = moves.input("IP address of the syslog server: ")
+        port = moves.input("Server port [514]: ")
+        if port == '':
+            port = '514'
+        confirm = moves.input("""Modify Syslog App Summary:
+                              Syslog Server IP: %s
+                              Syslog Server Port: %s
+                              Description: %s
+                              Confirm changes [y/n]: """ % (server_ip, port, description))
+        if confirm.lower() in ('y', 'yes'):
+            run = self.mod_app_syslog(pid, server_ip, port, description)
+            return run
+        else:
+            return "Canceling; no changes made.\n"
+
+    def mod_bypasska_guided(self, pid, description):
+        '''Interactive menu to modify Bypass Keepalive app.
+        
+           :param pid: A string or int, PID of running app instance.
+           :param description: A string, new description for app instance.
+           :returns: A string, JSON-formatted.'''
+        conn_type = moves.input('''Bypass Switch connection type:
+                                   1 - IP Address
+                                   2 - RS232 Console Cable
+                                   Enter selection [1]: ''')
+        if conn_type in ('', '1'):
+            conn_type = 'IP'
+            bypass_ip = moves.input("IP address of Bypass Switch: ")
+        elif int(conn_type) == 2:
+            conn_type = 'RS232'
+        else:
+            return "That is not a valid input for Connection Type; canceling Bypass Keepalive."
+        interval = moves.input("Check interval time in milliseconds that the "
+                               "App should check for heartbeat packets [2000]: ")
+        if interval == '':
+            interval = '2000'
+        if conn_type == 'IP':
+            confirm = moves.input('''Modify Bypass Keepalive Summary:
+                                  Connection Type: %s
+                                  Bypass Switch IP: %s
+                                  Check Interval: %s
+                                  Description: %s
+                                  Confirm changes [y/n]''' % (conn_type, bypass_ip, interval,
+                                                              description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_bypasskeepalive(pid, conn_type, interval, description, bypass_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        else:
+            confirm = moves.input('''Modify Bypass Keepalive Summary:
+                                  Connection Type: %s
+                                  Check Interval: %s
+                                  Description: %s
+                                  Confirm changes [y/n]''' % (conn_type, interval, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_bypasskeepalive(pid, conn_type, interval, description)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+    
+    def mod_heartbeat_guided(self, pid, description):
+        '''Interactive menu to modify Heartbeat app.
+        
+           :param pid: A string or int, PID of running app instance.
+           :param description: A string, new description for app instance.
+           :returns: A string, JSON-formatted.'''
+        hb_in = moves.input("Port number on which the App expects heartbeat packets to arrive: ")
+        act_comm = moves.input("Command to run when heartbeat packets are detected: ")
+        hb_out = moves.input("Port number on which the App sends heartbeat packets: ")
+        deact_comm = moves.input("Command to run when heartbeat packets are not detected: ")
+        interval = moves.input("Check interval time in milliseconds that the "
+                               "App should check for heartbeat packets [2000]: ")
+        if interval == '':
+            interval = '2000'
+        proto = moves.input('''Protocol to use for heartbeat packets:
+                               1 - UDP
+                               2 - ICMP
+                               Enter selection [1]: ''')
+        if proto in ('', '1'):
+            proto = 'UDP'
+            src_port = moves.input("Enter source port for UDP heartbeat packets [5555]: ")
+            if src_port == '':
+                src_port = '5555'
+            dst_port = moves.input("Enter destination port for UDP heartbeat packets [5556]: ")
+            if dst_port == '':
+                dst_port = '5556'
+        elif proto == '2':
+            proto = 'ICMP'
+        else:
+            return "That is not a valid input for Protocol; canceling Modify Heartbeat."
+        src_mac = moves.input("Enter source MAC address for "
+                              "heartbeat packets [00:00:00:00:00:01]: ")
+        if src_mac == '':
+            src_mac = '00:00:00:00:00:01'
+        dst_mac = moves.input("Enter destination MAC address for "
+                              "heartbeat packets [00:00:00:00:00:02]: ")
+        if dst_mac == '':
+            dst_mac = '00:00:00:00:00:02'
+        src_ip = moves.input("Enter source IP address for heartbeat packets [0.0.0.1]: ")
+        if src_ip == '':
+            src_ip = '0.0.0.1'
+        dst_ip = moves.input("Enter destination IP address for heartbeat packets [0.0.0.2]: ")
+        if dst_ip == '':
+            dst_ip = '0.0.0.2'
+        if proto == 'UDP':
+            confirm = moves.input("""Modify Heartbeat App Summary:
+                                  Port to receive Heartbeat packets: %s
+                                  Activation Command: %s
+                                  Port to send Heartbeat packets: %s
+                                  Deactivation Command: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Heartbeat Source Port: %s
+                                  Heartbeat Destination Port: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out,
+                                                                deact_comm, interval, proto,
+                                                                src_mac, dst_mac, src_ip, dst_ip,
+                                                                src_port, dst_port, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval,
+                                             description, proto, src_mac, dst_mac, src_ip, dst_ip,
+                                             src_port, dst_port)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        elif proto == 'ICMP':
+            confirm = moves.input("""Modify Heartbeat App Summary:
+                                  Port to receive Heartbeat packets: %s
+                                  Activation Command: %s
+                                  Port to send heartbeat packets: %s
+                                  Deactivation Command: %s
+                                  Check Interval: %s
+                                  Heartbeat Protocol: %s
+                                  Heartbeat Source MAC: %s
+                                  Heartbeat Destination MAC: %s
+                                  Heartbeat Source IP: %s
+                                  Heartbeat Destination IP: %s
+                                  Description: %s
+                                  Confirm changes [y/n]: """ % (hb_in, act_comm, hb_out, deact_comm,
+                                                                interval, proto, src_mac, dst_mac,
+                                                                src_ip, dst_ip, description))
+            if confirm.lower() in ('y', 'yes'):
+                run = self.mod_app_heartbeat(pid, hb_in, act_comm, hb_out, deact_comm, interval,
+                                             description, proto, src_mac, dst_mac, src_ip, dst_ip)
+                return run
+            else:
+                return "Canceling; no changes made.\n"
+        else:
+            return "Something went wrong."
 
     def mod_app_ntp(self, pid, server1, server2=None, user_description=''):
         """Modify an NTP app instance.
@@ -4509,7 +4488,13 @@ on QSFP ports of G4 devices. \n""")
            :param src_port: A string, source TCP or UDP port for hearbeat; default 5555
            :param dst_port: A string, destination TCP or UDP for heartbeat; default 5556
            :param bypass_ip: A string, management IP address of bypass switch; default 1.1.1.1.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable can't be converted to int.
+           :raises: ValueError: if bypass_port1 variable can't be converted to int.
+           :raises: ValueError: if bypass_port2 variable can't be converted to int.
+           :raises: ValueError: if hb_in variable can't be converted to int.
+           :raises: ValueError: if hb_out variable can't be converted to int.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4519,22 +4504,30 @@ on QSFP ports of G4 devices. \n""")
         except ValueError as reason:
             return ("That is not a valid input for PID; canceling Modify HeartbeatBypass.", reason)
         try:
-            int(bypass_port1)
+            pm_port_test = int(bypass_port1)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
-            return ("That is not a valid port number for Bypass Port 1; "
+            return ("That is not an valid input for Bypass Port 1; "
                     "canceling Modify HeartbeatBypass.", reason)
         try:
-            int(bypass_port2)
+            pm_port_test = int(bypass_port2)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not a valid port number for Bypass Port 2; "
                     "canceling Modify HeartbeatBypass.", reason)
         try:
-            int(hb_in)
+            pm_port_test = int(hb_in)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not a valid port number for Heartbeat In Port; "
                     "canceling Modify HeartbeatBypass.", reason)
         try:
-            int(hb_out)
+            pm_port_test = int(hb_out)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not a valid port number for Heartbeat Out Port; "
                     "canceling Modify HeartbeatBypass.", reason)
@@ -4548,19 +4541,22 @@ on QSFP ports of G4 devices. \n""")
         else:
             return ("That is not a valid input for Protocol; must be UDP or "
                     "ICMP.  Canceling Modify HeartbeatBypass.")
-        #MAC address regex check
-        try:
-            src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
-            src_ip = src_ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid input for Source IP; "
-                    "canceling Modify HeartbeatBypass.", reason)
-        try:
-            dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
-            dst_ip = dst_ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid input for Destination IP; "
-                    "canceling Modify HeartbeatBypass.", reason)
+        if pm_input_check.mac(src_mac) != 0:
+            src_mac = pm_input_check.mac(src_mac)
+        else:
+            return "That is not a valid MAC address for Source MAC; canceling Modify HeartbeatBypass."
+        if pm_input_check.mac(dst_mac) != 0:
+            dst_mac = pm_input_check.mac(dst_mac)
+        else:
+            return "That is not a valid MAC address for Destination MAC; canceling Modify HeartbeatBypass."
+        if pm_input_check.ipv4(src_ip) != 0:
+                src_ip = pm_input_check.ipv4(src_ip)
+        else:
+            return "That is not a valid IP address for Source IP; canceling Modify HeartbeatBypass. \n"
+        if pm_input_check.ipv4(dst_ip) != 0:
+                dst_ip = pm_input_check.ipv4(dst_ip)
+        else:
+             return "That is not a valid IP address for Destination IP; canceling Modify HeartbeatBypass. \n"
         data = {'bypassPort1': bypass_port1,
                 'bypassPort2': bypass_port2,
                 'connectionType': conn_type,
@@ -4582,28 +4578,22 @@ on QSFP ports of G4 devices. \n""")
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
             if conn_type.upper() == 'IP':
-                try:
-                    ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
-                    data['bypassIP'] = ip_check[0]
-                except TypeError as reason:
-                    return ("That is not a valid input for Bypass Switch IP; "
-                            "canceling Modify HeartbeatBypass.", reason)
+                if pm_input_check.ipv4(bypass_ip) != 0:
+                    data['bypassIP'] = pm_input_check.ipv4(bypass_ip)
+                else:
+                    return "That is not a valid IP address for Bypass Switch IP; canceling HeartbeatBypass. \n"
         else:
             return ("That is not a valid input for Connection Type; must be "
                     "IP or RS232.  Canceling Modify HeartbeatBypass.")
         if proto == 'UDP':
-            try:
-                int(src_port)
-            except ValueError as reason:
-                return ("That is not a valid input for Source Port; "
-                        "canceling Modify HeartbeatBypass.", reason)
-            data['portSrc'] = src_port
-            try:
-                int(dst_port)
-            except ValueError as reason:
-                return ("That is not a valid input for Destination Port; "
-                        "canceling Modify HeartbeatBypass.", reason)
-            data['portDst'] = dst_port
+            if pm_input_check.port(src_port):
+                data['portSrc'] = src_port
+            else:
+                return "That is not a valid UDP port number for Heartbeat Source Port; canceling Modify HeartbeatBypass. \n"
+            if pm_input_check.port(dst_port):
+                data['portDst'] = dst_port
+            else:
+                return "That is not a valid UDP port number for Heartbeat Destination Port; canceling Modify HeartbeatBypass. \n"
         try:
             response = requests.put(uri, data=data, auth=(self.username, self.password))
             content = response.content
@@ -4620,7 +4610,9 @@ on QSFP ports of G4 devices. \n""")
            :param server_ip: A string, IP address of syslog server.
            :param port: A string, A string, syslog port; defaults to 514.
            :param user_description: A string, description for syslog app instance (optional).
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable can't be converted to int.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4629,20 +4621,17 @@ on QSFP ports of G4 devices. \n""")
             int(pid)
         except ValueError as reason:
             return ("That is not a valid input for PID; canceling Modify Syslog.", reason)
-        try:
-            ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', server_ip)
-            server = ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid server IP address; canceling Modify Syslog.", reason)
-        try:
-            int(port)
-        except ValueError as reason:
-            return ("That is not a valid input for port number; canceling Modify Syslog.", reason)
+        if pm_input_check.ipv4(server_ip) != 0:
+            server_ip = pm_input_check.ipv4(server_ip)
+        else:
+            return "That is not a valid server IP address; canceling Modify Syslog."
+        if not pm_input_check.port(port):
+            return "That is not a valid TCP/UDP port number; canceling Modify Syslog."
         data = {'description': 'Logs syslog info to a remote server',
                 'name': 'Syslog',
                 'pid': pid,
                 'port': port,
-                'server': server,
+                'server': server_ip,
                 'userDescription': user_description}
         try:
             response = requests.put(uri, data=data, auth=(self.username, self.password))
@@ -4662,7 +4651,10 @@ on QSFP ports of G4 devices. \n""")
            :param interval: A string, check interval in milliseconds; default is 2000.
            :param description: A string, description for app instance (optional).
            :param bypass_ip: A string, IP address of bypass switch; default is 1.1.1.1.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable can't be converted to int.
+           :raises: ValueError: if interval variable can't be converted to int.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4687,12 +4679,10 @@ on QSFP ports of G4 devices. \n""")
                 return ("Controlling a Bypass Switch with RS232 is not "
                         "supported on Gen 4 hardware; please use IP instead.")
             if conn_type.upper() == 'IP':
-                try:
-                    ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', bypass_ip)
-                    data['bypassIP'] = ip_check[0]
-                except TypeError as reason:
-                    return ("That is not a valid input for Bypass Switch IP; "
-                            "canceling Modify Bypass Keepalive.", reason)
+                if pm_input_check.ipv4(bypass_ip) != 0:
+                    data['bypassIP'] = pm_input_check.ipv4(bypass_ip)
+                else:
+                    return "That is not a valid input for Bypass Switch IP; canceling Modify Bypass Keepalive."
         else:
             return ("That is not a valid input for Connection Type; "
                     "must be IP or RS232.  Canceling Modify Bypass Keepalive.")
@@ -4726,7 +4716,12 @@ on QSFP ports of G4 devices. \n""")
            :param dst_ip: A string, destination IP address to assign to heartbeat; default is 0.0.0.2.
            :param src_port: A string, source port to assign to heartbeat; default is 5555.
            :param dst_port: A string, destination port to assign to heartbeat; default is 5556.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable can't be converted to int.
+           :raises: ValueError: if hb_in variable can't be converted to int.
+           :raises: ValueError: if hb_out variable can't be converted to int.
+           :raises: ValueError: if interval variable can't be converted to int.
+           :raises: ConnectionError: if unable to successfully make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4737,12 +4732,16 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not a valid input for PID; "
                     "canceling Modify Heartbeat.", reason)
         try:
-            int(hb_in)
+            pm_port_test = int(hb_in)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not a valid port number for Heartbeat In Port; "
                     "canceling Modify Heartbeat.", reason)
         try:
-            int(hb_out)
+            pm_port_test = int(hb_out)
+            if pm_port_test > self.ports:
+                return "Physical port does not exist on device."
         except ValueError as reason:
             return ("That is not a valid port number for Heartbeat Out Port; "
                     "canceling Modify Heartbeat.", reason)
@@ -4756,29 +4755,26 @@ on QSFP ports of G4 devices. \n""")
         else:
             return ("That is not a valid input for Protocol; "
                     "must be UDP or ICMP.  Canceling Modify Heartbeat.")
-        #MAC address regex check
-        try:
-            src_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', src_ip)
-            src_ip = src_ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid input for Source IP; "
-                    "canceling Modify Heartbeat.", reason)
-        try:
-            dst_ip_check = re.findall('\A(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dst_ip)
-            dst_ip = dst_ip_check[0]
-        except TypeError as reason:
-            return ("That is not a valid input for Destination IP; "
-                    "canceling Modify Heartbeat.", reason)
-        try:
-            int(src_port)
-        except ValueError as reason:
-            return ("That is not a valid input for Source Port; "
-                    "canceling Modify Heartbeat.", reason)
-        try:
-            int(dst_port)
-        except ValueError as reason:
-            return ("That is not a valid input for Destination Port; "
-                    "canceling Modify Heartbeat.", reason)
+        if pm_input_check.mac(src_mac) != 0:
+            src_mac = pm_input_check.mac(src_mac)
+        else:
+            return "That is not a valid input for Source MAC; canceling Modify Heartbeat."
+        if pm_input_check.mac(dst_mac) != 0:
+            dst_mac = pm_input_check.mac(dst_mac)
+        else:
+            return "That is not a valid input for Destination MAC; Modify Heartbeat."
+        if pm_input_check.ipv4(src_ip) != 0:
+            src_ip = pm_input_check.ipv4(src_ip)
+        else:
+            return "That is not a valid input for Source IP; canceling Modify Heartbeat."
+        if pm_input_check.ipv4(dst_ip) != 0:
+            dst_ip = pm_input_check.ipv4(dst_ip)
+        else:
+            return "That is not a valid input for Destination IP; canceling Modify Heartbeat."
+        if not pm_input_check.port(src_port):
+            return "That is not a valid input for Source Port; canceling Modify Heartbeat."
+        if not pm_input_check.port(dst_port):
+            return "That is not a valid input for Destination Port; canceling Modify Heartbeat."
         data = {'activateCommand': act_comm,
                 'deactivateCommand': deact_comm,
                 'description': 'Periodically sends a heartbeat to check if a connection is alive.  Runs a command if the connection goes up or down.',
@@ -4805,7 +4801,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def call_app_action_guided(self):
-        """Interactive menu to call a custom app action."""
+        """Interactive menu to call a custom app action.
+        
+           :returns: A string, JSON-Formatted."""
         pid = moves.input('Enter the PID of the app instance: ')
         name = moves.input('Enter the name of the custom app action: ')
         confirm = moves.input("""Call App Action Summary:
@@ -4822,7 +4820,9 @@ on QSFP ports of G4 devices. \n""")
         
            :param pid: A string, process ID of the app instance.
            :param name: A string, name of custom app action.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable can't be converted to int.
+           :raises: ConnectionError: If unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps/action?'
         else:
@@ -4843,7 +4843,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def kill_app_guided(self):
-        """Interactive menu to stop an active app instance."""
+        """Interactive menu to stop an active app instance.
+        
+           :returns, A string, JSON-formatted."""
         pid = moves.input('What is the process ID of the app to kill: ')
         confirm = moves.input("""Kill App Summary:
                             Process ID: %s
@@ -4857,7 +4859,9 @@ on QSFP ports of G4 devices. \n""")
         """Stop an active app instance.
         
            :param pid: A string, process ID of app instance to terminate.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if pid variable can't be converted to int.
+           :raises: ConnectionError: if unable to make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/apps?'
         else:
@@ -4877,21 +4881,55 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_hash_algorithms_guided(self):
-        """Interactive menu to set group hash algorithms."""
+        """Interactive menu to set group hash algorithms.
+        
+           :returns: A string, JSON-formatted."""
         if self.hardware in ('4', '2'):
             macsa = moves.input('Type "true" to use MAC source address; '
                               'type "false" to ignore [true]: ')
+            if macsa.lower() in ('false', 'f', 'no', 'n'):
+                macsa = False
+            else:
+                macsa = True
             macda = moves.input('Type "true" to use MAC destination address; '
-                              'type "false" to ignore [true]: ')
+                                'type "false" to ignore [true]: ')
+            if macda.lower() in ('false', 'f', 'no', 'n'):
+                macda = False
+            else:
+                macda = True
             ether = moves.input('Type "true" to use ether type; type '
-                              '"false" to ignore [true]: ')
+                                '"false" to ignore [true]: ')
+            if ether.lower() in ('false', 'f', 'no', 'n'):
+                ether = False
+            else:
+                ether = True
             ipsa = moves.input('Type "true" to use IP source address; '
-                             'type "false" to ignore [true]: ')
+                               'type "false" to ignore [true]: ')
+            if ipsa.lower() in ('false', 'f', 'no', 'n'):
+                ipsa = False
+            else:
+                ipsa = True
             ipda = moves.input('Type "true" to use IP destination address; '
-                             'type "false" to ignore [true]: ')
+                               'type "false" to ignore [true]: ')
+            if ipda.lower() in ('false', 'f', 'no', 'n'):
+                ipda = False
+            else:
+                ipda = True
             proto = moves.input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
+            if proto.lower() in ('false', 'f', 'no', 'n'):
+                proto = False
+            else:
+                proto = True
             src = moves.input('Type "true" to use source port; type "false" to ignore [true]: ')
+            if src.lower() in ('false', 'f', 'no', 'n'):
+                src = False
+            else:
+                src = True
             dst = moves.input('Type "true" to use destination port; type "false" to ignore [true]: ')
+            if dst.lower() in ('false', 'f', 'no', 'n'):
+                dst = False
+            else:
+                dst = True
             confirm = moves.input("""Set Hash Algorithms Summary:
                                 Use Source MAC Address: %s
                                 Use Destination MAC Address: %s
@@ -4901,46 +4939,56 @@ on QSFP ports of G4 devices. \n""")
                                 Use IP Protocol: %s
                                 Use Source Port: %s
                                 Use Destination Port: %s
-                                Confirm changes [y/n]: """ % (macsa,
-                                                              macda,
-                                                              ether,
-                                                              ipsa,
-                                                              ipda,
-                                                              proto,
-                                                              src,
-                                                              dst))
+                                Confirm changes [y/n]: """ % (macsa, macda, ether, ipsa, ipda,
+                                                              proto, src, dst))
             if confirm.lower() in ('y', 'yes'):
                 run = self.set_hash_algorithms(macsa, macda, ether, ipsa, ipda, proto, src, dst)
             else:
                 return "Canceling; no changes made.\n"
         else:
             ipsa = moves.input('Type "true" to use IP source address; '
-                             'type "false" to ignore [true]: ')
+                               'type "false" to ignore [true]: ')
+            if ipsa.lower() in ('false', 'f', 'no', 'n'):
+                ipsa = False
+            else:
+                ipsa = True
             ipda = moves.input('Type "true" to use IP destination address; '
-                             'type "false" to ignore [true]: ')
+                               'type "false" to ignore [true]: ')
+            if ipda.lower() in ('false', 'f', 'no', 'n'):
+                ipda = False
+            else:
+                ipda = True
             proto = moves.input('Type "true" to use IP protocol; type "false" to ignore [true]: ')
+            if proto.lower() in ('false', 'f', 'no', 'n'):
+                proto = False
+            else:
+                proto = True
             src = moves.input('Type "true" to use source port; type "false" to ignore [true]: ')
+            if src.lower() in ('false', 'f', 'no', 'n'):
+                src = False
+            else:
+                src = True
             dst = moves.input('Type "true" to use destination port; type "false" to ignore [true]: ')
+            if dst.lower() in ('false', 'f', 'no', 'n'):
+                dst = False
+            else:
+                dst = True
             confirm = moves.input("""Set Hash Algorithms Summary:
                                 Use Source IP Address: %s
                                 Use Destination IP Address: %s
                                 Use IP Protocol: %s
                                 Use Source Port: %s
                                 Use Destination Port: %s
-                                Confirm changes [y/n]: """ % (ipsa,
-                                                              ipda,
-                                                              proto,
-                                                              src,
-                                                              dst))
+                                Confirm changes [y/n]: """ % (ipsa, ipda, proto, src, dst))
             if confirm.lower() in ('y', 'yes'):
-                run = self.set_hash_algorithms('', '', '', ipsa,
+                run = self.set_hash_algorithms(False, False, False, ipsa,
                                                ipda, proto, src, dst)
             else:
                 return "Canceling; no changes made.\n"
         return run
 
-    def set_hash_algorithms(self, macsa, macda, ether,
-                            ipsa, ipda, proto, src, dst):
+    def set_hash_algorithms(self, macsa=True, macda=True, ether=True,
+                            ipsa=True, ipda=True, proto=True, src=True, dst=True):
         """Set group hash algorithms on the Packetmaster.
            
            :param macsa: A bool, True to enable, False to disable.
@@ -4951,44 +4999,29 @@ on QSFP ports of G4 devices. \n""")
            :param proto: A bool, True to enable, False to disable.
            :param src: A bool, True to enable, False to disable.
            :param dst: A bool, True to enable, False to disable.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make POST request to device."""
         #EX2 has only 'ipsa', 'ipda', 'ip_protocol', 'scp_port', 'dst_port'
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/grouphash?'
         else:
             uri = 'http://' + self._address + '/rest/device/grouphash?'
-        if macsa in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
-            macsa = False
-        else:
-            macsa = True
-        if macda in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
-            macda = False
-        else:
-            macda = True
-        if ether in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
-            ether = False
-        else:
-            ether = True
-        if ipsa in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
-            ipsa = False
-        else:
-            ipsa = True
-        if ipda in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
-            ipda = False
-        else:
-            ipda = True
-        if proto in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
-            proto = False
-        else:
-            proto = True
-        if src in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
-            src = False
-        else:
-            src = True
-        if dst in (False, 'False', 'false', 'f', 'No', 'no', 'n', 'F', 'N'):
-            dst = False
-        else:
-            dst = True
+        if not isinstance(macsa, bool):
+            return "That is not a valid input for MAC Source Address; canceling Set Hash Algorithms." 
+        if not isinstance(macda, bool):
+            return "That is not a valid input for MAC Destination Address; canceling Set Hash Algorithms." 
+        if not isinstance(ether, bool):
+            return "That is not a valid input for Ethertype; canceling Set Hash Algorithms." 
+        if not isinstance(ipsa, bool):
+            return "That is not a valid input for IP Source Address; canceling Set Hash Algorithms." 
+        if not isinstance(ipda, bool):
+            return "That is not a valid input for IP Destination Address; canceling Set Hash Algorithms." 
+        if not isinstance(proto, bool):
+            return "That is not a valid input for Protocol; canceling Set Hash Algorithms." 
+        if not isinstance(src, bool):
+            return "That is not a valid input for Source Port; canceling Set Hash Algorithms."
+        if not isinstance(dst, bool):
+            return "That is not a valid input for Destination Port; canceling Set Hash Algorithms."
         if self.hardware in ('4', '2'):
             data = {'macsa': macsa,
                     'macda': macda,
@@ -5002,10 +5035,10 @@ on QSFP ports of G4 devices. \n""")
             #May need to become 'elif self.hardware == '3.1'' with new
             #elif statements for gen 3.  Need EX5-2 and EX12 to verify
             data = {'ipsa': ipsa,
-                      'ipda': ipda,
-                      'ip_protocol': proto,
-                      'src_port': src,
-                      'dst_port': dst}
+                    'ipda': ipda,
+                    'ip_protocol': proto,
+                    'src_port': src,
+                    'dst_port': dst}
         try:
             response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
@@ -5017,9 +5050,15 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_rule_permanence_guided(self):
-        """Interactive menu to set Rule Mode Permanance."""
+        """Interactive menu to set Rule Mode Permanance.
+        
+           :returns: A string, JSON-formatted."""
         perm = moves.input('type "true" to enable permanent rules; '
                          'type "false" disable them [false]: ').lower()
+        if perm.lower() in ('true', 't', 'y', 'yes'):
+            perm = True
+        else:
+            perm = False
         confirm = moves.input("""Set Rule Permamence Summary:
                             Permanance Enabled: %s
                             Confirm changes [y/n]: """ % perm)
@@ -5028,22 +5067,18 @@ on QSFP ports of G4 devices. \n""")
             return run
         return "Canceling; no changes made.\n"
 
-    def set_rule_permanence(self, permanence):
+    def set_rule_permanence(self, permanence=False):
         """Set Rule Mode Permanance on the Packetmaster.
         
            :param permanence: A bool, True to enable, False to disable.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/permanentrulesmode?'
         else:
             uri = 'http://' + self._address + '/rest/device/permanentrulesmode?'
-        if isinstance(permanence, bool) and permanence:
-            permanence = True
-        elif isinstance(permanence, str) and permanence.lower() in ('true', 'yes',
-                                                                    'y', 't'):
-            permanence = True
-        else:
-            permanence = False
+        if not isinstance(permanence, bool):
+            return "Permanence must be 'True' or 'False'; canceling Set Rule Permanence."
         data = {'state': permanence}
         try:
             response = requests.post(uri, data=data,
@@ -5056,7 +5091,10 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_storage_mode_guided(self):
-        """Interactive menu to set Rule Storage Mode."""
+        """Interactive menu to set Rule Storage Mode.
+        
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if mode variable can't be converted to int."""
         mode = moves.input('''Select the rule storage mode:
                         1 - Simple
                         2 - IPv6
@@ -5082,10 +5120,12 @@ on QSFP ports of G4 devices. \n""")
         return "Canceling; no changes made.\n"
 
     def set_storage_mode(self, mode):
-        """Set Rule Storage Mode of the Packetmaster.
+        """Set Rule Storage Mode of the Packetmaster (requires reboot).
         
            :param mode: A string, 'simple' for more rules but no ipv6 support, 'ipv6' for ipv6 support and fewer rules.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: AttributeError: if mode variable can't be converted to lowercase.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/rulestoragemode?'
         else:
@@ -5107,13 +5147,15 @@ on QSFP ports of G4 devices. \n""")
                                      auth=(self.username, self.password))
             content = response.content
             info = json.loads(content)
-            return json.dumps(info, indent=4)
+            return (json.dumps(info, indent=4), "Reboot required for changes to take effect.")
         except ConnectionError as error:
             content = 'No Response'
             raise error
 
     def add_user_guided(self):
-        """Interactive menu to add a user account to the Packetmaster."""
+        """Interactive menu to add a user account to the Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         username = moves.input('Enter a username: ').strip()
         access_level = moves.input("""Choose an access level for the user:
                                 1 - Read only
@@ -5123,6 +5165,10 @@ on QSFP ports of G4 devices. \n""")
         passwd = moves.input("Enter a password for the user: ")
         description = moves.input("Add a description for this user: ")
         rad = moves.input("Use RADIUS authentication?  Y or N [N]: ").lower()
+        if rad in ('y', 'yes'):
+            rad = True
+        else:
+            rad = False 
         confirm = moves.input("""Add User Summary:
                             Username: %s
                             Access Level: %s
@@ -5148,7 +5194,9 @@ on QSFP ports of G4 devices. \n""")
            :param passwd: A string, user password.
            :param description: A string, description for user (optional).
            :param rad: A bool, True for RADIUS authentication, False for local auth; default is False.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if access_level variable can't be converted to int.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users?'
         else:
@@ -5169,12 +5217,8 @@ on QSFP ports of G4 devices. \n""")
             return ("That is not a valid user access level; canceling Add User.", reason)
         if access_level not in (1, 7, 31):
             return "That is not a valid user access level; canceling Add User."
-        if isinstance(rad, bool) and rad:
-            rad = True
-        elif isinstance(rad, str) and rad.lower() in ('true', 'y', 'yes', 't'):
-            rad = True
-        else:
-            rad = False
+        if not isinstance(rad, bool):
+            return "Radius must be True or False; canceling Add User."
         data = {'username': username,
                 'accesslevel': access_level,
                 'password': passwd,
@@ -5191,7 +5235,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def mod_user_guided(self):
-        """Interactive menu to modify a user account on the Packetmaster."""
+        """Interactive menu to modify a user account on the Packetmaster.
+        
+           :returns: A string, JSON-formatted."""
         cur_name = moves.input('What is the username you would like to modify: ')
         new_name = moves.input('Enter a new username: ')
         description = moves.input("Enter a new description; "
@@ -5203,6 +5249,10 @@ on QSFP ports of G4 devices. \n""")
                                Enter the numeric value for the access level: """).strip()
         passwd = moves.input("Enter a new password for the user: ")
         rad = moves.input("Use RADIUS authentication?  Y or N [N]: ").lower()
+        if rad in ('y', 'yes'):
+            rad = True
+        else:
+            rad = False 
         confirm = moves.input("""Modify User Summary:
                             Modify User: %s
                             New Username: %s
@@ -5231,7 +5281,9 @@ on QSFP ports of G4 devices. \n""")
            :param passwd: A string, user password.
            :param description: A string, description for user (optional).
            :param rad: A bool, True for RADIUS authentication, False for local auth; default is False.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if access_level variable can't be converted to int.
+           :raises: ConnectionError: if unable to make PUT request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users?'
         else:
@@ -5254,12 +5306,8 @@ on QSFP ports of G4 devices. \n""")
         if access_level not in (1, 7, 31):
             return ("That is not a valid user access level; "
                     "canceling Modify User.")
-        if isinstance(rad, bool) and rad:
-            rad = True
-        elif isinstance(rad, str) and rad.lower() in ('true', 'y', 'yes', 't'):
-            rad = True
-        else:
-            rad = False
+        if not isinstance(rad, bool):
+            return "Radius must be True or False; canceling Modify User."
         data = {'username': cur_name,
                 'new_username': new_name,
                 'accesslevel': access_level,
@@ -5277,7 +5325,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def delete_user_guided(self):
-        """Interactive menu to delete a user account from the Packetmaster."""
+        """Interactive menu to delete a user account from the Packetmaster.
+           
+           :returns: A string, JSON-formatted."""
         username = moves.input('What is the user name to delete: ')
         confirm = moves.input("""Delete User Summary:
                             Delete User: %s
@@ -5290,8 +5340,9 @@ on QSFP ports of G4 devices. \n""")
     def delete_user(self, username):
         """Delete a user account from the Packetmaster.
         
-           param username: A string, username of user to delete.
-           :returns: A string, JSON-formatted."""
+           :param username: A string, username of user to delete.
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users?'
         else:
@@ -5315,14 +5366,20 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_uac_guided(self):
-        """Interactive menu to enable/disable user authentication."""
-        access = moves.input(('type "true" to turn on UAC; '
-                            'type "false" to turn it off [false]: ').lower())
+        """Interactive menu to enable/disable user authentication.
+        
+           :returns: A string, JSON-formatted."""
+        uac = moves.input('type "true" to turn on UAC; '
+                            'type "false" to turn it off [false]: ')
+        if uac.lower() in ('true', 't', 'y', 'yes'):
+            uac = True
+        else:
+            uac = False
         confirm = moves.input("""UAC Summary:
                             User Access Control On: %s
-                            Confirm changes [y/n]: """ % access)
+                            Confirm changes [y/n]: """ % uac)
         if confirm.lower() in ('y', 'yes'):
-            run = self.set_uac(access)
+            run = self.set_uac(uac)
             return run
         return "Canceling; no changes made.\n"
 
@@ -5330,17 +5387,14 @@ on QSFP ports of G4 devices. \n""")
         """Enable/disable user authentication on the Packetmaster.
         
            :param uac: A bool, True for enable, False for disable.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users/uac?'
         else:
             uri = 'http://' + self._address + '/rest/users/uac?'
-        if isinstance(uac, bool) and uac:
-            uac = True
-        elif isinstance(uac, str) and uac.lower() in ('true', 'yes', 't', 'y'):
-            uac = True
-        else:
-            uac = False
+        if not isinstance(uac, bool):
+            return "User Access Control must be True or False; canceling Set UAC."
         data = {'state': uac}
         try:
             response = requests.post(uri, data=data,
@@ -5353,7 +5407,9 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_radius_guided(self):
-        """Interactive menu to set RADIUS configuration."""
+        """Interactive menu to set RADIUS configuration.
+        
+           :returns: A string, JSON-formatted."""
         server = moves.input('Enter the IP address '
                            'of the RADIUS server: ').strip()
         print("Enter the RADIUS secret.")
@@ -5392,7 +5448,10 @@ on QSFP ports of G4 devices. \n""")
            :param refresh: An int, refresh rate in milliseconds.
            :param level: An int, default login level for RADIUS. 0 for None, 1 for read, 7 for write, 31 for super user.
            :param port: An int, RADIUS port number; default is 1812.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ValueError: if refresh variable can't be converted to int.
+           :raises: ValueErrir: if level variable can't be converted to int.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/users/radius?'
         else:
@@ -5411,11 +5470,8 @@ on QSFP ports of G4 devices. \n""")
         if level not in (0, 1, 7, 31):
             return ("That is not a valid input for RADIUS login level; "
                     "canceling Set Radius.")
-        try:
-            port = int(port)
-        except ValueError as reason:
-            return ("That is not a valid port input; "
-                    "canceling RADIUS settings call.", reason)
+        if not pm_input_check.port(port):
+            return "That is not a valid port input; canceling set RADIUS."
         data = {'server': server,
                 'port': port,
                 'secret': secret,
@@ -5432,10 +5488,13 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_https_guided(self):
-        """Interactive menu to enable/disable HTTPS web interface."""
+        """Interactive menu to enable/disable HTTPS web interface.
+        
+           :returns: A string, JSON-formatted."""
         enabled = moves.input(('Type "true" to enable HTTPS on web interface; '
-                             'type "false" to turn it off [false]: ').lower())
-        if enabled == 'true':
+                             'type "false" to turn it off [false]: '))
+        if enabled.lower() in ('true', 't', 'yes', 'y'):
+            enabled = True
             print("Please enter the SSL password")
             ssl = getpass()
         else:
@@ -5454,15 +5513,14 @@ on QSFP ports of G4 devices. \n""")
         
            :param enabled: A bool, True to enable, False to disable. Default is False.
            :param ssl: A string, SSL/TLS password. Default None.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/https?'
         else:
             uri = 'http://' + self._address + '/rest/device/https?'
-        if enabled.lower() == 'true' or enabled is True:
-            enabled = True
-        else:
-            enabled = False
+        if not isinstance(enabled, bool):
+            return "enabled must be True or False; canceling Set HTTPS."
         data = {'https_enabled': enabled,
                 'ssl_password': ssl}
         try:
@@ -5470,15 +5528,22 @@ on QSFP ports of G4 devices. \n""")
                                      auth=(self.username, self.password))
             content = response.content
             info = json.loads(content)
-            return json.dumps(info, indent=4)
+            return (json.dumps(info, indent=4), 
+                    "Restart Webserver for setting to take effect.")
         except ConnectionError as error:
             content = "No Response"
             raise error
 
     def set_telnet_guided(self):
-        """Interactive menu to enable/disable Telnet service."""
+        """Interactive menu to enable/disable Telnet service.
+        
+           :returns: A string, JSON-formatted."""
         enabled = moves.input(('Type "true" to enable Telnet; '
                              'type "false" to turn it off [false]: ').lower())
+        if enabled.lower() in ('true', 'yes', 'y'):
+            enabled = True
+        else:
+            enabled = False
         confirm = moves.input("""Set Telnet Summary:
                             Telnet Service On: %s
                             Confirm changes [y/n]: """ % enabled)
@@ -5491,23 +5556,21 @@ on QSFP ports of G4 devices. \n""")
         """Enable/disable Telnet service on the Packetmaster.
         
            :param enabled: A bool, True for enable, False for disable. Default is False.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectioError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/telnet?'
         else:
             uri = 'http://' + self._address + '/rest/device/telnet?'
-        if enabled.lower() == 'true' or enabled is True:
-            enabled = True
-        else:
-            enabled = False
+        if not isinstance(enabled, bool):
+            return "Enabled must be True or False; canceling Set Telnet."
         data = {'activated': enabled}
         try:
             response = requests.post(uri, data=data,
                                      auth=(self.username, self.password))
             content = response.content
             info = json.loads(content)
-            return (json.dumps(info, indent=4),
-                    "Device must be rebooted for change to take effect")
+            return json.dumps(info, indent=4)
         except ConnectionError as error:
             content = "No Response"
             raise error
@@ -5515,7 +5578,8 @@ on QSFP ports of G4 devices. \n""")
     def del_web_log(self):
         """Delete Webserver logs.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectioError: if unable to make DELETE request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/weblog?'
         else:
@@ -5530,14 +5594,16 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def set_dns_guided(self):
-        """Interactive menu to set DNS configuration."""
+        """Interactive menu to set DNS configuration.
+        
+           :returns: A string, JSON-formatted."""
         print('You may set up to three DNS servers.')
-        dns1 = moves.input(('Enter the IP address of the first DNS '
-                          'server or leave blank for none [none]: ').strip())
-        dns2 = moves.input(('Enter the IP address of the second DNS '
-                          'server or leave blank for none [none]: ').strip())
-        dns3 = moves.input(('Enter the IP address of the third DNS '
-                          'server or leave blank for none [none]: ').strip())
+        dns1 = moves.input(('Enter the IP address or domain name of the first DNS '
+                          'server; leave blank for none [none]: ').strip())
+        dns2 = moves.input(('Enter the IP address or domain name of the second DNS '
+                          'server; leave blank for none [none]: ').strip())
+        dns3 = moves.input(('Enter the IP address or domain name of the third DNS '
+                          'server; leave blank for none [none]: ').strip())
         confirm = moves.input("""Set DNS Summary:
                             DNS Server 1: %s
                             DNS Server 2: %s
@@ -5554,7 +5620,8 @@ on QSFP ports of G4 devices. \n""")
            :param dns1: A string, IP address or Domaine Name of DNS server (optional).
            :param dns2: A string, IP address or Domaine Name of DNS server (optional).
            :param dns3: A string, IP address or Domaine Name of DNS server (optional).
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/nameresolution?'
         else:
@@ -5580,9 +5647,14 @@ on QSFP ports of G4 devices. \n""")
             return 'No valid DNS server addresses given; DNS entries cleared.'
 
     def set_id_led_guided(self):
-        """Interactive menu to enable/disable ID LED."""
-        led = moves.input(('type "true" to turn the ID LED on; '
-                         'type "false" to turn it off [false]: ').lower())
+        """Interactive menu to enable/disable ID LED.
+        
+           :returns: A string, JSON-formatted."""
+        led = moves.input('type "True" to enable ID LED and "False" to disable [False]: ')
+        if led.lower() in ('true', 't', 'y', 'yes'):
+            led = True
+        else:
+            led = False
         confirm = moves.input("""Set ID LED Summary:
                             ID LED On: %s
                             Confirm changes [y/n]: """ % led)
@@ -5595,20 +5667,17 @@ on QSFP ports of G4 devices. \n""")
         """Enable/disable ID LED on the face of the Packetmaster.
         
            :param led: A bool, True to enable, False to disable.
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/idled?'
         else:
             uri = 'http://' + self._address + '/rest/device/idled?'
-        led = led.lower()
-        if led == 'true' or led is True:
-            led = True
-        else:
-            led = False
+        if not isinstance(led, bool):
+            return "LED must be True or False; canceling Set ID LED."
         data = {'activated': led}
         try:
-            response = requests.post(uri, data=data,
-                                     auth=(self.username, self.password))
+            response = requests.post(uri, data=data, auth=(self.username, self.password))
             content = response.content
             info = json.loads(content)
             return json.dumps(info, indent=4)
@@ -5619,7 +5688,8 @@ on QSFP ports of G4 devices. \n""")
     def restart_webserver(self):
         """Restart the Packetmaster Web Server. Does not reboot device.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/restartwebserver?'
         else:
@@ -5636,7 +5706,8 @@ on QSFP ports of G4 devices. \n""")
     def reboot(self):
         """Reboot the Packetmaster.
         
-           :returns: A string, JSON-formatted."""
+           :returns: A string, JSON-formatted.
+           :raises: ConnectionError: if unable to make POST request to device."""
         if self.__https:
             uri = 'https://' + self._address + '/rest/device/reboot?'
         else:
@@ -5645,7 +5716,7 @@ on QSFP ports of G4 devices. \n""")
         try:
             requests.post(uri, auth=(self.username, self.password))
             message = ('Device is rebooting...'
-                       'please allow 2 to 3 minutes for it to complete')
+                       'please allow a few minutes to complete')
             return message
         except ConnectionError as error:
             raise error
