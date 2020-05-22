@@ -1244,7 +1244,7 @@ on QSFP ports of G4 devices. \n""")
             raise error
 
     def reset_port_counters(self):
-        """Reser all port counters to zero.
+        """Reset all port counters to zero.
         
            :returns: A string, JSON-formatted.
            :raises: ConnectionError: if unable to successfully make DELETE request to device."""
