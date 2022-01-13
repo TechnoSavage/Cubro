@@ -596,7 +596,7 @@ if __name__ == '__main__':
                    2: PACKETMASTER.add_user_guided,
                    3: PACKETMASTER.mod_user_guided,
                    4: PACKETMASTER.delete_user_guided,
-                   5: PACKETMASTER.user_uac,
+                   5: PACKETMASTER.get_uac,
                    6: PACKETMASTER.set_uac_guided,
                    7: PACKETMASTER.get_radius,
                    8: PACKETMASTER.set_radius_guided,
