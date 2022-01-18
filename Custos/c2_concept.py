@@ -25,19 +25,19 @@ rita_db_name = 'th_concept'
 cmd = 'rita import ./*.log %s' % rita_db_name
 sp = subprocess.Popen(cmd, shell=True)
 rc = sp.wait()
-print(rc)
 
 #verify creation of RITA database
 cmd = 'rita list'
-sp = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+sp = subprocess.Popen(cmd,
+                      stdout=subprocess.PIPE,
+                      stdout=subprocess.STDOUT)
 rc = sp.wait()
-sto = sp.stdout
-print('this is stdout', sto)
-db_list = sto.splitlines()
-print(db_list)
-if rita_db_name not in db_list:
-    print('Failed to import Zeek logs to RITA')
-    exit()
+print(sp.stdout)
+
+#print(db_list)
+#if rita_db_name not in db_list:
+    #print('Failed to import Zeek logs to RITA')
+    #exit()
 
 #Execute RITA detection mothods and create dict object for each entry that meets score threshold
 
