@@ -43,7 +43,6 @@ try:
 except OSError as e:
     print(e)
 db_list = output.decode(encoding='utf-8').splitlines()
-print(db_list)
 if rita_db_name not in db_list:
     print('Failed to import Zeek logs to RITA')
     exit()
@@ -65,14 +64,14 @@ try:
 except OSError as e:
     print(e)
 beacons = output.decode(encoding='utf-8').splitlines()
-beacons = beacons.pop(0)
+beacons.pop(0)
 hits = []
 for beacon in beacons:
     fields = beacon.split(',')
     score = float(fields[0])
     if score >= confidence:
         hits.append(beacon)
-detections[beacons] = hits
+detections['beacons'] = hits
 
 #RITA 'show-beacons-fqdn' block
 try:
@@ -86,13 +85,13 @@ try:
 except OSError as e:
     print(e)
 beacons_fqdn = output.decode(encoding='utf-8').splitlines()
-beacons_fqdn = beacons_fqdn.pop(0)
+beacons_fqdn.pop(0)
 hits = []
 for beacon in beacons_fqdn:
     fields = beacon.split(',')
     score = float(fields[0])
     if score >= confidence:
         hits.append(beacon)
-detections[beacons_fqdn] = hits
+detections['beacons_fqdn'] = hits
 
 print(detections)
