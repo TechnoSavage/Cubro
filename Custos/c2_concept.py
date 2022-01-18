@@ -31,7 +31,8 @@ print(rc)
 cmd = 'rita list'
 sp = subprocess.Popen(cmd, shell=True)
 rc = sp.wait()
-db_list = rc.splitlines()
+print('this is stdout', rc.stdout)
+db_list = rc.stdout.splitlines()
 print(db_list)
 if rita_db_name not in db_list:
     print('Failed to import Zeek logs to RITA')
