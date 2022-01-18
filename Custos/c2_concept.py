@@ -27,6 +27,16 @@ sp = subprocess.Popen(cmd, shell=True)
 rc = sp.wait()
 print(rc)
 
+#verify creation of RITA database
+cmd = 'rita list'
+sp = subprocess.Popen(cmd, shell=True)
+rc = sp.wait()
+db_list = rc.splitlines()
+print(db_list)
+if rita_db_name not in db_list:
+    print('Failed to import Zeek logs to RITA')
+    exit()
+
 #Execute RITA detection mothods and create dict object for each entry that meets score threshold
 
 confidence = 0.80  #Define confidence score threshold
