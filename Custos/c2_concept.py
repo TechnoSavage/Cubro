@@ -28,9 +28,12 @@ rc = sp.wait()
 
 #verify creation of RITA database
 cmd = 'rita list'
-sp = subprocess.Popen(cmd, capture_output=True)
+sp = subprocess.Popen(cmd,
+                      stdout = subprocess.PIPE,
+                      stderr = subprocess.STDOUT)
 rc = sp.wait()
-print(sp.stdout)
+output = sp.stdout.read()
+print(output.decode(encoding='utf-8'))
 
 #print(db_list)
 #if rita_db_name not in db_list:
