@@ -29,7 +29,7 @@ print(rc)
 
 #verify creation of RITA database
 cmd = 'rita list'
-sp = subprocess.Popen(cmd, shell=True)
+sp = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 rc = sp.wait()
 sto = sp.stdout
 print('this is stdout', sto)
