@@ -28,9 +28,7 @@ rc = sp.wait()
 
 #verify creation of RITA database
 cmd = 'rita list'
-sp = subprocess.Popen(cmd,
-                      stdout=subprocess.PIPE,
-                      stdout=subprocess.STDOUT)
+sp = subprocess.Popen(cmd, capture_output=True)
 rc = sp.wait()
 print(sp.stdout)
 
