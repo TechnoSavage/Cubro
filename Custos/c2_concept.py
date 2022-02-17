@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
-"""A script to demonstrate concept of C2 detection in Custos"""
+"""A script to demonstrate concept of C2 detection in Custos. Script automates initial steps
+   of capture analysis with Zeek and RITA. Script assumes Custos will be the source of PCAP
+   files in the future."""
+
 import json
 import requests
 import subprocess
@@ -9,7 +12,7 @@ from requests import ConnectionError
 
 
 def get_nonce():
-    '''Retrieve seed 7 nonce from Custos.'''
+    '''Retrieve seed & nonce from Custos.'''
     uri = 'https://loaclhost/v1/auth/nonce/admin@custos.com?'
     headers = {'X-Requested-With': 'XMLHttpRequest',
                'Content-Type': 'application/json'}
@@ -57,16 +60,18 @@ def create_pcap(token, time, name):
         raise error
 
 if __name__ == '__main__':
-    #API to export PCAP for previous day
+    #API to export PCAP for previous day. Note: API calls to Custos
+    #suspended due to Custos PCAP export file limit of 500MB being 
+    #unsuitable to the use case concept. 
 
-    year = datetime.now().year
-    month = datetime.now().month
-    day = datetime.now().day
+    #year = datetime.now().year
+    #month = datetime.now().month
+    #day = datetime.now().day
 
     #Use Custos API to generate PCAP file
 
-    nonce = get_nonce()
-    token = get_token()
+    #nonce = get_nonce()
+    #token = get_token()
 
     #Verify file exists
 
@@ -108,7 +113,7 @@ if __name__ == '__main__':
         print('Failed to import Zeek logs to RITA')
         exit()
 
-    #Execute RITA detection mothods and create dict object for each entry that meets score threshold
+    #Execute RITA detection methods and create dict object for each entry that meets score threshold
 
     confidence = 0.80  #Define confidence score threshold
     detections = {}
@@ -155,6 +160,6 @@ if __name__ == '__main__':
             hits.append(beacon)
     detections['beacons_fqdn'] = hits
 
-    print(detections)
+    print(detections) #remove after functional code is finished, write to file instead
 
     #Add further info to detections e.g. Custos app detection, reverse DNS, cert info
