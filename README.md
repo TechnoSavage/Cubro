@@ -17,7 +17,7 @@ Requirements (Global)
 - Clone this repository
 
 ```
-git clone https://github.com/TechnoSavage/cubro.git
+git clone https://github.com/TechnoSavage/Cubro.git
 ```
 
 - Install dependancies
