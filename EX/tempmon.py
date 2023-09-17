@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 Python 3 script to monitor the environment status on a Cubro Packetmaster over time
 and write environment results to file. Use with firmware 2.2.5 or newer.
