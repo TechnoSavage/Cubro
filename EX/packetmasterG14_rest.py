@@ -1,12 +1,12 @@
 """ Packetmaster EX device class for REST API interaction,
     Use with firmware version 2.2.5 or newer and up to G4 NPB."""
 
-from getpass import getpass
+import input_validation
 import json
 import re
 import requests
 from requests.exceptions import ConnectionError
-import input_validation
+
 
 class PacketmasterEX(object):
     """Object class representing a Cubro Packetmaster EX Network Packet Broker.
@@ -45,7 +45,7 @@ class PacketmasterEX(object):
             try:
                 self.__https = True
                 port_test = self.get_portcount()
-                if not isinstance(port_test, (int, long)):
+                if not isinstance(port_test, (int)):
                     print(port_test['error'])
                     return "Connection test failed"
                 self.get_gen()
@@ -159,11 +159,11 @@ class PacketmasterEX(object):
             gateway = input_validation.ipv4(gateway)
         else:
             return "That is not a valid Gateway Address; canceling Set IP Configuration. \n"
-        confirm = input("""Configuration change summary:
-                        New management IP: %s
-                        New Subnet Mask: %s
-                        New Gateway: %s
-                        Confirm changes [y/n]: """ % (address, netmask, gateway))
+        confirm = input(f"""Configuration change summary:
+                        New management IP: {address}
+                        New Subnet Mask: {netmask}
+                        New Gateway: {gateway}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.set_ipconfig(address, netmask, gateway)
             return run
@@ -247,9 +247,9 @@ class PacketmasterEX(object):
     def set_name_guided(self):
         """Interactive menu for setting Packetmaster name."""
         newname = input('Enter device name: ')
-        confirm = input("""Configuration change summary:
-                        New Device Name: %s
-                        Confirm changes [y/n]: """ % newname)
+        confirm = input(f"""Configuration change summary:
+                        New Device Name: {newname}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.set_name(newname)
             return run
@@ -299,10 +299,10 @@ class PacketmasterEX(object):
         """Interactive menu for setting Packetmaster name and notes."""
         newname = input('Enter device name: ')
         newnotes = input('Enter device notes: ')
-        confirm = input("""Configuration change summary:
-                        New Device Name: %s
-                        New Device Notes: %s
-                        Confirm changes [y/n]: """ % (newname, newnotes))
+        confirm = input(f"""Configuration change summary:
+                        New Device Name: {newname}
+                        New Device Notes: {newnotes}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.set_label(newname, newnotes)
             return run
@@ -439,19 +439,16 @@ class PacketmasterEX(object):
                 recalc = True
             else:
                 recalc = False
-            confirm = input("""Configuration change summary:
-                            Interface: %s
-                            New Speed: %s
-                            New Duplex: %s
-                            New Description: %s
-                            Force TX (unidirectional): %s
-                            CRC Check: %s
-                            CRC Recalculation: %s
-                            Split Interface: %s
-                            Confirm changes [y/n]: """ % (interface, speed,
-                                                          duplex, description,
-                                                          forcetx, check,
-                                                          recalc, split))
+            confirm = input(f"""Configuration change summary:
+                            Interface: {interface}
+                            New Speed: {speed}
+                            New Duplex: {duplex}
+                            New Description: {description}
+                            Force TX (unidirectional): {forcetx}
+                            CRC Check: {check}
+                            CRC Recalculation: {recalc}
+                            Split Interface: {split}
+                            Confirm changes [y/n]: """)
             if confirm.lower() in ('y', 'yes'):
                 run = self.set_portconfig(interface, speed, duplex,
                                            description, forcetx, check,
@@ -476,31 +473,27 @@ class PacketmasterEX(object):
                 recalc = True
             else:
                 recalc = False
-            confirm = input("""Configuration change summary:
-                            Interface: %s
-                            New Speed: %s
-                            New Duplex: %s
-                            New Description: %s
-                            Force TX (unidirectional): %s
-                            CRC Check: %s
-                            CRC Recalculation: %s
-                            Confirm changes [y/n]: """ % (interface, speed,
-                                                          duplex, description,
-                                                          forcetx, check,
-                                                          recalc))
+            confirm = input(f"""Configuration change summary:
+                            Interface: {interface}
+                            New Speed: {speed}
+                            New Duplex: {duplex}
+                            New Description: {description}
+                            Force TX (unidirectional): {forcetx}
+                            CRC Check: {check}
+                            CRC Recalculation: {recalc}
+                            Confirm changes [y/n]: """)
             if confirm.lower() in ('y', 'yes'):
                 run = self.set_portconfig(interface, speed, duplex,
                                           description, forcetx, check, recalc)
             else:
                 return "Canceling; no changes made.\n"
         else:
-            confirm = input("""Configuration change summary:
-                            Interface: %s
-                            New Speed: %s
-                            New Duplex: %s
-                            New Description: %s
-                            Confirm changes [y/n]: """ % (interface, speed,
-                                                          duplex, description))
+            confirm = input(f"""Configuration change summary:
+                            Interface: {interface}
+                            New Speed: {speed}
+                            New Duplex: {duplex}
+                            New Description: {description}
+                            Confirm changes [y/n]: """)
             if confirm.lower() in ('y', 'yes'):
                 run = self.set_portconfig(interface, speed, duplex, description)
             else:
@@ -536,7 +529,7 @@ class PacketmasterEX(object):
             return "That is not a valid port number; canceling Set Port Config."
         if '/' not in port_no[0] and int(port_no[0]) > self.ports:
             return ("Port number does not exist on this device; "
-                    "this device has %s ports. Canceling Set Port Config.\n" % self.ports)
+                    f"this device has {self.ports} ports. Canceling Set Port Config.\n")
         if self.generation == '4':
             if speed.lower() == 'auto':
                 speed = 'auto'
@@ -615,10 +608,10 @@ class PacketmasterEX(object):
             shutdown = True
         else:
             shutdown = False
-        confirm = input("""Configuration change summary:
-                        Interface: %s
-                        Shutdown: %s
-                        Confirm changes [y/n]: """ % (if_name, shutdown))
+        confirm = input(f"""Configuration change summary:
+                        Interface: {if_name}
+                        Shutdown: {shutdown}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.set_portenable(if_name, shutdown)
             return run
@@ -924,9 +917,9 @@ class PacketmasterEX(object):
                            'order matters - improper syntax will cause Add Rule to fail: ')
         data['actions'] = ruleaction
         check_data = json.dumps(data, indent=4)
-        confirm = input("""Configuration change summary:
-                        Rule Parameters: %s
-                        Confirm changes [y/n]: """ % check_data)
+        confirm = input(f"""Configuration change summary:
+                        Rule Parameters: {check_data}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.set_rule(data)
             return run
@@ -1122,9 +1115,9 @@ class PacketmasterEX(object):
                            'order matters - improper syntax will cause Modify Rule to fail: ')
         data['actions'] = ruleaction
         check_data = json.dumps(data, indent=4)
-        confirm = input("""Configuration change summary:
-                        Modified Rule Parameters: %s
-                        Confirm changes [y/n]: """ % check_data)
+        confirm = input(f"""Configuration change summary:
+                        Modified Rule Parameters: {check_data}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.mod_rule(data)
             return run
@@ -1300,9 +1293,9 @@ class PacketmasterEX(object):
         if extra != '':
             data['match[extra]'] = extra
         check_data = json.dumps(data, indent=4)
-        confirm = input("""Configuration change summary:
-                        Delete Rule Matching: %s
-                        Confirm changes [y/n]: """ % check_data)
+        confirm = input(f"""Configuration change summary:
+                        Delete Rule Matching: {check_data}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.del_rule(data)
             return run
@@ -1412,8 +1405,8 @@ class PacketmasterEX(object):
         except ValueError as reason:
             return ("That is not a valid bucket number; canceling Add Group.", reason)
         if buckets >= 2 and buckets <= 16:
-            for bucket in xrange(buckets):
-                print("\nConfigure settings for bucket %s" % bucket)
+            for bucket in range(buckets):
+                print(f"\nConfigure settings for bucket {bucket}")
                 #Add check against number of ports on device
                 output = input("Output on which port: ")
                 #Validate if port exists on device
@@ -1543,9 +1536,9 @@ class PacketmasterEX(object):
                   'description': description
                  }
         check_data = json.dumps(data, indent=4)
-        confirm = input("""Configuration change summary:
-                        Add Group Parameters: %s
-                        Confirm changes [y/n]: """ % check_data)
+        confirm = input(f"""Configuration change summary:
+                        Add Group Parameters: {check_data}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.add_group(gid, data)
             return run
@@ -1616,8 +1609,8 @@ class PacketmasterEX(object):
         except ValueError as reason:
             return ("That is not a valid bucket number; canceling Modify Group.", reason)
         if buckets >= 2 and buckets <= 16:
-            for bucket in xrange(buckets):
-                print("\nConfigure settings for bucket %s" % bucket)
+            for bucket in range(buckets):
+                print(f"\nConfigure settings for bucket {bucket}")
                 #Add check against number of ports on device
                 output = input("Output on which port: ")
                 try:
@@ -1745,9 +1738,9 @@ class PacketmasterEX(object):
                   'type': group_type,
                   'description': description}
         check_data = json.dumps(data, indent=4)
-        confirm = input("""Configuration change summary:
-                        Modified Group Parameters: %s
-                        Confirm changes [y/n]: """ % check_data)
+        confirm = input(f"""Configuration change summary:
+                        Modified Group Parameters: {check_data}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.mod_group(gid, data)
             return run
@@ -1797,9 +1790,9 @@ class PacketmasterEX(object):
             int(gid)
         except ValueError as reason:
             return ("That is not a valid group ID, canceling Delete Group.", reason)
-        confirm = input("""Configuration Change Summary:
-                        Delete Group ID: %s
-                        Confirm changes [y/n]: """ % gid)
+        confirm = input(f"""Configuration Change Summary:
+                        Delete Group ID: {gid}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.delete_group(gid)
             return run
@@ -2216,11 +2209,11 @@ class PacketmasterEX(object):
         port = input("What is the TCP Port of the controller: ")
         if not input_validation.port(port):
             return "That is not a valid TCP port number; canceling Set Controller. \n"
-        confirm = input("""Configuration change summary:
-                        Controller connection type: %s
-                        Controller IP Address: %s
-                        Controller port: %s
-                        Confirm changes [y/n]: """ % (conn, ipadd, port))
+        confirm = input(f"""Configuration change summary:
+                        Controller connection type: {conn}
+                        Controller IP Address: {ipadd}
+                        Controller port: {port}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.set_controller(conn, ipadd, port)
             return run
@@ -2276,11 +2269,11 @@ class PacketmasterEX(object):
         port = input("What is the TCP Port of the controller: ")
         if not input_validation.port(port):
             return "That is not a valid TCP port number; canceling Delete Controller. \n"
-        confirm = input("""Configuration change summary:
-                        Controller connection type: %s
-                        Controller IP Address: %s
-                        Controller port: %s
-                        Confirm changes [y/n]: """ % (conn, ipadd, port))
+        confirm = input(f"""Configuration change summary:
+                        Controller connection type: {conn}
+                        Controller IP Address: {ipadd}
+                        Controller port: {port}
+                        Confirm changes [y/n]: """)
         if confirm.lower() in ('y', 'yes'):
             run = self.del_controller(conn, ipadd, port)
             return run
