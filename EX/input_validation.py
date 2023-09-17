@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 """ A collection of functions to perform input validation on various arguments
 passed to the Packetmaster ReST API. """
