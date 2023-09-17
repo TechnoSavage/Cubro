@@ -5,18 +5,19 @@
 #!/usr/bin/python
 
 #Import necessary Python libraries
+from __future__ import print_function #Requires Python 2.6 or later
 import json, time, sys, re
 from getpass import getpass
 from packetmaster_ex_rest import PacketmasterEX
 
 def usage():
-    print """Usage:
+    print("""Usage:
              -r, --read FILE   Use a list of IP addresses from a text file to provision Packetmasters.
              -l, --list 192.168.1.2 [192.168.1.3][...]   Enter IP addresses separated by spaces to
                                                          provision Packetmasters.
 
              This script will apply a preset baseline configuration to each Packetmaster IP address provided.
-             This script assumes that the Packetmasters do not have UAC enabled."""
+             This script assumes that the Packetmasters do not have UAC enabled.""")
 
              #  -sr, --saveread <savepoint name> <file name> Specify a save point file to upload
              #                   and a list of IP addresses from a text file to provision Packetmasters.
@@ -63,11 +64,11 @@ if __name__ == '__main__':
                 for item in ip:
                     ip_list.append(item)
         run = apply_config(ip_list)
-        print run
+        print(run)
     elif len(sys.argv) > 1 and str(sys.argv[1]) == '-l' or len(sys.argv) > 1 and str(sys.argv[1]) == '--list':
         ip_list = sys.argv[2:]
         run = apply_config(ip_list)
-        print run
+        print(run)
     # elif len(sys.argv) == 4 and str(sys.argv[1]) == '-sr' or len(sys.argv) == 4 and str(sys.argv[1]) == '--saveread':
     #     savename = sys.argv[2]
     #     filename = sys.argv[3]
