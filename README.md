@@ -6,7 +6,6 @@ Various scripts for interacting with and demonstrating Cubro device APIs and fea
 Requirements (Global)
 
 - Python 3.8+
-- pipenv - https://pypi.org/project/pipenv/
 
 ## Cubro API Docs
 
